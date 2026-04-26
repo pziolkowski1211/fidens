@@ -1,4 +1,4 @@
-﻿import Image from "next/image";
+import Image from "next/image";
 import Link from "next/link";
 import SearchAutocomplete from "./components/SearchAutocomplete";
 
@@ -9,14 +9,16 @@ export default function Home() {
       {/* NAWIGACJA */}
       <nav style={{backgroundColor: "#1B2A4A"}} className="px-6 py-4 relative flex items-center">
         {/* Logo - lewa strona */}
-        <div className="flex items-center" style={{ width: "180px" }}>
-          <Image src="/jasne.png" alt="Fidens" width={300} height={200} style={{ height: "55px", width: "auto" }} priority />
-        </div>
-
+        
         {/* Wyszukiwarka - matematycznie wycentrowana na srodku ekranu */}
         <Link href="/" className="flex items-center" style={{ width: "180px" }}>
   <Image src="/jasne.png" alt="Fidens" width={300} height={200} style={{ height: "55px", width: "auto" }} priority />
 </Link>
+
+        {/* Wyszukiwarka - matematycznie wycentrowana na srodku ekranu */}
+        <div className="absolute left-1/2 -translate-x-1/2">
+          <SearchAutocomplete variant="desktop" />
+        </div>
 
         {/* Menu - prawa strona */}
         <div className="ml-auto flex items-center gap-8">
@@ -162,3 +164,4 @@ export default function Home() {
     </main>
   );
 }
+
