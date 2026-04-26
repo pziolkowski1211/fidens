@@ -1,32 +1,29 @@
-# FIDENS.PL — Portal brokerski
+## Szczegóły techniczne
 
-## O projekcie
-Portal brokerski do sprzedaży pojazdów i maszyn budowlanych z finansowaniem.
-Właściciel jest brokerem finansowym — zarabia na prowizji od leasingu/kredytu.
-Klienci przychodzą z social mediów.
+### Pliki w app/
+- page.tsx (strona główna)
+- layout.tsx
+- globals.css
+- Brak podstron i komponentów na razie
 
-## Technologia
-- Next.js + Tailwind CSS
-- GitHub: https://github.com/pziolkowski1211/fidens
-- Hosting: Vercel (fidens.pl)
-- Baza danych: Supabase (do podpięcia)
+### Responsywność
+Strona musi działać na desktop I mobile (klienci przychodzą z social mediów = głównie telefon)
+Hamburger menu na mobile do zrobienia
 
-## Kolory
-- Granat: #1B2A4A
-- Złoto: #F0A500
-- Biel: #ffffff
+### Zdjęcia ogłoszeń
+Uploadowane przez panel admina do Supabase Storage
+Możliwość wgrania ręcznie LUB import z OtoMoto (osobno)
 
-## Co jest gotowe
-- Strona główna: nawigacja, hero, ogłoszenie tygodnia, najnowsze oferty, jak to działa, opinie, stopka
-- Nawigacja: Logo + "Jak działa leasing" + "O nas" + "Kontakt" + przycisk "Zamów bezpłatną kalkulację"
-- Hero: "Finansowanie pojazdów i maszyn budowlanych"
+### Panel admina
+Zabezpieczony logowaniem — tylko właściciel
+Logowanie przez Supabase Auth
 
-## Co do zrobienia
-1. Wyszukiwarka autocomplete w nawigacji
-2. Podpiąć Supabase jako bazę danych
-3. Panel admina do dodawania ogłoszeń
-4. Podstrony: Osobowe, Ciężarowe, Maszyny, Leasing, O nas, Kontakt
-5. Pojedyncze ogłoszenie z kalkulatorem leasingowym
-6. Formularz kontaktowy z mailem
-7. Import ogłoszeń z OtoMoto
-8. SEO
+### Formularz kontaktowy
+Przez Resend (darmowy do 3000 maili/msc)
+Mail zawiera: dane pojazdu + parametry leasingu które ustawił klient
+
+### Import z OtoMoto
+Brak oficjalnego API — podajesz link do ogłoszenia
+Automatyczne pobieranie danych (scraping)
+Zdjęcia wgrywane osobno ręcznie (inne niż na OtoMoto!)
+Synchronizacja — ogłoszenie znika z OtoMoto = znika z Fidens
