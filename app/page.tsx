@@ -4,51 +4,28 @@ export default function Home() {
       
       {/* NAWIGACJA */}
       <nav style={{backgroundColor: '#1B2A4A'}} className="px-6 py-4 flex items-center justify-between">
-        <div style={{color: '#F0A500', fontSize: '24px', fontWeight: '700', letterSpacing: '2px'}}>
-          FIDENS
-        </div>
-        <div className="flex gap-8">
-          <a href="/osobowe" style={{color: 'rgba(255,255,255,0.8)', fontSize: '14px'}}>Osobowe</a>
-          <a href="/ciezarowe" style={{color: 'rgba(255,255,255,0.8)', fontSize: '14px'}}>Ciężarowe</a>
-          <a href="/maszyny" style={{color: 'rgba(255,255,255,0.8)', fontSize: '14px'}}>Maszyny</a>
-          <a href="/leasing" style={{color: 'rgba(255,255,255,0.8)', fontSize: '14px'}}>Jak działa leasing</a>
-          <a href="/o-nas" style={{color: 'rgba(255,255,255,0.8)', fontSize: '14px'}}>O mnie</a>
-        </div>
-        <a href="/kontakt" style={{backgroundColor: '#F0A500', color: '#1B2A4A', padding: '8px 20px', borderRadius: '6px', fontWeight: '600', fontSize: '14px'}}>
-          Kontakt
-        </a>
-      </nav>
+  <div style={{color: '#F0A500', fontSize: '24px', fontWeight: '700', letterSpacing: '2px'}}>
+    FIDENS
+  </div>
+  <div className="flex gap-8">
+    <a href="/leasing" style={{color: 'rgba(255,255,255,0.8)', fontSize: '14px'}}>Jak działa leasing</a>
+    <a href="/o-nas" style={{color: 'rgba(255,255,255,0.8)', fontSize: '14px'}}>O nas</a>
+    <a href="/kontakt" style={{color: 'rgba(255,255,255,0.8)', fontSize: '14px'}}>Kontakt</a>
+  </div>
+  <a href="/kontakt" style={{backgroundColor: '#F0A500', color: '#1B2A4A', padding: '8px 20px', borderRadius: '6px', fontWeight: '600', fontSize: '14px'}}>
+    Zamów bezpłatną kalkulację
+  </a>
+</nav>
 
-      {/* HERO */}
-      <section style={{backgroundColor: '#1B2A4A'}} className="px-6 py-20 text-center">
-        <h1 style={{color: '#ffffff', fontSize: '48px', fontWeight: '700', lineHeight: '1.2', marginBottom: '16px'}}>
-          Znajdź pojazd.<br/>My zajmiemy się resztą.
-        </h1>
-        <p style={{color: 'rgba(255,255,255,0.6)', fontSize: '18px', marginBottom: '40px'}}>
-          Leasing i kredyt w 60 minut. Rejestracja i ubezpieczenie w cenie.
-        </p>
-        <div style={{backgroundColor: '#ffffff', borderRadius: '12px', padding: '16px', maxWidth: '600px', margin: '0 auto', display: 'flex', gap: '12px'}}>
-          <select style={{flex: 1, padding: '10px', borderRadius: '6px', border: '1px solid #e0e0e0', fontSize: '14px'}}>
-            <option>Kategoria</option>
-            <option>Osobowe</option>
-            <option>Ciężarowe</option>
-            <option>Maszyny</option>
-          </select>
-          <select style={{flex: 1, padding: '10px', borderRadius: '6px', border: '1px solid #e0e0e0', fontSize: '14px'}}>
-            <option>Marka</option>
-          </select>
-          <select style={{flex: 1, padding: '10px', borderRadius: '6px', border: '1px solid #e0e0e0', fontSize: '14px'}}>
-            <option>Rata do...</option>
-            <option>1000 zł/msc</option>
-            <option>2000 zł/msc</option>
-            <option>3000 zł/msc</option>
-            <option>5000 zł/msc</option>
-          </select>
-          <button style={{backgroundColor: '#F0A500', color: '#1B2A4A', padding: '10px 24px', borderRadius: '6px', fontWeight: '700', fontSize: '14px', border: 'none', cursor: 'pointer'}}>
-            Szukaj
-          </button>
-        </div>
-      </section>
+{/* HERO */}
+<section style={{backgroundColor: '#1B2A4A'}} className="px-6 py-20 text-center">
+  <h1 style={{color: '#ffffff', fontSize: '48px', fontWeight: '700', lineHeight: '1.2', marginBottom: '16px'}}>
+    Finansowanie pojazdów<br/>i maszyn budowlanych
+  </h1>
+  <p style={{color: 'rgba(255,255,255,0.6)', fontSize: '18px', marginBottom: '16px'}}>
+    Leasing, kredyt, wynajem — szybka decyzja kredytowa.<br/>Ty wybierasz pojazd, my zajmujemy się resztą.
+  </p>
+</section>
 
       {/* OGŁOSZENIE TYGODNIA */}
       <section className="px-6 py-12" style={{backgroundColor: '#ffffff'}}>
