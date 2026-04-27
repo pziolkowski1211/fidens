@@ -1,64 +1,55 @@
-import Image from "next/image";
-import Link from "next/link";
-import SearchAutocomplete from "./components/SearchAutocomplete";
+﻿import Navbar from "./components/Navbar";
 
 export default function Home() {
   return (
-    <main className="min-h-screen" style={{backgroundColor: "#f8f9fb"}}>
+    <main className="min-h-screen" style={{ backgroundColor: "#f8f9fb" }}>
 
-      {/* NAWIGACJA */}
-      <nav style={{backgroundColor: "#1B2A4A"}} className="px-6 py-4 relative flex items-center">
-        {/* Logo - lewa strona */}
-        
-        {/* Wyszukiwarka - matematycznie wycentrowana na srodku ekranu */}
-        <Link href="/" className="flex items-center" style={{ width: "180px" }}>
-  <Image src="/jasne.png" alt="Fidens" width={300} height={200} style={{ height: "55px", width: "auto" }} priority />
-</Link>
-
-        {/* Wyszukiwarka - matematycznie wycentrowana na srodku ekranu */}
-        <div className="absolute left-1/2 -translate-x-1/2">
-          <SearchAutocomplete variant="desktop" />
-        </div>
-
-        {/* Menu - prawa strona */}
-        <div className="ml-auto flex items-center gap-8">
-          <a href="/leasing" style={{color: "rgba(255,255,255,0.8)", fontSize: "14px"}}>Jak dziala leasing</a>
-          <a href="/o-nas" style={{color: "rgba(255,255,255,0.8)", fontSize: "14px"}}>O nas</a>
-          <a href="/kontakt" style={{color: "rgba(255,255,255,0.8)", fontSize: "14px"}}>Kontakt</a>
-          <a href="/kontakt" style={{backgroundColor: "#F0A500", color: "#1B2A4A", padding: "8px 20px", borderRadius: "6px", fontWeight: "600", fontSize: "14px"}}>
-            Zamow bezplatna kalkulacje
-          </a>
-        </div>
-      </nav>
+      <Navbar />
 
       {/* HERO */}
-      <section style={{backgroundColor: "#1B2A4A"}} className="px-6 py-20 text-center">
-        <h1 style={{color: "#ffffff", fontSize: "48px", fontWeight: "700", lineHeight: "1.2", marginBottom: "16px"}}>
-          Finansowanie pojazdow<br/>i maszyn budowlanych
+      <section style={{ backgroundColor: "#1B2A4A" }} className="px-4 sm:px-6 py-12 sm:py-16 lg:py-20 text-center">
+        <h1 className="text-white text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight mb-4">
+          Finansowanie pojazdow<br className="hidden sm:inline" />
+          <span className="sm:hidden"> </span>i maszyn budowlanych
         </h1>
-        <p style={{color: "rgba(255,255,255,0.6)", fontSize: "18px", marginBottom: "16px"}}>
-          Leasing, kredyt, wynajem &mdash; szybka decyzja kredytowa.<br/>Ty wybierasz pojazd, my zajmujemy sie reszta.
+        <p className="text-white/60 text-base sm:text-lg mb-4 px-4">
+          Leasing, kredyt, wynajem &mdash; szybka decyzja kredytowa.<br className="hidden sm:inline" />
+          <span className="sm:hidden"> </span>Ty wybierasz pojazd, my zajmujemy sie reszta.
         </p>
       </section>
 
       {/* OGLOSZENIE TYGODNIA */}
-      <section className="px-6 py-12" style={{backgroundColor: "#ffffff"}}>
-        <div style={{maxWidth: "1100px", margin: "0 auto"}}>
-          <div style={{display: "flex", alignItems: "center", gap: "12px", marginBottom: "20px"}}>
-            <h2 style={{fontSize: "24px", fontWeight: "700", color: "#1B2A4A"}}>Ogloszenie tygodnia</h2>
-            <span style={{backgroundColor: "#F0A500", color: "#1B2A4A", fontSize: "11px", fontWeight: "700", padding: "3px 10px", borderRadius: "20px"}}>Wyroznione</span>
+      <section className="px-4 sm:px-6 py-10 sm:py-12" style={{ backgroundColor: "#ffffff" }}>
+        <div className="max-w-[1100px] mx-auto">
+          <div className="flex items-center gap-3 mb-5 flex-wrap">
+            <h2 className="text-xl sm:text-2xl font-bold" style={{ color: "#1B2A4A" }}>Ogloszenie tygodnia</h2>
+            <span className="text-[11px] font-bold py-[3px] px-[10px] rounded-full" style={{ backgroundColor: "#F0A500", color: "#1B2A4A" }}>
+              Wyroznione
+            </span>
           </div>
-          <div style={{backgroundColor: "#f8f9fb", borderRadius: "12px", border: "1px solid #e8eaed", display: "flex", overflow: "hidden"}}>
-            <div style={{width: "400px", backgroundColor: "#e8eaed", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center"}}>
-              <span style={{color: "#aaa", fontSize: "13px"}}>Zdjecie pojazdu</span>
+
+          <div className="rounded-xl overflow-hidden flex flex-col lg:flex-row" style={{ backgroundColor: "#f8f9fb", border: "1px solid #e8eaed" }}>
+            {/* Zdjecie */}
+            <div className="w-full lg:w-[400px] h-48 sm:h-64 lg:h-auto flex-shrink-0 flex items-center justify-center" style={{ backgroundColor: "#e8eaed" }}>
+              <span className="text-sm" style={{ color: "#aaa" }}>Zdjecie pojazdu</span>
             </div>
-            <div style={{padding: "32px"}}>
-              <div style={{fontSize: "11px", backgroundColor: "#F0A500", color: "#1B2A4A", padding: "3px 10px", borderRadius: "3px", display: "inline-block", marginBottom: "12px", fontWeight: "700"}}>Ogloszenie tygodnia</div>
-              <h3 style={{fontSize: "28px", fontWeight: "700", color: "#1B2A4A", marginBottom: "8px"}}>BMW 5 Series 530d xDrive</h3>
-              <p style={{fontSize: "14px", color: "#888", marginBottom: "20px"}}>2022 &middot; 68 000 km &middot; Diesel &middot; Automat &middot; Salon Polska</p>
-              <div style={{fontSize: "36px", fontWeight: "700", color: "#1B2A4A", marginBottom: "4px"}}>1 890 zl <span style={{fontSize: "16px", color: "#888", fontWeight: "400"}}>/miesiac</span></div>
-              <p style={{fontSize: "12px", color: "#bbb", marginBottom: "24px"}}>Cena pojazdu dostepna po kontakcie</p>
-              <button style={{backgroundColor: "#F0A500", color: "#1B2A4A", padding: "14px 32px", borderRadius: "8px", fontSize: "15px", fontWeight: "700", border: "none", cursor: "pointer"}}>
+
+            {/* Tresc */}
+            <div className="p-6 sm:p-8 flex flex-col">
+              <div className="text-[11px] font-bold py-[3px] px-[10px] rounded-[3px] inline-block mb-3 self-start" style={{ backgroundColor: "#F0A500", color: "#1B2A4A" }}>
+                Ogloszenie tygodnia
+              </div>
+              <h3 className="text-xl sm:text-2xl lg:text-[28px] font-bold mb-2" style={{ color: "#1B2A4A" }}>
+                BMW 5 Series 530d xDrive
+              </h3>
+              <p className="text-sm mb-5" style={{ color: "#888" }}>
+                2022 &middot; 68 000 km &middot; Diesel &middot; Automat &middot; Salon Polska
+              </p>
+              <div className="text-[28px] sm:text-3xl lg:text-[36px] font-bold mb-1" style={{ color: "#1B2A4A" }}>
+                1 890 zl <span className="text-base font-normal" style={{ color: "#888" }}>/miesiac</span>
+              </div>
+              <p className="text-xs mb-5" style={{ color: "#bbb" }}>Cena pojazdu dostepna po kontakcie</p>
+              <button className="font-bold rounded-lg py-3.5 px-6 sm:px-8 text-sm sm:text-[15px] border-none cursor-pointer self-start hover:opacity-90 transition-opacity" style={{ backgroundColor: "#F0A500", color: "#1B2A4A" }}>
                 Sprawdz oferte &rarr;
               </button>
             </div>
@@ -67,28 +58,39 @@ export default function Home() {
       </section>
 
       {/* NAJNOWSZE OFERTY */}
-      <section className="px-6 py-12">
-        <div style={{maxWidth: "1100px", margin: "0 auto"}}>
-          <div style={{display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px"}}>
-            <h2 style={{fontSize: "24px", fontWeight: "700", color: "#1B2A4A"}}>Najnowsze oferty</h2>
-            <a href="/ogloszenia" style={{color: "#F0A500", fontSize: "14px", fontWeight: "600"}}>Zobacz wszystkie &rarr;</a>
+      <section className="px-4 sm:px-6 py-10 sm:py-12">
+        <div className="max-w-[1100px] mx-auto">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl sm:text-2xl font-bold" style={{ color: "#1B2A4A" }}>Najnowsze oferty</h2>
+            <a href="/ogloszenia" className="text-sm font-semibold" style={{ color: "#F0A500" }}>
+              Zobacz wszystkie &rarr;
+            </a>
           </div>
-          <div style={{display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "20px"}}>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {[
-              {nazwa: "Audi A6 40 TDI", rok: "2021", przebieg: "95 000 km", rata: "1 490", badge: "Nowe"},
-              {nazwa: "Volvo FH 500", rok: "2020", przebieg: "410 000 km", rata: "3 200", badge: "Nowe"},
-              {nazwa: "Caterpillar 320", rok: "2019", przebieg: "Koparka", rata: "4 100", badge: "Promocja"},
+              { nazwa: "Audi A6 40 TDI", rok: "2021", przebieg: "95 000 km", rata: "1 490", badge: "Nowe" },
+              { nazwa: "Volvo FH 500", rok: "2020", przebieg: "410 000 km", rata: "3 200", badge: "Nowe" },
+              { nazwa: "Caterpillar 320", rok: "2019", przebieg: "Koparka", rata: "4 100", badge: "Promocja" },
             ].map((auto) => (
-              <div key={auto.nazwa} style={{backgroundColor: "#ffffff", borderRadius: "12px", border: "1px solid #e8eaed", overflow: "hidden", cursor: "pointer"}}>
-                <div style={{height: "180px", backgroundColor: "#e8eaed", display: "flex", alignItems: "center", justifyContent: "center"}}>
-                  <span style={{color: "#aaa", fontSize: "13px"}}>Zdjecie pojazdu</span>
+              <div key={auto.nazwa} className="rounded-xl overflow-hidden cursor-pointer hover:shadow-lg transition-shadow" style={{ backgroundColor: "#ffffff", border: "1px solid #e8eaed" }}>
+                <div className="h-44 sm:h-48 flex items-center justify-center" style={{ backgroundColor: "#e8eaed" }}>
+                  <span className="text-sm" style={{ color: "#aaa" }}>Zdjecie pojazdu</span>
                 </div>
-                <div style={{padding: "16px"}}>
-                  <div style={{fontSize: "10px", backgroundColor: auto.badge === "Promocja" ? "#fff3e0" : "#e8f4e8", color: auto.badge === "Promocja" ? "#e65100" : "#2a7a2a", padding: "2px 8px", borderRadius: "3px", display: "inline-block", marginBottom: "8px"}}>{auto.badge}</div>
-                  <div style={{fontSize: "16px", fontWeight: "700", color: "#1B2A4A", marginBottom: "4px"}}>{auto.nazwa}</div>
-                  <div style={{fontSize: "13px", color: "#888", marginBottom: "12px"}}>{auto.rok} &middot; {auto.przebieg}</div>
-                  <div style={{fontSize: "22px", fontWeight: "700", color: "#1B2A4A"}}>{auto.rata} zl <span style={{fontSize: "13px", color: "#888", fontWeight: "400"}}>/msc</span></div>
-                  <button style={{marginTop: "12px", width: "100%", backgroundColor: "#1B2A4A", color: "#fff", padding: "10px", borderRadius: "6px", fontSize: "13px", fontWeight: "600", border: "none", cursor: "pointer"}}>
+                <div className="p-4">
+                  <div className="text-[10px] py-0.5 px-2 rounded-[3px] inline-block mb-2"
+                    style={{
+                      backgroundColor: auto.badge === "Promocja" ? "#fff3e0" : "#e8f4e8",
+                      color: auto.badge === "Promocja" ? "#e65100" : "#2a7a2a"
+                    }}>
+                    {auto.badge}
+                  </div>
+                  <div className="text-base font-bold mb-1" style={{ color: "#1B2A4A" }}>{auto.nazwa}</div>
+                  <div className="text-[13px] mb-3" style={{ color: "#888" }}>{auto.rok} &middot; {auto.przebieg}</div>
+                  <div className="text-[22px] font-bold" style={{ color: "#1B2A4A" }}>
+                    {auto.rata} zl <span className="text-[13px] font-normal" style={{ color: "#888" }}>/msc</span>
+                  </div>
+                  <button className="mt-3 w-full text-white py-2.5 rounded-md text-[13px] font-semibold border-none cursor-pointer hover:opacity-90 transition-opacity" style={{ backgroundColor: "#1B2A4A" }}>
                     Sprawdz oferte
                   </button>
                 </div>
@@ -99,28 +101,28 @@ export default function Home() {
       </section>
 
       {/* JAK TO DZIALA */}
-      <section style={{backgroundColor: "#1B2A4A"}} className="px-6 py-16">
-        <div style={{maxWidth: "1100px", margin: "0 auto", textAlign: "center"}}>
-          <h2 style={{color: "#ffffff", fontSize: "32px", fontWeight: "700", marginBottom: "48px"}}>Jak to dziala?</h2>
-          <div style={{display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: "16px", alignItems: "start"}}>
+      <section className="px-4 sm:px-6 py-12 sm:py-16" style={{ backgroundColor: "#1B2A4A" }}>
+        <div className="max-w-[1100px] mx-auto">
+          <h2 className="text-white text-2xl sm:text-3xl font-bold text-center mb-10 sm:mb-12">
+            Jak to dziala?
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6 sm:gap-4">
             {[
-              {nr: "1", tekst: "Zloz wniosek online"},
-              {nr: "2", tekst: "Decyzja w 60 minut"},
-              {nr: "3", tekst: "Podpisz umowe"},
-              {nr: "4", tekst: "Wplac oplate wstepna"},
-              {nr: "5", tekst: "Rejestrujemy i ubezpieczamy"},
-              {nr: "6", tekst: "Pojazd gotowy do drogi"},
-            ].map((krok, i) => (
-              <div key={krok.nr} style={{position: "relative"}}>
-                <div style={{width: "48px", height: "48px", borderRadius: "50%", backgroundColor: "#F0A500", color: "#1B2A4A", fontSize: "18px", fontWeight: "700", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px"}}>
+              { nr: "1", tekst: "Zloz wniosek online" },
+              { nr: "2", tekst: "Decyzja w 60 minut" },
+              { nr: "3", tekst: "Podpisz umowe" },
+              { nr: "4", tekst: "Wplac oplate wstepna" },
+              { nr: "5", tekst: "Rejestrujemy i ubezpieczamy" },
+              { nr: "6", tekst: "Pojazd gotowy do drogi" },
+            ].map((krok) => (
+              <div key={krok.nr} className="text-center">
+                <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 text-lg font-bold"
+                  style={{ backgroundColor: "#F0A500", color: "#1B2A4A" }}>
                   {krok.nr}
                 </div>
-                <div style={{color: "rgba(255,255,255,0.85)", fontSize: "13px", lineHeight: "1.4"}}>
+                <div className="text-[13px] leading-snug" style={{ color: "rgba(255,255,255,0.85)" }}>
                   {krok.tekst}
                 </div>
-                {i < 5 && (
-                  <div style={{position: "absolute", top: "20px", right: "-8px", color: "#F0A500", fontSize: "20px"}}>&rsaquo;</div>
-                )}
               </div>
             ))}
           </div>
@@ -128,19 +130,25 @@ export default function Home() {
       </section>
 
       {/* OPINIE */}
-      <section className="px-6 py-16" style={{backgroundColor: "#ffffff"}}>
-        <div style={{maxWidth: "1100px", margin: "0 auto"}}>
-          <h2 style={{fontSize: "32px", fontWeight: "700", color: "#1B2A4A", textAlign: "center", marginBottom: "48px"}}>Opinie klientow</h2>
-          <div style={{display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "24px"}}>
+      <section className="px-4 sm:px-6 py-12 sm:py-16" style={{ backgroundColor: "#ffffff" }}>
+        <div className="max-w-[1100px] mx-auto">
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-10 sm:mb-12" style={{ color: "#1B2A4A" }}>
+            Opinie klientow
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              {tekst: "Ekspresowa decyzja, zero stresu. Polecam kazdemu przedsiebiorcy.", imie: "Marek K.", miasto: "Warszawa"},
-              {tekst: "Wszystko zalatwione w jeden dzien. Auto stalo pod domem nastepnego dnia.", imie: "Tomasz W.", miasto: "Krakow"},
-              {tekst: "Profesjonalne podejscie, najlepsza oferta leasingu jaka znalazlem.", imie: "Anna P.", miasto: "Wroclaw"},
+              { tekst: "Ekspresowa decyzja, zero stresu. Polecam kazdemu przedsiebiorcy.", imie: "Marek K.", miasto: "Warszawa" },
+              { tekst: "Wszystko zalatwione w jeden dzien. Auto stalo pod domem nastepnego dnia.", imie: "Tomasz W.", miasto: "Krakow" },
+              { tekst: "Profesjonalne podejscie, najlepsza oferta leasingu jaka znalazlem.", imie: "Anna P.", miasto: "Wroclaw" },
             ].map((opinia) => (
-              <div key={opinia.imie} style={{backgroundColor: "#f8f9fb", borderRadius: "12px", padding: "24px", border: "1px solid #e8eaed"}}>
-                <div style={{color: "#F0A500", fontSize: "18px", marginBottom: "12px"}}>&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                <p style={{fontSize: "14px", color: "#555", lineHeight: "1.6", marginBottom: "16px", fontStyle: "italic"}}>&quot;{opinia.tekst}&quot;</p>
-                <div style={{fontSize: "13px", fontWeight: "600", color: "#1B2A4A"}}>{opinia.imie}, {opinia.miasto}</div>
+              <div key={opinia.imie} className="rounded-xl p-6" style={{ backgroundColor: "#f8f9fb", border: "1px solid #e8eaed" }}>
+                <div className="text-lg mb-3" style={{ color: "#F0A500" }}>&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                <p className="text-sm leading-relaxed mb-4 italic" style={{ color: "#555" }}>
+                  &quot;{opinia.tekst}&quot;
+                </p>
+                <div className="text-[13px] font-semibold" style={{ color: "#1B2A4A" }}>
+                  {opinia.imie}, {opinia.miasto}
+                </div>
               </div>
             ))}
           </div>
@@ -148,20 +156,21 @@ export default function Home() {
       </section>
 
       {/* STOPKA */}
-      <footer style={{backgroundColor: "#1B2A4A"}} className="px-6 py-10">
-        <div style={{maxWidth: "1100px", margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center"}}>
-          <Image src="/jasne.png" alt="Fidens" width={240} height={160} style={{ height: "44px", width: "auto" }} />
-          <div className="flex gap-8">
-            <a href="/o-nas" style={{color: "rgba(255,255,255,0.5)", fontSize: "13px"}}>O mnie</a>
-            <a href="/kontakt" style={{color: "rgba(255,255,255,0.5)", fontSize: "13px"}}>Kontakt</a>
-            <a href="/regulamin" style={{color: "rgba(255,255,255,0.5)", fontSize: "13px"}}>Regulamin</a>
-            <a href="/polityka" style={{color: "rgba(255,255,255,0.5)", fontSize: "13px"}}>Polityka prywatnosci</a>
+      <footer className="px-4 sm:px-6 py-8 sm:py-10" style={{ backgroundColor: "#1B2A4A" }}>
+        <div className="max-w-[1100px] mx-auto flex flex-col sm:flex-row justify-between items-center gap-6">
+          <div className="text-xl font-bold tracking-widest" style={{ color: "#F0A500" }}>FIDENS</div>
+          <div className="flex flex-wrap justify-center gap-4 sm:gap-8">
+            <a href="/o-nas" className="text-[13px]" style={{ color: "rgba(255,255,255,0.5)" }}>O mnie</a>
+            <a href="/kontakt" className="text-[13px]" style={{ color: "rgba(255,255,255,0.5)" }}>Kontakt</a>
+            <a href="/regulamin" className="text-[13px]" style={{ color: "rgba(255,255,255,0.5)" }}>Regulamin</a>
+            <a href="/polityka" className="text-[13px]" style={{ color: "rgba(255,255,255,0.5)" }}>Polityka prywatnosci</a>
           </div>
-          <div style={{color: "rgba(255,255,255,0.3)", fontSize: "12px"}}>(c) 2026 Fidens. Wszelkie prawa zastrzezone.</div>
+          <div className="text-xs text-center" style={{ color: "rgba(255,255,255,0.3)" }}>
+            (c) 2026 Fidens. Wszelkie prawa zastrzezone.
+          </div>
         </div>
       </footer>
 
     </main>
   );
 }
-

@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState, useRef, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
@@ -7,9 +7,10 @@ import { searchVehicles, type VehicleSuggestion } from "@/lib/vehicles/catalog"
 interface SearchAutocompleteProps {
   variant?: "desktop" | "mobile"
   onSelect?: () => void
+  autoFocus?: boolean
 }
 
-export default function SearchAutocomplete({ variant = "desktop", onSelect }: SearchAutocompleteProps) {
+export default function SearchAutocomplete({ variant = "desktop", onSelect, autoFocus = false }: SearchAutocompleteProps) {
   const router = useRouter()
   const [query, setQuery] = useState("")
   const [suggestions, setSuggestions] = useState<VehicleSuggestion[]>([])
@@ -17,6 +18,12 @@ export default function SearchAutocomplete({ variant = "desktop", onSelect }: Se
   const [highlightedIndex, setHighlightedIndex] = useState(-1)
   const containerRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (autoFocus) {
+      inputRef.current?.focus()
+    }
+  }, [autoFocus])
 
   useEffect(() => {
     if (query.trim().length === 0) {
