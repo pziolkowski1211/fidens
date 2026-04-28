@@ -7,20 +7,43 @@ interface PageProps {
   params: Promise<{ slug: string }>
 }
 
+interface Listing {
+  id: string
+  slug: string
+  title: string
+  brand: string | null
+  model: string | null
+  year: number | null
+  mileage_km: number | null
+  fuel: string | null
+  transmission: string | null
+  power_hp: number | null
+  engine_cc: number | null
+  color: string | null
+  country_origin: string | null
+  price_pln: number | null
+  leasing_rate_pln: number | null
+  badge: string | null
+  description: string | null
+  vat_type: string | null
+}
+
 export default async function OgloszenieDetailPage({ params }: PageProps) {
   const { slug } = await params
   const supabase = await createClient()
 
-  const { data: listing, error } = await supabase
+  const { data, error } = await supabase
     .from("listings")
     .select("*")
     .eq("slug", slug)
     .eq("status", "active")
     .single()
 
-  if (error || !listing) {
+  if (error || !data) {
     notFound()
   }
+
+  const listing = data as Listing
 
   const formatNumber = (n: number | null | undefined): string => {
     if (n === null || n === undefined) return ""

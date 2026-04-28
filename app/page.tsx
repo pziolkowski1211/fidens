@@ -2,10 +2,32 @@
 import Navbar from "./components/Navbar";
 import { createClient } from "@/lib/supabase/server";
 
+interface FeaturedListing {
+  id: string;
+  slug: string;
+  title: string;
+  year: number | null;
+  mileage_km: number | null;
+  fuel: string | null;
+  transmission: string | null;
+  leasing_rate_pln: number | null;
+  badge: string | null;
+}
+
+interface LatestListing {
+  id: string;
+  slug: string;
+  title: string;
+  year: number | null;
+  mileage_km: number | null;
+  vehicle_type: string | null;
+  leasing_rate_pln: number | null;
+  badge: string | null;
+}
+
 export default async function Home() {
   const supabase = await createClient();
 
-  // Ogloszenie tygodnia (is_featured = TRUE)
   const { data: featuredData } = await supabase
     .from("listings")
     .select("id, slug, title, year, mileage_km, fuel, transmission, leasing_rate_pln, badge")
@@ -15,9 +37,8 @@ export default async function Home() {
     .limit(1)
     .maybeSingle();
 
-  const featured = featuredData;
+  const featured = featuredData as FeaturedListing | null;
 
-  // Najnowsze 3 oferty (z wykluczeniem ogloszenia tygodnia)
   let latestQuery = supabase
     .from("listings")
     .select("id, slug, title, year, mileage_km, vehicle_type, leasing_rate_pln, badge")
@@ -30,7 +51,7 @@ export default async function Home() {
   }
 
   const { data: latestData } = await latestQuery;
-  const latest = latestData || [];
+  const latest: LatestListing[] = (latestData as LatestListing[] | null) || [];
 
   return (
     <main className="min-h-screen" style={{ backgroundColor: "#f8f9fb" }}>

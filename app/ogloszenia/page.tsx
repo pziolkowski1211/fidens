@@ -10,6 +10,19 @@ interface PageProps {
   }>
 }
 
+interface ListingCard {
+  id: string
+  slug: string
+  title: string
+  brand: string | null
+  model: string | null
+  year: number | null
+  mileage_km: number | null
+  leasing_rate_pln: number | null
+  badge: string | null
+  vehicle_type: string | null
+}
+
 export default async function OgloszeniaPage({ searchParams }: PageProps) {
   const params = await searchParams
   const marka = params.marka
@@ -18,7 +31,6 @@ export default async function OgloszeniaPage({ searchParams }: PageProps) {
 
   const supabase = await createClient()
 
-  // Buduj zapytanie z filtrami
   let query = supabase
     .from("listings")
     .select("id, slug, title, brand, model, year, mileage_km, leasing_rate_pln, badge, vehicle_type")
@@ -36,13 +48,13 @@ export default async function OgloszeniaPage({ searchParams }: PageProps) {
     query = query.textSearch("search_vector", q, { type: "websearch", config: "simple" })
   }
 
-  const { data: listings, error } = await query
+  const { data, error } = await query
 
   if (error) {
     console.error("Blad pobierania ogloszen:", error)
   }
 
-  const listingsArr = listings || []
+  const listingsArr: ListingCard[] = (data as ListingCard[] | null) || []
 
   let title = "Wszystkie ogłoszenia"
   let filterText = ""
