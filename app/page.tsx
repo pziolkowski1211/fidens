@@ -1,6 +1,37 @@
-﻿import Navbar from "./components/Navbar";
+﻿import Link from "next/link";
+import Navbar from "./components/Navbar";
+import { createClient } from "@/lib/supabase/server";
 
-export default function Home() {
+export default async function Home() {
+  const supabase = await createClient();
+
+  // Ogloszenie tygodnia (is_featured = TRUE)
+  const { data: featuredData } = await supabase
+    .from("listings")
+    .select("id, slug, title, year, mileage_km, fuel, transmission, leasing_rate_pln, badge")
+    .eq("status", "active")
+    .eq("is_featured", true)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const featured = featuredData;
+
+  // Najnowsze 3 oferty (z wykluczeniem ogloszenia tygodnia)
+  let latestQuery = supabase
+    .from("listings")
+    .select("id, slug, title, year, mileage_km, vehicle_type, leasing_rate_pln, badge")
+    .eq("status", "active")
+    .order("created_at", { ascending: false })
+    .limit(3);
+
+  if (featured) {
+    latestQuery = latestQuery.neq("id", featured.id);
+  }
+
+  const { data: latestData } = await latestQuery;
+  const latest = latestData || [];
+
   return (
     <main className="min-h-screen" style={{ backgroundColor: "#f8f9fb" }}>
 
@@ -19,86 +50,105 @@ export default function Home() {
       </section>
 
       {/* OGLOSZENIE TYGODNIA */}
-      <section className="px-4 sm:px-6 py-10 sm:py-12" style={{ backgroundColor: "#ffffff" }}>
-        <div className="max-w-[1100px] mx-auto">
-          <div className="flex items-center gap-3 mb-5 flex-wrap">
-            <h2 className="text-xl sm:text-2xl font-bold" style={{ color: "#1B2A4A" }}>Ogłoszenie tygodnia</h2>
-            <span className="text-[11px] font-bold py-[3px] px-[10px] rounded-full" style={{ backgroundColor: "#F0A500", color: "#1B2A4A" }}>
-              Wyróżnione
-            </span>
-          </div>
-
-          <div className="rounded-xl overflow-hidden flex flex-col lg:flex-row" style={{ backgroundColor: "#f8f9fb", border: "1px solid #e8eaed" }}>
-            {/* Zdjecie */}
-            <div className="w-full lg:w-[400px] h-48 sm:h-64 lg:h-auto flex-shrink-0 flex items-center justify-center" style={{ backgroundColor: "#e8eaed" }}>
-              <span className="text-sm" style={{ color: "#aaa" }}>Zdjęcie pojazdu</span>
+      {featured && (
+        <section className="px-4 sm:px-6 py-10 sm:py-12" style={{ backgroundColor: "#ffffff" }}>
+          <div className="max-w-[1100px] mx-auto">
+            <div className="flex items-center gap-3 mb-5 flex-wrap">
+              <h2 className="text-xl sm:text-2xl font-bold" style={{ color: "#1B2A4A" }}>Ogłoszenie tygodnia</h2>
+              <span className="text-[11px] font-bold py-[3px] px-[10px] rounded-full" style={{ backgroundColor: "#F0A500", color: "#1B2A4A" }}>
+                Wyróżnione
+              </span>
             </div>
 
-            {/* Tresc */}
-            <div className="p-6 sm:p-8 flex flex-col">
-              <div className="text-[11px] font-bold py-[3px] px-[10px] rounded-[3px] inline-block mb-3 self-start" style={{ backgroundColor: "#F0A500", color: "#1B2A4A" }}>
-                Ogłoszenie tygodnia
+            <Link
+              href={"/ogloszenia/" + featured.slug}
+              className="rounded-xl overflow-hidden flex flex-col lg:flex-row hover:shadow-lg transition-shadow block"
+              style={{ backgroundColor: "#f8f9fb", border: "1px solid #e8eaed" }}
+            >
+              <div className="w-full lg:w-[400px] h-48 sm:h-64 lg:h-auto flex-shrink-0 flex items-center justify-center" style={{ backgroundColor: "#e8eaed" }}>
+                <span className="text-sm" style={{ color: "#aaa" }}>Zdjęcie pojazdu</span>
               </div>
-              <h3 className="text-xl sm:text-2xl lg:text-[28px] font-bold mb-2" style={{ color: "#1B2A4A" }}>
-                BMW 5 Series 530d xDrive
-              </h3>
-              <p className="text-sm mb-5" style={{ color: "#888" }}>
-                2022 &middot; 68 000 km &middot; Diesel &middot; Automat &middot; Salon Polska
-              </p>
-              <div className="text-[28px] sm:text-3xl lg:text-[36px] font-bold mb-1" style={{ color: "#1B2A4A" }}>
-                1 890 zł <span className="text-base font-normal" style={{ color: "#888" }}>/miesiąc</span>
+
+              <div className="p-6 sm:p-8 flex flex-col">
+                <div className="text-[11px] font-bold py-[3px] px-[10px] rounded-[3px] inline-block mb-3 self-start" style={{ backgroundColor: "#F0A500", color: "#1B2A4A" }}>
+                  Ogłoszenie tygodnia
+                </div>
+                <h3 className="text-xl sm:text-2xl lg:text-[28px] font-bold mb-2" style={{ color: "#1B2A4A" }}>
+                  {featured.title}
+                </h3>
+                <p className="text-sm mb-5" style={{ color: "#888" }}>
+                  {[
+                    featured.year,
+                    featured.mileage_km ? formatNumber(featured.mileage_km) + " km" : null,
+                    featured.fuel ? capitalize(featured.fuel) : null,
+                    featured.transmission ? capitalize(featured.transmission) : null,
+                  ].filter(Boolean).join(" · ")}
+                </p>
+                {featured.leasing_rate_pln && (
+                  <div className="text-[28px] sm:text-3xl lg:text-[36px] font-bold mb-5" style={{ color: "#1B2A4A" }}>
+                    od {formatNumber(featured.leasing_rate_pln)} zł <span className="text-base font-normal" style={{ color: "#888" }}>/miesiąc</span>
+                  </div>
+                )}
+                <span className="font-bold rounded-lg py-3.5 px-6 sm:px-8 text-sm sm:text-[15px] self-start" style={{ backgroundColor: "#F0A500", color: "#1B2A4A" }}>
+                  Sprawdź ofertę &rarr;
+                </span>
               </div>
-              <p className="text-xs mb-5" style={{ color: "#bbb" }}>Cena pojazdu dostępna po kontakcie</p>
-              <button className="font-bold rounded-lg py-3.5 px-6 sm:px-8 text-sm sm:text-[15px] border-none cursor-pointer self-start hover:opacity-90 transition-opacity" style={{ backgroundColor: "#F0A500", color: "#1B2A4A" }}>
-                Sprawdź ofertę &rarr;
-              </button>
-            </div>
+            </Link>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* NAJNOWSZE OFERTY */}
-      <section className="px-4 sm:px-6 py-10 sm:py-12">
-        <div className="max-w-[1100px] mx-auto">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl sm:text-2xl font-bold" style={{ color: "#1B2A4A" }}>Najnowsze oferty</h2>
-            <a href="/ogloszenia" className="text-sm font-semibold" style={{ color: "#F0A500" }}>
-              Zobacz wszystkie &rarr;
-            </a>
-          </div>
+      {latest.length > 0 && (
+        <section className="px-4 sm:px-6 py-10 sm:py-12">
+          <div className="max-w-[1100px] mx-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl sm:text-2xl font-bold" style={{ color: "#1B2A4A" }}>Najnowsze oferty</h2>
+              <Link href="/ogloszenia" className="text-sm font-semibold" style={{ color: "#F0A500" }}>
+                Zobacz wszystkie &rarr;
+              </Link>
+            </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {[
-              { nazwa: "Audi A6 40 TDI", rok: "2021", przebieg: "95 000 km", rata: "1 490", badge: "Nowe" },
-              { nazwa: "Volvo FH 500", rok: "2020", przebieg: "410 000 km", rata: "3 200", badge: "Nowe" },
-              { nazwa: "Caterpillar 320", rok: "2019", przebieg: "Koparka", rata: "4 100", badge: "Promocja" },
-            ].map((auto) => (
-              <div key={auto.nazwa} className="rounded-xl overflow-hidden cursor-pointer hover:shadow-lg transition-shadow" style={{ backgroundColor: "#ffffff", border: "1px solid #e8eaed" }}>
-                <div className="h-44 sm:h-48 flex items-center justify-center" style={{ backgroundColor: "#e8eaed" }}>
-                  <span className="text-sm" style={{ color: "#aaa" }}>Zdjęcie pojazdu</span>
-                </div>
-                <div className="p-4">
-                  <div className="text-[10px] py-0.5 px-2 rounded-[3px] inline-block mb-2"
-                    style={{
-                      backgroundColor: auto.badge === "Promocja" ? "#fff3e0" : "#e8f4e8",
-                      color: auto.badge === "Promocja" ? "#e65100" : "#2a7a2a"
-                    }}>
-                    {auto.badge}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {latest.map((auto) => (
+                <Link
+                  key={auto.id}
+                  href={"/ogloszenia/" + auto.slug}
+                  className="rounded-xl overflow-hidden cursor-pointer hover:shadow-lg transition-shadow block"
+                  style={{ backgroundColor: "#ffffff", border: "1px solid #e8eaed" }}
+                >
+                  <div className="h-44 sm:h-48 flex items-center justify-center" style={{ backgroundColor: "#e8eaed" }}>
+                    <span className="text-sm" style={{ color: "#aaa" }}>Zdjęcie pojazdu</span>
                   </div>
-                  <div className="text-base font-bold mb-1" style={{ color: "#1B2A4A" }}>{auto.nazwa}</div>
-                  <div className="text-[13px] mb-3" style={{ color: "#888" }}>{auto.rok} &middot; {auto.przebieg}</div>
-                  <div className="text-[22px] font-bold" style={{ color: "#1B2A4A" }}>
-                    {auto.rata} zł <span className="text-[13px] font-normal" style={{ color: "#888" }}>/msc</span>
+                  <div className="p-4">
+                    {auto.badge && (
+                      <div className="text-[10px] py-0.5 px-2 rounded-[3px] inline-block mb-2"
+                        style={{
+                          backgroundColor: auto.badge === "Promocja" ? "#fff3e0" : "#e8f4e8",
+                          color: auto.badge === "Promocja" ? "#e65100" : "#2a7a2a"
+                        }}>
+                        {auto.badge}
+                      </div>
+                    )}
+                    <div className="text-base font-bold mb-1" style={{ color: "#1B2A4A" }}>{auto.title}</div>
+                    <div className="text-[13px] mb-3" style={{ color: "#888" }}>
+                      {[
+                        auto.year,
+                        auto.mileage_km ? formatNumber(auto.mileage_km) + " km" : null,
+                      ].filter(Boolean).join(" · ")}
+                    </div>
+                    {auto.leasing_rate_pln && (
+                      <div className="text-[22px] font-bold" style={{ color: "#1B2A4A" }}>
+                        od {formatNumber(auto.leasing_rate_pln)} zł <span className="text-[13px] font-normal" style={{ color: "#888" }}>/msc</span>
+                      </div>
+                    )}
                   </div>
-                  <button className="mt-3 w-full text-white py-2.5 rounded-md text-[13px] font-semibold border-none cursor-pointer hover:opacity-90 transition-opacity" style={{ backgroundColor: "#1B2A4A" }}>
-                    Sprawdź ofertę
-                  </button>
-                </div>
-              </div>
-            ))}
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* JAK TO DZIALA */}
       <section className="px-4 sm:px-6 py-12 sm:py-16" style={{ backgroundColor: "#1B2A4A" }}>
@@ -173,4 +223,12 @@ export default function Home() {
 
     </main>
   );
+}
+
+function capitalize(s: string): string {
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+function formatNumber(n: number): string {
+  return n.toLocaleString("pl-PL").replace(/,/g, " ");
 }

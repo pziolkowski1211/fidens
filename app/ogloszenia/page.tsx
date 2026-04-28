@@ -1,5 +1,6 @@
 ﻿import Link from "next/link"
 import Navbar from "../components/Navbar"
+import { createClient } from "@/lib/supabase/server"
 
 interface PageProps {
   searchParams: Promise<{
@@ -15,7 +16,33 @@ export default async function OgloszeniaPage({ searchParams }: PageProps) {
   const model = params.model
   const q = params.q
 
-  const listings: Array<{ id: string; nazwa: string; rok: string; przebieg: string; rata: string }> = []
+  const supabase = await createClient()
+
+  // Buduj zapytanie z filtrami
+  let query = supabase
+    .from("listings")
+    .select("id, slug, title, brand, model, year, mileage_km, leasing_rate_pln, badge, vehicle_type")
+    .eq("status", "active")
+    .order("is_featured", { ascending: false })
+    .order("created_at", { ascending: false })
+
+  if (marka) {
+    query = query.ilike("brand", marka)
+  }
+  if (model) {
+    query = query.ilike("model", model)
+  }
+  if (q) {
+    query = query.textSearch("search_vector", q, { type: "websearch", config: "simple" })
+  }
+
+  const { data: listings, error } = await query
+
+  if (error) {
+    console.error("Blad pobierania ogloszen:", error)
+  }
+
+  const listingsArr = listings || []
 
   let title = "Wszystkie ogłoszenia"
   let filterText = ""
@@ -30,7 +57,7 @@ export default async function OgloszeniaPage({ searchParams }: PageProps) {
     title = "Wyniki wyszukiwania: \"" + q + "\""
   }
 
-  const noResults = listings.length === 0
+  const noResults = listingsArr.length === 0
 
   return (
     <main className="min-h-screen flex flex-col" style={{ backgroundColor: "#f8f9fb" }}>
@@ -41,9 +68,9 @@ export default async function OgloszeniaPage({ searchParams }: PageProps) {
           <h1 className="text-2xl sm:text-3xl font-bold mb-2" style={{ color: "#1B2A4A" }}>
             {title}
           </h1>
-          {filterText && (
+          {!noResults && (
             <p className="text-sm" style={{ color: "#888" }}>
-              Znaleziono <strong>{listings.length}</strong> {pluralizeOferty(listings.length)}
+              Znaleziono <strong>{listingsArr.length}</strong> {pluralizeOferty(listingsArr.length)}
             </p>
           )}
         </div>
@@ -55,17 +82,37 @@ export default async function OgloszeniaPage({ searchParams }: PageProps) {
             <BrakOfert filterText={filterText} marka={marka} model={model} />
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {listings.map((auto) => (
-                <div key={auto.id} className="rounded-xl overflow-hidden" style={{ backgroundColor: "#ffffff", border: "1px solid #e8eaed" }}>
-                  <div className="h-44" style={{ backgroundColor: "#e8eaed" }} />
-                  <div className="p-4">
-                    <div className="text-base font-bold" style={{ color: "#1B2A4A" }}>{auto.nazwa}</div>
-                    <div className="text-[13px]" style={{ color: "#888" }}>{auto.rok}</div>
-                    <div className="text-[22px] font-bold mt-2" style={{ color: "#1B2A4A" }}>
-                      {auto.rata} zł <span className="text-[13px] font-normal" style={{ color: "#888" }}>/msc</span>
-                    </div>
+              {listingsArr.map((auto) => (
+                <Link
+                  key={auto.id}
+                  href={"/ogloszenia/" + auto.slug}
+                  className="rounded-xl overflow-hidden cursor-pointer hover:shadow-lg transition-shadow block"
+                  style={{ backgroundColor: "#ffffff", border: "1px solid #e8eaed" }}
+                >
+                  <div className="h-44 sm:h-48 flex items-center justify-center" style={{ backgroundColor: "#e8eaed" }}>
+                    <span className="text-sm" style={{ color: "#aaa" }}>Zdjęcie pojazdu</span>
                   </div>
-                </div>
+                  <div className="p-4">
+                    {auto.badge && (
+                      <div className="text-[10px] py-0.5 px-2 rounded-[3px] inline-block mb-2"
+                        style={{
+                          backgroundColor: auto.badge === "Promocja" ? "#fff3e0" : "#e8f4e8",
+                          color: auto.badge === "Promocja" ? "#e65100" : "#2a7a2a"
+                        }}>
+                        {auto.badge}
+                      </div>
+                    )}
+                    <div className="text-base font-bold mb-1" style={{ color: "#1B2A4A" }}>{auto.title}</div>
+                    <div className="text-[13px] mb-3" style={{ color: "#888" }}>
+                      {[auto.year, auto.mileage_km ? formatNumber(auto.mileage_km) + " km" : null].filter(Boolean).join(" · ")}
+                    </div>
+                    {auto.leasing_rate_pln && (
+                      <div className="text-[22px] font-bold" style={{ color: "#1B2A4A" }}>
+                        od {formatNumber(auto.leasing_rate_pln)} zł <span className="text-[13px] font-normal" style={{ color: "#888" }}>/msc</span>
+                      </div>
+                    )}
+                  </div>
+                </Link>
               ))}
             </div>
           )}
@@ -122,4 +169,8 @@ function pluralizeOferty(n: number): string {
   if (n === 1) return "ofertę"
   if (n >= 2 && n <= 4) return "oferty"
   return "ofert"
+}
+
+function formatNumber(n: number): string {
+  return n.toLocaleString("pl-PL").replace(/,/g, " ")
 }
