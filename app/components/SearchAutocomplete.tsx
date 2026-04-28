@@ -158,7 +158,7 @@ export default function SearchAutocomplete({ variant = "desktop", onSelect, auto
                 </span>
                 <span className="text-[10px] uppercase tracking-wider text-gray-400 shrink-0">
                   {item.category === "osobowe" && "Osobowe"}
-                  {item.category === "ciezarowe" && "Ciezarowe"}
+                  {item.category === "ciezarowe" && "Ciężarowe"}
                   {item.category === "maszyna" && "Maszyna"}
                 </span>
               </li>

@@ -17,7 +17,7 @@ export default async function OgloszeniaPage({ searchParams }: PageProps) {
 
   const listings: Array<{ id: string; nazwa: string; rok: string; przebieg: string; rata: string }> = []
 
-  let title = "Wszystkie ogloszenia"
+  let title = "Wszystkie ogłoszenia"
   let filterText = ""
   if (marka && model) {
     filterText = capitalize(marka) + " " + capitalize(model)
@@ -62,7 +62,7 @@ export default async function OgloszeniaPage({ searchParams }: PageProps) {
                     <div className="text-base font-bold" style={{ color: "#1B2A4A" }}>{auto.nazwa}</div>
                     <div className="text-[13px]" style={{ color: "#888" }}>{auto.rok}</div>
                     <div className="text-[22px] font-bold mt-2" style={{ color: "#1B2A4A" }}>
-                      {auto.rata} zl <span className="text-[13px] font-normal" style={{ color: "#888" }}>/msc</span>
+                      {auto.rata} zł <span className="text-[13px] font-normal" style={{ color: "#888" }}>/msc</span>
                     </div>
                   </div>
                 </div>
@@ -74,7 +74,7 @@ export default async function OgloszeniaPage({ searchParams }: PageProps) {
 
       <footer className="px-4 sm:px-6 py-8 sm:py-10" style={{ backgroundColor: "#1B2A4A" }}>
         <div className="max-w-[1100px] mx-auto text-center text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
-          (c) 2026 Fidens. Wszelkie prawa zastrzezone.
+          (c) 2026 Fidens. Wszelkie prawa zastrzeżone.
         </div>
       </footer>
     </main>
@@ -95,7 +95,7 @@ function BrakOfert({ filterText, marka, model }: { filterText: string; marka?: s
         Brak ofert{filterText && " dla"} {filterText && <span style={{ color: "#F0A500" }}>{filterText}</span>}
       </h2>
       <p className="text-[15px] leading-relaxed mb-6" style={{ color: "#666" }}>
-        Nie mamy aktualnie tego pojazdu w ofercie, ale mozesz o niego zapytac &mdash;
+        Nie mamy aktualnie tego pojazdu w ofercie, ale możesz o niego zapytać &mdash;
         <br />sprowadzimy go specjalnie dla Ciebie.
       </p>
       <Link
@@ -107,7 +107,7 @@ function BrakOfert({ filterText, marka, model }: { filterText: string; marka?: s
       </Link>
       <div className="mt-6">
         <Link href="/ogloszenia" className="text-[13px] underline" style={{ color: "#888" }}>
-          Lub zobacz wszystkie dostepne oferty
+          Lub zobacz wszystkie dostępne oferty
         </Link>
       </div>
     </div>
@@ -119,7 +119,7 @@ function capitalize(s: string): string {
 }
 
 function pluralizeOferty(n: number): string {
-  if (n === 1) return "oferte"
+  if (n === 1) return "ofertę"
   if (n >= 2 && n <= 4) return "oferty"
   return "ofert"
 }

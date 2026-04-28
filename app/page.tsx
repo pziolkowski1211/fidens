@@ -9,12 +9,12 @@ export default function Home() {
       {/* HERO */}
       <section style={{ backgroundColor: "#1B2A4A" }} className="px-4 sm:px-6 py-12 sm:py-16 lg:py-20 text-center">
         <h1 className="text-white text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight mb-4">
-          Finansowanie pojazdow<br className="hidden sm:inline" />
+          Finansowanie pojazdów<br className="hidden sm:inline" />
           <span className="sm:hidden"> </span>i maszyn budowlanych
         </h1>
         <p className="text-white/60 text-base sm:text-lg mb-4 px-4">
           Leasing, kredyt, wynajem &mdash; szybka decyzja kredytowa.<br className="hidden sm:inline" />
-          <span className="sm:hidden"> </span>Ty wybierasz pojazd, my zajmujemy sie reszta.
+          <span className="sm:hidden"> </span>Ty wybierasz pojazd, my zajmujemy się resztą.
         </p>
       </section>
 
@@ -22,22 +22,22 @@ export default function Home() {
       <section className="px-4 sm:px-6 py-10 sm:py-12" style={{ backgroundColor: "#ffffff" }}>
         <div className="max-w-[1100px] mx-auto">
           <div className="flex items-center gap-3 mb-5 flex-wrap">
-            <h2 className="text-xl sm:text-2xl font-bold" style={{ color: "#1B2A4A" }}>Ogloszenie tygodnia</h2>
+            <h2 className="text-xl sm:text-2xl font-bold" style={{ color: "#1B2A4A" }}>Ogłoszenie tygodnia</h2>
             <span className="text-[11px] font-bold py-[3px] px-[10px] rounded-full" style={{ backgroundColor: "#F0A500", color: "#1B2A4A" }}>
-              Wyroznione
+              Wyróżnione
             </span>
           </div>
 
           <div className="rounded-xl overflow-hidden flex flex-col lg:flex-row" style={{ backgroundColor: "#f8f9fb", border: "1px solid #e8eaed" }}>
             {/* Zdjecie */}
             <div className="w-full lg:w-[400px] h-48 sm:h-64 lg:h-auto flex-shrink-0 flex items-center justify-center" style={{ backgroundColor: "#e8eaed" }}>
-              <span className="text-sm" style={{ color: "#aaa" }}>Zdjecie pojazdu</span>
+              <span className="text-sm" style={{ color: "#aaa" }}>Zdjęcie pojazdu</span>
             </div>
 
             {/* Tresc */}
             <div className="p-6 sm:p-8 flex flex-col">
               <div className="text-[11px] font-bold py-[3px] px-[10px] rounded-[3px] inline-block mb-3 self-start" style={{ backgroundColor: "#F0A500", color: "#1B2A4A" }}>
-                Ogloszenie tygodnia
+                Ogłoszenie tygodnia
               </div>
               <h3 className="text-xl sm:text-2xl lg:text-[28px] font-bold mb-2" style={{ color: "#1B2A4A" }}>
                 BMW 5 Series 530d xDrive
@@ -46,11 +46,11 @@ export default function Home() {
                 2022 &middot; 68 000 km &middot; Diesel &middot; Automat &middot; Salon Polska
               </p>
               <div className="text-[28px] sm:text-3xl lg:text-[36px] font-bold mb-1" style={{ color: "#1B2A4A" }}>
-                1 890 zl <span className="text-base font-normal" style={{ color: "#888" }}>/miesiac</span>
+                1 890 zł <span className="text-base font-normal" style={{ color: "#888" }}>/miesiąc</span>
               </div>
-              <p className="text-xs mb-5" style={{ color: "#bbb" }}>Cena pojazdu dostepna po kontakcie</p>
+              <p className="text-xs mb-5" style={{ color: "#bbb" }}>Cena pojazdu dostępna po kontakcie</p>
               <button className="font-bold rounded-lg py-3.5 px-6 sm:px-8 text-sm sm:text-[15px] border-none cursor-pointer self-start hover:opacity-90 transition-opacity" style={{ backgroundColor: "#F0A500", color: "#1B2A4A" }}>
-                Sprawdz oferte &rarr;
+                Sprawdź ofertę &rarr;
               </button>
             </div>
           </div>
@@ -75,7 +75,7 @@ export default function Home() {
             ].map((auto) => (
               <div key={auto.nazwa} className="rounded-xl overflow-hidden cursor-pointer hover:shadow-lg transition-shadow" style={{ backgroundColor: "#ffffff", border: "1px solid #e8eaed" }}>
                 <div className="h-44 sm:h-48 flex items-center justify-center" style={{ backgroundColor: "#e8eaed" }}>
-                  <span className="text-sm" style={{ color: "#aaa" }}>Zdjecie pojazdu</span>
+                  <span className="text-sm" style={{ color: "#aaa" }}>Zdjęcie pojazdu</span>
                 </div>
                 <div className="p-4">
                   <div className="text-[10px] py-0.5 px-2 rounded-[3px] inline-block mb-2"
@@ -88,10 +88,10 @@ export default function Home() {
                   <div className="text-base font-bold mb-1" style={{ color: "#1B2A4A" }}>{auto.nazwa}</div>
                   <div className="text-[13px] mb-3" style={{ color: "#888" }}>{auto.rok} &middot; {auto.przebieg}</div>
                   <div className="text-[22px] font-bold" style={{ color: "#1B2A4A" }}>
-                    {auto.rata} zl <span className="text-[13px] font-normal" style={{ color: "#888" }}>/msc</span>
+                    {auto.rata} zł <span className="text-[13px] font-normal" style={{ color: "#888" }}>/msc</span>
                   </div>
                   <button className="mt-3 w-full text-white py-2.5 rounded-md text-[13px] font-semibold border-none cursor-pointer hover:opacity-90 transition-opacity" style={{ backgroundColor: "#1B2A4A" }}>
-                    Sprawdz oferte
+                    Sprawdź ofertę
                   </button>
                 </div>
               </div>
@@ -104,14 +104,14 @@ export default function Home() {
       <section className="px-4 sm:px-6 py-12 sm:py-16" style={{ backgroundColor: "#1B2A4A" }}>
         <div className="max-w-[1100px] mx-auto">
           <h2 className="text-white text-2xl sm:text-3xl font-bold text-center mb-10 sm:mb-12">
-            Jak to dziala?
+            Jak to działa?
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6 sm:gap-4">
             {[
-              { nr: "1", tekst: "Zloz wniosek online" },
+              { nr: "1", tekst: "Złóż wniosek online" },
               { nr: "2", tekst: "Decyzja w 60 minut" },
-              { nr: "3", tekst: "Podpisz umowe" },
-              { nr: "4", tekst: "Wplac oplate wstepna" },
+              { nr: "3", tekst: "Podpisz umowę" },
+              { nr: "4", tekst: "Wpłać opłatę wstępną" },
               { nr: "5", tekst: "Rejestrujemy i ubezpieczamy" },
               { nr: "6", tekst: "Pojazd gotowy do drogi" },
             ].map((krok) => (
@@ -133,13 +133,13 @@ export default function Home() {
       <section className="px-4 sm:px-6 py-12 sm:py-16" style={{ backgroundColor: "#ffffff" }}>
         <div className="max-w-[1100px] mx-auto">
           <h2 className="text-2xl sm:text-3xl font-bold text-center mb-10 sm:mb-12" style={{ color: "#1B2A4A" }}>
-            Opinie klientow
+            Opinie klientów
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              { tekst: "Ekspresowa decyzja, zero stresu. Polecam kazdemu przedsiebiorcy.", imie: "Marek K.", miasto: "Warszawa" },
-              { tekst: "Wszystko zalatwione w jeden dzien. Auto stalo pod domem nastepnego dnia.", imie: "Tomasz W.", miasto: "Krakow" },
-              { tekst: "Profesjonalne podejscie, najlepsza oferta leasingu jaka znalazlem.", imie: "Anna P.", miasto: "Wroclaw" },
+              { tekst: "Ekspresowa decyzja, zero stresu. Polecam każdemu przedsiębiorcy.", imie: "Marek K.", miasto: "Warszawa" },
+              { tekst: "Wszystko załatwione w jeden dzień. Auto stało pod domem następnego dnia.", imie: "Tomasz W.", miasto: "Kraków" },
+              { tekst: "Profesjonalne podejście, najlepsza oferta leasingu jaką znalazłem.", imie: "Anna P.", miasto: "Wrocław" },
             ].map((opinia) => (
               <div key={opinia.imie} className="rounded-xl p-6" style={{ backgroundColor: "#f8f9fb", border: "1px solid #e8eaed" }}>
                 <div className="text-lg mb-3" style={{ color: "#F0A500" }}>&#9733;&#9733;&#9733;&#9733;&#9733;</div>
@@ -163,10 +163,10 @@ export default function Home() {
             <a href="/o-nas" className="text-[13px]" style={{ color: "rgba(255,255,255,0.5)" }}>O mnie</a>
             <a href="/kontakt" className="text-[13px]" style={{ color: "rgba(255,255,255,0.5)" }}>Kontakt</a>
             <a href="/regulamin" className="text-[13px]" style={{ color: "rgba(255,255,255,0.5)" }}>Regulamin</a>
-            <a href="/polityka" className="text-[13px]" style={{ color: "rgba(255,255,255,0.5)" }}>Polityka prywatnosci</a>
+            <a href="/polityka" className="text-[13px]" style={{ color: "rgba(255,255,255,0.5)" }}>Polityka prywatności</a>
           </div>
           <div className="text-xs text-center" style={{ color: "rgba(255,255,255,0.3)" }}>
-            (c) 2026 Fidens. Wszelkie prawa zastrzezone.
+            (c) 2026 Fidens. Wszelkie prawa zastrzeżone.
           </div>
         </div>
       </footer>

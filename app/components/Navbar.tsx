@@ -57,14 +57,14 @@ export default function Navbar() {
 
         {/* DESKTOP: Menu prawa strona */}
         <div className="hidden lg:flex ml-auto items-center gap-8">
-          <Link href="/leasing" style={{ color: "rgba(255,255,255,0.8)", fontSize: "14px" }}>Jak dziala leasing</Link>
+          <Link href="/leasing" style={{ color: "rgba(255,255,255,0.8)", fontSize: "14px" }}>Jak działa leasing</Link>
           <Link href="/o-nas" style={{ color: "rgba(255,255,255,0.8)", fontSize: "14px" }}>O nas</Link>
           <Link href="/kontakt" style={{ color: "rgba(255,255,255,0.8)", fontSize: "14px" }}>Kontakt</Link>
           <Link
             href="/kontakt"
             style={{ backgroundColor: "#F0A500", color: "#1B2A4A", padding: "8px 20px", borderRadius: "6px", fontWeight: "600", fontSize: "14px" }}
           >
-            Zamow bezplatna kalkulacje
+            Zamów bezpłatną kalkulację
           </Link>
         </div>
 
@@ -147,7 +147,7 @@ export default function Navbar() {
                 onClick={() => setIsMenuOpen(false)}
                 className="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 text-base transition-colors"
               >
-                Strona glowna
+                Strona główna
               </Link>
               <Link
                 href="/ogloszenia"
@@ -161,7 +161,7 @@ export default function Navbar() {
                 onClick={() => setIsMenuOpen(false)}
                 className="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 text-base transition-colors"
               >
-                Jak dziala leasing
+                Jak działa leasing
               </Link>
               <Link
                 href="/o-nas"
@@ -187,7 +187,7 @@ export default function Navbar() {
                 className="block w-full text-center font-bold rounded-lg py-3.5 text-sm transition-opacity hover:opacity-90"
                 style={{ backgroundColor: "#F0A500", color: "#1B2A4A" }}
               >
-                Zamow bezplatna kalkulacje
+                Zamów bezpłatną kalkulację
               </Link>
             </div>
           </div>
