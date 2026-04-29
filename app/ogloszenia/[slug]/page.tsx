@@ -1,6 +1,7 @@
 ﻿import { notFound } from "next/navigation"
 import Link from "next/link"
 import Navbar from "../../components/Navbar"
+import Carousel from "../../components/Carousel"
 import { createClient } from "@/lib/supabase/server"
 
 interface PageProps {
@@ -28,6 +29,11 @@ interface Listing {
   vat_type: string | null
 }
 
+interface ListingImage {
+  url: string
+  position: number
+}
+
 export default async function OgloszenieDetailPage({ params }: PageProps) {
   const { slug } = await params
   const supabase = await createClient()
@@ -44,6 +50,15 @@ export default async function OgloszenieDetailPage({ params }: PageProps) {
   }
 
   const listing = data as Listing
+
+  // Pobierz zdjecia
+  const { data: imagesData } = await supabase
+    .from("listing_images")
+    .select("url, position")
+    .eq("listing_id", listing.id)
+    .order("position", { ascending: true })
+
+  const images: ListingImage[] = imagesData || []
 
   const formatNumber = (n: number | null | undefined): string => {
     if (n === null || n === undefined) return ""
@@ -82,10 +97,7 @@ export default async function OgloszenieDetailPage({ params }: PageProps) {
         <div className="max-w-[1100px] mx-auto grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8">
 
           <div>
-            <div className="rounded-xl overflow-hidden mb-6 flex items-center justify-center"
-              style={{ backgroundColor: "#e8eaed", aspectRatio: "16 / 10" }}>
-              <span className="text-sm" style={{ color: "#aaa" }}>Galeria zdjęć (wkrótce)</span>
-            </div>
+            <Carousel images={images} alt={listing.title} />
 
             <div className="flex items-start gap-3 mb-3 flex-wrap">
               <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: "#1B2A4A" }}>
@@ -134,7 +146,7 @@ export default async function OgloszenieDetailPage({ params }: PageProps) {
               </div>
               {listing.leasing_rate_pln && (
                 <div className="text-sm mb-5" style={{ color: "#888" }}>
-                  od <strong style={{ color: "#1B2A4A" }}>{formatNumber(listing.leasing_rate_pln)} zł</strong> /miesiąc
+                  od <strong style={{ color: "#1B2A4A" }}>{formatNumber(listing.leasing_rate_pln)} zl</strong> /miesiąc
                 </div>
               )}
 

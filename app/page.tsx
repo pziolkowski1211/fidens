@@ -12,6 +12,7 @@ interface FeaturedListing {
   transmission: string | null;
   leasing_rate_pln: number | null;
   badge: string | null;
+  cover_url: string | null;
 }
 
 interface LatestListing {
@@ -23,6 +24,7 @@ interface LatestListing {
   vehicle_type: string | null;
   leasing_rate_pln: number | null;
   badge: string | null;
+  cover_url: string | null;
 }
 
 export default async function Home() {
@@ -30,18 +32,32 @@ export default async function Home() {
 
   const { data: featuredData } = await supabase
     .from("listings")
-    .select("id, slug, title, year, mileage_km, fuel, transmission, leasing_rate_pln, badge")
+    .select("id, slug, title, year, mileage_km, fuel, transmission, leasing_rate_pln, badge, listing_images(url, is_cover)")
     .eq("status", "active")
     .eq("is_featured", true)
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
 
-  const featured = featuredData as FeaturedListing | null;
+  const featuredRaw = featuredData as { id: string; slug: string; title: string; year: number | null; mileage_km: number | null; fuel: string | null; transmission: string | null; leasing_rate_pln: number | null; badge: string | null; listing_images: { url: string; is_cover: boolean }[] | null } | null;
+  const featured: FeaturedListing | null = featuredRaw
+    ? {
+        id: featuredRaw.id,
+        slug: featuredRaw.slug,
+        title: featuredRaw.title,
+        year: featuredRaw.year,
+        mileage_km: featuredRaw.mileage_km,
+        fuel: featuredRaw.fuel,
+        transmission: featuredRaw.transmission,
+        leasing_rate_pln: featuredRaw.leasing_rate_pln,
+        badge: featuredRaw.badge,
+        cover_url: extractCoverUrl(featuredRaw.listing_images),
+      }
+    : null;
 
   let latestQuery = supabase
     .from("listings")
-    .select("id, slug, title, year, mileage_km, vehicle_type, leasing_rate_pln, badge")
+    .select("id, slug, title, year, mileage_km, vehicle_type, leasing_rate_pln, badge, listing_images(url, is_cover)")
     .eq("status", "active")
     .order("created_at", { ascending: false })
     .limit(3);
@@ -51,7 +67,17 @@ export default async function Home() {
   }
 
   const { data: latestData } = await latestQuery;
-  const latest: LatestListing[] = (latestData as LatestListing[] | null) || [];
+  const latest: LatestListing[] = (latestData || []).map((row: { id: string; slug: string; title: string; year: number | null; mileage_km: number | null; vehicle_type: string | null; leasing_rate_pln: number | null; badge: string | null; listing_images: { url: string; is_cover: boolean }[] | null }) => ({
+    id: row.id,
+    slug: row.slug,
+    title: row.title,
+    year: row.year,
+    mileage_km: row.mileage_km,
+    vehicle_type: row.vehicle_type,
+    leasing_rate_pln: row.leasing_rate_pln,
+    badge: row.badge,
+    cover_url: extractCoverUrl(row.listing_images),
+  }));
 
   return (
     <main className="min-h-screen" style={{ backgroundColor: "#f8f9fb" }}>
@@ -86,8 +112,13 @@ export default async function Home() {
               className="rounded-xl overflow-hidden flex flex-col lg:flex-row hover:shadow-lg transition-shadow block"
               style={{ backgroundColor: "#f8f9fb", border: "1px solid #e8eaed" }}
             >
-              <div className="w-full lg:w-[400px] h-48 sm:h-64 lg:h-auto flex-shrink-0 flex items-center justify-center" style={{ backgroundColor: "#e8eaed" }}>
-                <span className="text-sm" style={{ color: "#aaa" }}>Zdjęcie pojazdu</span>
+              <div className="w-full lg:w-[400px] h-48 sm:h-64 lg:h-auto flex-shrink-0 flex items-center justify-center overflow-hidden" style={{ backgroundColor: "#e8eaed" }}>
+                {featured.cover_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={featured.cover_url} alt={featured.title} className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-sm" style={{ color: "#aaa" }}>Brak zdjęcia</span>
+                )}
               </div>
 
               <div className="p-6 sm:p-8 flex flex-col">
@@ -103,11 +134,11 @@ export default async function Home() {
                     featured.mileage_km ? formatNumber(featured.mileage_km) + " km" : null,
                     featured.fuel ? capitalize(featured.fuel) : null,
                     featured.transmission ? capitalize(featured.transmission) : null,
-                  ].filter(Boolean).join(" · ")}
+                  ].filter(Boolean).join(" \u00B7 ")}
                 </p>
                 {featured.leasing_rate_pln && (
                   <div className="text-[28px] sm:text-3xl lg:text-[36px] font-bold mb-5" style={{ color: "#1B2A4A" }}>
-                    od {formatNumber(featured.leasing_rate_pln)} zł <span className="text-base font-normal" style={{ color: "#888" }}>/miesiąc</span>
+                    od {formatNumber(featured.leasing_rate_pln)} zl <span className="text-base font-normal" style={{ color: "#888" }}>/miesiąc</span>
                   </div>
                 )}
                 <span className="font-bold rounded-lg py-3.5 px-6 sm:px-8 text-sm sm:text-[15px] self-start" style={{ backgroundColor: "#F0A500", color: "#1B2A4A" }}>
@@ -138,8 +169,13 @@ export default async function Home() {
                   className="rounded-xl overflow-hidden cursor-pointer hover:shadow-lg transition-shadow block"
                   style={{ backgroundColor: "#ffffff", border: "1px solid #e8eaed" }}
                 >
-                  <div className="h-44 sm:h-48 flex items-center justify-center" style={{ backgroundColor: "#e8eaed" }}>
-                    <span className="text-sm" style={{ color: "#aaa" }}>Zdjęcie pojazdu</span>
+                  <div className="h-44 sm:h-48 flex items-center justify-center overflow-hidden" style={{ backgroundColor: "#e8eaed" }}>
+                    {auto.cover_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={auto.cover_url} alt={auto.title} className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-sm" style={{ color: "#aaa" }}>Brak zdjecia</span>
+                    )}
                   </div>
                   <div className="p-4">
                     {auto.badge && (
@@ -156,11 +192,11 @@ export default async function Home() {
                       {[
                         auto.year,
                         auto.mileage_km ? formatNumber(auto.mileage_km) + " km" : null,
-                      ].filter(Boolean).join(" · ")}
+                      ].filter(Boolean).join(" \u00B7 ")}
                     </div>
                     {auto.leasing_rate_pln && (
                       <div className="text-[22px] font-bold" style={{ color: "#1B2A4A" }}>
-                        od {formatNumber(auto.leasing_rate_pln)} zł <span className="text-[13px] font-normal" style={{ color: "#888" }}>/msc</span>
+                        od {formatNumber(auto.leasing_rate_pln)} zl <span className="text-[13px] font-normal" style={{ color: "#888" }}>/msc</span>
                       </div>
                     )}
                   </div>
@@ -182,7 +218,7 @@ export default async function Home() {
               { nr: "1", tekst: "Złóż wniosek online" },
               { nr: "2", tekst: "Decyzja w 60 minut" },
               { nr: "3", tekst: "Podpisz umowę" },
-              { nr: "4", tekst: "Wpłać opłatę wstępną" },
+              { nr: "4", tekst: "Wpłać oplate wstępną" },
               { nr: "5", tekst: "Rejestrujemy i ubezpieczamy" },
               { nr: "6", tekst: "Pojazd gotowy do drogi" },
             ].map((krok) => (
@@ -252,4 +288,10 @@ function capitalize(s: string): string {
 
 function formatNumber(n: number): string {
   return n.toLocaleString("pl-PL").replace(/,/g, " ");
+}
+
+function extractCoverUrl(images: { url: string; is_cover: boolean }[] | null | undefined): string | null {
+  if (!images || images.length === 0) return null;
+  const cover = images.find((img) => img.is_cover === true);
+  return cover ? cover.url : images[0].url;
 }

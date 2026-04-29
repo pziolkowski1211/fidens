@@ -21,6 +21,21 @@ interface ListingCard {
   leasing_rate_pln: number | null
   badge: string | null
   vehicle_type: string | null
+  cover_url: string | null
+}
+
+interface RawListingRow {
+  id: string
+  slug: string
+  title: string
+  brand: string | null
+  model: string | null
+  year: number | null
+  mileage_km: number | null
+  leasing_rate_pln: number | null
+  badge: string | null
+  vehicle_type: string | null
+  listing_images: { url: string; is_cover: boolean }[] | null
 }
 
 export default async function OgloszeniaPage({ searchParams }: PageProps) {
@@ -33,7 +48,7 @@ export default async function OgloszeniaPage({ searchParams }: PageProps) {
 
   let query = supabase
     .from("listings")
-    .select("id, slug, title, brand, model, year, mileage_km, leasing_rate_pln, badge, vehicle_type")
+    .select("id, slug, title, brand, model, year, mileage_km, leasing_rate_pln, badge, vehicle_type, listing_images(url, is_cover)")
     .eq("status", "active")
     .order("is_featured", { ascending: false })
     .order("created_at", { ascending: false })
@@ -54,7 +69,19 @@ export default async function OgloszeniaPage({ searchParams }: PageProps) {
     console.error("Blad pobierania ogloszen:", error)
   }
 
-  const listingsArr: ListingCard[] = (data as ListingCard[] | null) || []
+  const listingsArr: ListingCard[] = ((data as RawListingRow[] | null) || []).map((row) => ({
+    id: row.id,
+    slug: row.slug,
+    title: row.title,
+    brand: row.brand,
+    model: row.model,
+    year: row.year,
+    mileage_km: row.mileage_km,
+    leasing_rate_pln: row.leasing_rate_pln,
+    badge: row.badge,
+    vehicle_type: row.vehicle_type,
+    cover_url: extractCoverUrl(row.listing_images),
+  }))
 
   let title = "Wszystkie ogłoszenia"
   let filterText = ""
@@ -101,8 +128,13 @@ export default async function OgloszeniaPage({ searchParams }: PageProps) {
                   className="rounded-xl overflow-hidden cursor-pointer hover:shadow-lg transition-shadow block"
                   style={{ backgroundColor: "#ffffff", border: "1px solid #e8eaed" }}
                 >
-                  <div className="h-44 sm:h-48 flex items-center justify-center" style={{ backgroundColor: "#e8eaed" }}>
-                    <span className="text-sm" style={{ color: "#aaa" }}>Zdjęcie pojazdu</span>
+                  <div className="h-44 sm:h-48 flex items-center justify-center overflow-hidden" style={{ backgroundColor: "#e8eaed" }}>
+                    {auto.cover_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={auto.cover_url} alt={auto.title} className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-sm" style={{ color: "#aaa" }}>Brak zdjęcia</span>
+                    )}
                   </div>
                   <div className="p-4">
                     {auto.badge && (
@@ -116,11 +148,11 @@ export default async function OgloszeniaPage({ searchParams }: PageProps) {
                     )}
                     <div className="text-base font-bold mb-1" style={{ color: "#1B2A4A" }}>{auto.title}</div>
                     <div className="text-[13px] mb-3" style={{ color: "#888" }}>
-                      {[auto.year, auto.mileage_km ? formatNumber(auto.mileage_km) + " km" : null].filter(Boolean).join(" · ")}
+                      {[auto.year, auto.mileage_km ? formatNumber(auto.mileage_km) + " km" : null].filter(Boolean).join(" \u00B7 ")}
                     </div>
                     {auto.leasing_rate_pln && (
                       <div className="text-[22px] font-bold" style={{ color: "#1B2A4A" }}>
-                        od {formatNumber(auto.leasing_rate_pln)} zł <span className="text-[13px] font-normal" style={{ color: "#888" }}>/msc</span>
+                        od {formatNumber(auto.leasing_rate_pln)} zl <span className="text-[13px] font-normal" style={{ color: "#888" }}>/msc</span>
                       </div>
                     )}
                   </div>
@@ -166,7 +198,7 @@ function BrakOfert({ filterText, marka, model }: { filterText: string; marka?: s
       </Link>
       <div className="mt-6">
         <Link href="/ogloszenia" className="text-[13px] underline" style={{ color: "#888" }}>
-          Lub zobacz wszystkie dostępne oferty
+          Nie mamy aktualnie tego pojazdu w ofercie, ale możesz o niego zapytać
         </Link>
       </div>
     </div>
@@ -185,4 +217,10 @@ function pluralizeOferty(n: number): string {
 
 function formatNumber(n: number): string {
   return n.toLocaleString("pl-PL").replace(/,/g, " ")
+}
+
+function extractCoverUrl(images: { url: string; is_cover: boolean }[] | null | undefined): string | null {
+  if (!images || images.length === 0) return null
+  const cover = images.find((img) => img.is_cover === true)
+  return cover ? cover.url : images[0].url
 }
