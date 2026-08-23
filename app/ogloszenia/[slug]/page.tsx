@@ -77,7 +77,7 @@ export default async function OgloszenieDetailPage({ params }: PageProps) {
         <div className="max-w-[1100px] mx-auto text-xs" style={{ color: "#888" }}>
           <Link href="/" className="hover:underline">Strona główna</Link>
           {" > "}
-          <Link href="/Ogłoszenia" className="hover:underline">Ogłoszenia</Link>
+          <Link href="/ogloszenia" className="hover:underline">Ogłoszenia</Link>
           {" > "}
           <span style={{ color: "#1B2A4A" }}>{listing.title}</span>
         </div>
