@@ -169,12 +169,15 @@ Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyc
 
 ### Do zrobienia (priorytety)
 
-1. **Formularz kontaktowy** /kontakt - ZROBIONE (bez maili)
+1. **Formularz kontaktowy** /kontakt - KOMPLETNIE ZROBIONE
    - [x] Pola: imie, telefon, email, NIP, wiadomosc
    - [x] Odczyt query params z kalkulatora, zapis do contact_requests
    - [x] Link w Navbar juz podpiety
-   - [x] Naprawiono typy Supabase (lib/supabase/types.ts) - byl blad blokujacy zapis do bazy
-   - [ ] BRAKUJE: wysylka maila przez Resend (nastepny krok)
+   - [x] Naprawiono typy Supabase (lib/supabase/types.ts)
+   - [x] Wysylka maila przez Resend (RESEND_API_KEY w .env.local i na Vercel)
+   - [x] Domena fidens.pl w trakcie weryfikacji w Resend (rekordy DNS dodane w Hostido)
+   - [ ] BRAKUJE: zmiana adresu "from" na @fidens.pl gdy domena sie zweryfikuje w Resend
+   - [ ] BRAKUJE: zmiana adresu "to" z prywatnego maila na docelowy adres @fidens.pl
    - [ ] BRAKUJE: stylizacja formularza pod reszte strony
 
 2. **"Od X zl" na kartach ogloszen** (obecnie pokazuje leasing_rate_pln z bazy)
@@ -235,4 +238,5 @@ Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyc
 - **URL nie moze miec polskich znakow:** przy Ctrl+H uwaga zeby nie zmienic href="/ogloszenia"
   na href="/Ogloszenia" ani "/ogłoszenia". Klikac pojedynczo Replace, nie Replace All.
   Widok Git Local Changes (Working Tree) w VS Code = szybki sprawdzian co poszlo nie tak.
+
 
