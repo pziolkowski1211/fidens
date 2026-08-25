@@ -1,5 +1,8 @@
 ﻿"use server"
 import { createClient } from "@/lib/supabase/server"
+import { Resend } from "resend"
+
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function submitContactForm(formData: FormData) {
   const supabase = await createClient()
@@ -42,6 +45,29 @@ export async function submitContactForm(formData: FormData) {
 
   if (error) {
     return { success: false, error: error.message }
+  }
+
+  try {
+    await resend.emails.send({
+      from: "Fidens <onboarding@resend.dev>",
+      to: "p.ziolkowski1211@gmail.com",
+      subject: `Nowe zapytanie: ${name}`,
+      text: `Nowe zapytanie ofertowe.
+
+Imie: ${name}
+Telefon: ${phone}
+Email: ${email}
+NIP: ${nip || "brak"}
+Wiadomosc: ${message || "brak"}
+
+Parametry leasingu:
+Slug ogloszenia: ${slug || "brak"}
+Wplata wstepna: ${wstepna || "brak"}%
+Okres: ${msc || "brak"} msc
+Wykup: ${wykup || "brak"}%`,
+    })
+  } catch (emailError) {
+    console.error("Blad wysylki maila:", emailError)
   }
 
   return { success: true }
