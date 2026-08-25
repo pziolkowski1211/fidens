@@ -7,14 +7,16 @@ export type ListingStatus = 'active' | 'inactive' | 'sold'
 export interface Database {
   public: {
     Tables: {
-      listings: { Row: Listing; Insert: ListingInsert; Update: ListingUpdate }
-      listing_images: { Row: ListingImage; Insert: ListingImageInsert; Update: Partial<ListingImageInsert> }
-      contact_requests: { Row: ContactRequest; Insert: ContactRequestInsert; Update: Partial<ContactRequestInsert> }
+      listings: { Row: Listing; Insert: ListingInsert; Update: ListingUpdate; Relationships: [] }
+      listing_images: { Row: ListingImage; Insert: ListingImageInsert; Update: Partial<ListingImageInsert>; Relationships: [] }
+      contact_requests: { Row: ContactRequest; Insert: ContactRequestInsert; Update: Partial<ContactRequestInsert>; Relationships: [] }
     }
+    Views: Record<string, never>
+    Functions: Record<string, never>
   }
 }
 
-export interface Listing {
+export type Listing = {
   id: string
   created_at: string
   updated_at: string
@@ -45,16 +47,17 @@ export interface Listing {
   otomoto_id: string | null
   description: string | null
   location_city: string | null
+  vat_type: string | null
 }
 
 export type ListingInsert = Omit<Listing, 'id' | 'created_at' | 'updated_at'>
 export type ListingUpdate = Partial<ListingInsert>
 
-export interface ListingWithCover extends Listing {
+export type ListingWithCover = Listing & {
   cover_image: ListingImage | null
 }
 
-export interface ListingImage {
+export type ListingImage = {
   id: string
   listing_id: string
   storage_path: string
@@ -66,13 +69,15 @@ export interface ListingImage {
 
 export type ListingImageInsert = Omit<ListingImage, 'id' | 'created_at'>
 
-export interface ContactRequest {
+export type ContactRequest = {
   id: string
   created_at: string
   listing_id: string | null
   name: string
   phone: string
   email: string | null
+  nip: string | null
+  message: string | null
   leasing_initial_pct: number | null
   leasing_months: number | null
   leasing_residual_pct: number | null
