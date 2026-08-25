@@ -169,12 +169,13 @@ Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyc
 
 ### Do zrobienia (priorytety)
 
-1. **Formularz kontaktowy** /kontakt <-- NASTEPNY KROK
-   - Pola: imie, telefon, email + parametry leasingu z URL
-   - Odczyt query params z kalkulatora (marka, model, slug, typ, wstepna, msc, wykup, rata)
-   - Resend -> mail do wlasciciela z parametrami pojazdu i leasingu
-   - Zapis do contact_requests
-   - CTA prowadzi do /kontakt juz gotowe, brakuje samej strony!
+1. **Formularz kontaktowy** /kontakt - ZROBIONE (bez maili)
+   - [x] Pola: imie, telefon, email, NIP, wiadomosc
+   - [x] Odczyt query params z kalkulatora, zapis do contact_requests
+   - [x] Link w Navbar juz podpiety
+   - [x] Naprawiono typy Supabase (lib/supabase/types.ts) - byl blad blokujacy zapis do bazy
+   - [ ] BRAKUJE: wysylka maila przez Resend (nastepny krok)
+   - [ ] BRAKUJE: stylizacja formularza pod reszte strony
 
 2. **"Od X zl" na kartach ogloszen** (obecnie pokazuje leasing_rate_pln z bazy)
    - Zamiast statycznej raty z bazy - liczyc dynamicznie "najatrakcyjniejsza" rate
@@ -234,3 +235,4 @@ Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyc
 - **URL nie moze miec polskich znakow:** przy Ctrl+H uwaga zeby nie zmienic href="/ogloszenia"
   na href="/Ogloszenia" ani "/ogłoszenia". Klikac pojedynczo Replace, nie Replace All.
   Widok Git Local Changes (Working Tree) w VS Code = szybki sprawdzian co poszlo nie tak.
+
