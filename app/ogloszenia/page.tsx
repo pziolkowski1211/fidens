@@ -1,6 +1,7 @@
 ﻿import Link from "next/link"
 import Navbar from "../components/Navbar"
 import { createClient } from "@/lib/supabase/server"
+import { calculateShowcaseRate } from "@/lib/leasing/calculator"
 
 interface PageProps {
   searchParams: Promise<{
@@ -18,7 +19,7 @@ interface ListingCard {
   model: string | null
   year: number | null
   mileage_km: number | null
-  leasing_rate_pln: number | null
+  rate: number | null
   badge: string | null
   vehicle_type: string | null
   cover_url: string | null
@@ -32,7 +33,8 @@ interface RawListingRow {
   model: string | null
   year: number | null
   mileage_km: number | null
-  leasing_rate_pln: number | null
+  price_pln: number | null
+  vat_type: string | null
   badge: string | null
   vehicle_type: string | null
   listing_images: { url: string; is_cover: boolean }[] | null
@@ -48,7 +50,7 @@ export default async function OgloszeniaPage({ searchParams }: PageProps) {
 
   let query = supabase
     .from("listings")
-    .select("id, slug, title, brand, model, year, mileage_km, leasing_rate_pln, badge, vehicle_type, listing_images(url, is_cover)")
+    .select("id, slug, title, brand, model, year, mileage_km, price_pln, vat_type, badge, vehicle_type, listing_images(url, is_cover)")
     .eq("status", "active")
     .order("is_featured", { ascending: false })
     .order("created_at", { ascending: false })
@@ -66,7 +68,7 @@ export default async function OgloszeniaPage({ searchParams }: PageProps) {
   const { data, error } = await query
 
   if (error) {
-    console.error("Blad pobierania ogloszen:", error)
+    console.error("Błąd pobierania ogłoszeń:", error)
   }
 
   const listingsArr: ListingCard[] = ((data as RawListingRow[] | null) || []).map((row) => ({
@@ -77,7 +79,7 @@ export default async function OgloszeniaPage({ searchParams }: PageProps) {
     model: row.model,
     year: row.year,
     mileage_km: row.mileage_km,
-    leasing_rate_pln: row.leasing_rate_pln,
+    rate: row.price_pln ? calculateShowcaseRate(row.price_pln, row.vat_type === "marza") : null,
     badge: row.badge,
     vehicle_type: row.vehicle_type,
     cover_url: extractCoverUrl(row.listing_images),
@@ -150,9 +152,9 @@ export default async function OgloszeniaPage({ searchParams }: PageProps) {
                     <div className="text-[13px] mb-3" style={{ color: "#888" }}>
                       {[auto.year, auto.mileage_km ? formatNumber(auto.mileage_km) + " km" : null].filter(Boolean).join(" \u00B7 ")}
                     </div>
-                    {auto.leasing_rate_pln && (
+                    {auto.rate && (
                       <div className="text-[22px] font-bold" style={{ color: "#1B2A4A" }}>
-                        od {formatNumber(auto.leasing_rate_pln)} zl <span className="text-[13px] font-normal" style={{ color: "#888" }}>/msc</span>
+                        od {formatNumber(Math.round(auto.rate))} zl <span className="text-[13px] font-normal" style={{ color: "#888" }}>/msc</span>
                       </div>
                     )}
                   </div>

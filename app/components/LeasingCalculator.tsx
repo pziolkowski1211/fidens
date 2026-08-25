@@ -1,6 +1,7 @@
 ﻿"use client"
 
 import { useState, useMemo, useEffect } from "react"
+import { getWykupLimits, calculateRata } from "@/lib/leasing/calculator"
 
 interface LeasingCalculatorProps {
   price: number
@@ -8,49 +9,6 @@ interface LeasingCalculatorProps {
   slug: string
   brand: string | null
   model: string | null
-}
-
-const OKRES_MIN = 24
-const OKRES_MAX = 72
-const WPLATA_MIN = 0
-const WPLATA_MAX = 45
-const APR_MIN = 5.2
-const APR_MAX = 6.2
-
-function getWykupLimits(okres: number): { min: number; max: number } {
-  if (okres <= 24) return { min: 16, max: 55 }
-  if (okres <= 36) return { min: 1, max: 45 }
-  if (okres <= 48) return { min: 1, max: 40 }
-  if (okres <= 60) return { min: 1, max: 35 }
-  return { min: 1, max: 30 }
-}
-
-function getAPR(wplataProc: number, okresMsc: number, wykupProc: number, hasWykup: boolean): number {
-  const wplataScore = 1 - (wplataProc - WPLATA_MIN) / (WPLATA_MAX - WPLATA_MIN)
-  const okresScore = (okresMsc - OKRES_MIN) / (OKRES_MAX - OKRES_MIN)
-  let score: number
-  if (hasWykup) {
-    const wykupLimits = getWykupLimits(okresMsc)
-    const wykupRange = wykupLimits.max - wykupLimits.min
-    const wykupScore = wykupRange > 0 ? (wykupProc - wykupLimits.min) / wykupRange : 0
-    score = (wplataScore + okresScore + wykupScore) / 3
-  } else {
-    score = (wplataScore + okresScore) / 2
-  }
-  const apr = APR_MIN + score * (APR_MAX - APR_MIN)
-  return apr / 100
-}
-
-function calculateRata(cena: number, wplataProc: number, okresMsc: number, wykupProc: number, hasWykup: boolean): number {
-  const wplata = cena * (wplataProc / 100)
-  const wykup = hasWykup ? cena * (wykupProc / 100) : 0
-  const kapital = cena - wplata
-  const aprRoczne = getAPR(wplataProc, okresMsc, wykupProc, hasWykup)
-  const r = aprRoczne / 12
-  if (r === 0) return (kapital - wykup) / okresMsc
-  const factor = Math.pow(1 + r, okresMsc)
-  const pv = kapital - wykup / factor
-  return (pv * r) / (1 - 1 / factor)
 }
 
 function formatNumber(n: number): string {

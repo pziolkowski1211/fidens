@@ -1,6 +1,7 @@
 ﻿import Link from "next/link";
 import Navbar from "./components/Navbar";
 import { createClient } from "@/lib/supabase/server";
+import { calculateShowcaseRate } from "@/lib/leasing/calculator";
 
 interface FeaturedListing {
   id: string;
@@ -10,7 +11,7 @@ interface FeaturedListing {
   mileage_km: number | null;
   fuel: string | null;
   transmission: string | null;
-  leasing_rate_pln: number | null;
+  rate: number | null;
   badge: string | null;
   cover_url: string | null;
 }
@@ -22,7 +23,7 @@ interface LatestListing {
   year: number | null;
   mileage_km: number | null;
   vehicle_type: string | null;
-  leasing_rate_pln: number | null;
+  rate: number | null;
   badge: string | null;
   cover_url: string | null;
 }
@@ -32,14 +33,14 @@ export default async function Home() {
 
   const { data: featuredData } = await supabase
     .from("listings")
-    .select("id, slug, title, year, mileage_km, fuel, transmission, leasing_rate_pln, badge, listing_images(url, is_cover)")
+    .select("id, slug, title, year, mileage_km, fuel, transmission, price_pln, vat_type, badge, listing_images(url, is_cover)")
     .eq("status", "active")
     .eq("is_featured", true)
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
 
-  const featuredRaw = featuredData as { id: string; slug: string; title: string; year: number | null; mileage_km: number | null; fuel: string | null; transmission: string | null; leasing_rate_pln: number | null; badge: string | null; listing_images: { url: string; is_cover: boolean }[] | null } | null;
+  const featuredRaw = featuredData as { id: string; slug: string; title: string; year: number | null; mileage_km: number | null; fuel: string | null; transmission: string | null; price_pln: number | null; vat_type: string | null; badge: string | null; listing_images: { url: string; is_cover: boolean }[] | null } | null;
   const featured: FeaturedListing | null = featuredRaw
     ? {
         id: featuredRaw.id,
@@ -49,7 +50,7 @@ export default async function Home() {
         mileage_km: featuredRaw.mileage_km,
         fuel: featuredRaw.fuel,
         transmission: featuredRaw.transmission,
-        leasing_rate_pln: featuredRaw.leasing_rate_pln,
+        rate: featuredRaw.price_pln ? calculateShowcaseRate(featuredRaw.price_pln, featuredRaw.vat_type === "marza") : null,
         badge: featuredRaw.badge,
         cover_url: extractCoverUrl(featuredRaw.listing_images),
       }
@@ -57,7 +58,7 @@ export default async function Home() {
 
   let latestQuery = supabase
     .from("listings")
-    .select("id, slug, title, year, mileage_km, vehicle_type, leasing_rate_pln, badge, listing_images(url, is_cover)")
+    .select("id, slug, title, year, mileage_km, vehicle_type, price_pln, vat_type, badge, listing_images(url, is_cover)")
     .eq("status", "active")
     .order("created_at", { ascending: false })
     .limit(3);
@@ -67,14 +68,14 @@ export default async function Home() {
   }
 
   const { data: latestData } = await latestQuery;
-  const latest: LatestListing[] = (latestData || []).map((row: { id: string; slug: string; title: string; year: number | null; mileage_km: number | null; vehicle_type: string | null; leasing_rate_pln: number | null; badge: string | null; listing_images: { url: string; is_cover: boolean }[] | null }) => ({
+  const latest: LatestListing[] = (latestData || []).map((row: { id: string; slug: string; title: string; year: number | null; mileage_km: number | null; vehicle_type: string | null; price_pln: number | null; vat_type: string | null; badge: string | null; listing_images: { url: string; is_cover: boolean }[] | null }) => ({
     id: row.id,
     slug: row.slug,
     title: row.title,
     year: row.year,
     mileage_km: row.mileage_km,
     vehicle_type: row.vehicle_type,
-    leasing_rate_pln: row.leasing_rate_pln,
+    rate: row.price_pln ? calculateShowcaseRate(row.price_pln, row.vat_type === "marza") : null,
     badge: row.badge,
     cover_url: extractCoverUrl(row.listing_images),
   }));
@@ -96,7 +97,7 @@ export default async function Home() {
         </p>
       </section>
 
-      {/* OGLOSZENIE TYGODNIA */}
+      {/* OGŁOSZENIE TYGODNIA */}
       {featured && (
         <section className="px-4 sm:px-6 py-10 sm:py-12" style={{ backgroundColor: "#ffffff" }}>
           <div className="max-w-[1100px] mx-auto">
@@ -136,9 +137,9 @@ export default async function Home() {
                     featured.transmission ? capitalize(featured.transmission) : null,
                   ].filter(Boolean).join(" \u00B7 ")}
                 </p>
-                {featured.leasing_rate_pln && (
+                {featured.rate && (
                   <div className="text-[28px] sm:text-3xl lg:text-[36px] font-bold mb-5" style={{ color: "#1B2A4A" }}>
-                    od {formatNumber(featured.leasing_rate_pln)} zl <span className="text-base font-normal" style={{ color: "#888" }}>/miesiąc</span>
+                    od {formatNumber(Math.round(featured.rate))} zl <span className="text-base font-normal" style={{ color: "#888" }}>/miesiąc</span>
                   </div>
                 )}
                 <span className="font-bold rounded-lg py-3.5 px-6 sm:px-8 text-sm sm:text-[15px] self-start" style={{ backgroundColor: "#F0A500", color: "#1B2A4A" }}>
@@ -174,7 +175,7 @@ export default async function Home() {
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={auto.cover_url} alt={auto.title} className="w-full h-full object-cover" />
                     ) : (
-                      <span className="text-sm" style={{ color: "#aaa" }}>Brak zdjecia</span>
+                      <span className="text-sm" style={{ color: "#aaa" }}>Brak zdjęcia</span>
                     )}
                   </div>
                   <div className="p-4">
@@ -194,9 +195,9 @@ export default async function Home() {
                         auto.mileage_km ? formatNumber(auto.mileage_km) + " km" : null,
                       ].filter(Boolean).join(" \u00B7 ")}
                     </div>
-                    {auto.leasing_rate_pln && (
+                    {auto.rate && (
                       <div className="text-[22px] font-bold" style={{ color: "#1B2A4A" }}>
-                        od {formatNumber(auto.leasing_rate_pln)} zl <span className="text-[13px] font-normal" style={{ color: "#888" }}>/msc</span>
+                        od {formatNumber(Math.round(auto.rate))} zl <span className="text-[13px] font-normal" style={{ color: "#888" }}>/msc</span>
                       </div>
                     )}
                   </div>
@@ -218,7 +219,7 @@ export default async function Home() {
               { nr: "1", tekst: "Złóż wniosek online" },
               { nr: "2", tekst: "Decyzja w 60 minut" },
               { nr: "3", tekst: "Podpisz umowę" },
-              { nr: "4", tekst: "Wpłać oplate wstępną" },
+              { nr: "4", tekst: "Wpłać opłatę wstępną" },
               { nr: "5", tekst: "Rejestrujemy i ubezpieczamy" },
               { nr: "6", tekst: "Pojazd gotowy do drogi" },
             ].map((krok) => (
