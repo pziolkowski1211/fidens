@@ -180,12 +180,11 @@ Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyc
    - [ ] BRAKUJE: zmiana adresu "to" z prywatnego maila na docelowy adres @fidens.pl
    - [ ] BRAKUJE: stylizacja formularza pod reszte strony
 
-2. **"Od X zl" na kartach ogloszen** (obecnie pokazuje leasing_rate_pln z bazy)
-   - Zamiast statycznej raty z bazy - liczyc dynamicznie "najatrakcyjniejsza" rate
-   - Wariant B (realistyczny): wplata 20%, okres 60 msc, wykup MAX dla okresu (35% dla 60)
-   - Wariant A (skrajny): max wplata 45%, max okres 72 msc, max wykup 30% - agresywne "od X"
-   - Decyzja klienta: wariant B jesli chcemy uczciwie sprzedawac, A jesli agresywnie
-   - Alternatywnie: pole showcase_rate w bazie, klientka wpisuje recznie per pojazd
+2. **"Od X zl" na kartach ogloszen** - ZROBIONE
+   - [x] Decyzja klienta: Wariant B (realistyczny) - wplata 20%, okres 60 msc, wykup MAX dla okresu
+   - [x] Wspolny wzor w lib/leasing/calculator.ts (uzywany przez karty ORAZ LeasingCalculator.tsx)
+   - [x] Zaktualizowane: strona glowna (ogloszenie tygodnia + najnowsze), lista /ogloszenia
+   - [x] LeasingCalculator.tsx startuje z tymi samymi parametrami (60 msc, max wykup) - spojna rata karta/kalkulator
 
 3. **Panel admina** /admin
    - Logowanie przez Supabase Auth (tylko 1 user)
@@ -238,5 +237,6 @@ Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyc
 - **URL nie moze miec polskich znakow:** przy Ctrl+H uwaga zeby nie zmienic href="/ogloszenia"
   na href="/Ogloszenia" ani "/ogłoszenia". Klikac pojedynczo Replace, nie Replace All.
   Widok Git Local Changes (Working Tree) w VS Code = szybki sprawdzian co poszlo nie tak.
+
 
 
