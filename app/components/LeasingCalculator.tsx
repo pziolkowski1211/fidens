@@ -16,10 +16,10 @@ function formatNumber(n: number): string {
 }
 
 export default function LeasingCalculator({ price, isMarza, slug, brand, model }: LeasingCalculatorProps) {
-  const [wplataProc, setWplataProc] = useState(20)
-  const [okresMsc, setOkresMsc] = useState(48)
-  const [wykupProc, setWykupProc] = useState(10)
   const hasWykup = !isMarza
+  const [wplataProc, setWplataProc] = useState(20)
+  const [okresMsc, setOkresMsc] = useState(60)
+  const [wykupProc, setWykupProc] = useState(() => (hasWykup ? getWykupLimits(60).max : 10))
 
   useEffect(() => {
     if (!hasWykup) return
