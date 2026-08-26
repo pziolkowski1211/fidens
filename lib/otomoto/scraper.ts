@@ -233,3 +233,62 @@ export async function fetchOtomotoListing(url: string): Promise<OtomotoScrapedDa
     warnings,
   }
 }
+export type OtomotoListingStatus = "active" | "inactive" | "unknown"
+
+// Lekkie sprawdzenie czy ogloszenie nadal istnieje na OtoMoto - bez pelnego
+// scrapowania wszystkich pol. Uzywane przez cron synchronizujacy.
+// - "active": strona zwraca dane ogloszenia (znaleziono obiekt advert)
+// - "inactive": OtoMoto zwraca 404/410, albo strona jasno wskazuje ze
+//   ogloszenie wygaslo/zostalo zakonczone
+// - "unknown": nie udalo sie jednoznacznie stwierdzic (inny blad HTTP,
+//   problem sieciowy, zmiana struktury strony) - NIE zmieniamy wtedy
+//   statusu w bazie, zeby uniknac falszywego oznaczenia dobrego
+//   ogloszenia jako nieaktywne
+export async function checkOtomotoListingStatus(url: string): Promise<OtomotoListingStatus> {
+  let res: Response
+
+  try {
+    res = await fetch(url, {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept-Language": "pl-PL,pl;q=0.9",
+      },
+    })
+  } catch {
+    return "unknown"
+  }
+
+  if (res.status === 404 || res.status === 410) {
+    return "inactive"
+  }
+
+  if (!res.ok) {
+    return "unknown"
+  }
+
+  const html = await res.text()
+
+  // Uwaga: te teksty sa przypuszczeniem (nie mielismy realnego przykladu
+  // wygaslego ogloszenia do sprawdzenia) - moze wymagac poprawki.
+  const EXPIRED_MARKERS = [
+    "To ogloszenie jest nieaktualne",
+    "Ogloszenie zostalo zakonczone",
+    "Ogloszenie zostalo usuniete",
+  ]
+  if (EXPIRED_MARKERS.some((marker) => html.includes(marker))) {
+    return "inactive"
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const widget =
+    (extractJsonObject(html, '"financingAdCarDetailsWidget":{"status"') as any) ??
+    (extractJsonObject(html, '"financingSimulatorWidget":{"status"') as any)
+  const advert = widget?.props?.advert
+
+  if (advert) {
+    return "active"
+  }
+
+  return "unknown"
+}

@@ -86,7 +86,7 @@ export default async function OgloszenieDetailPage({ params }: PageProps) {
       <section className="px-4 sm:px-6 py-8 sm:py-10 flex-1">
         <div className="max-w-[1100px] mx-auto grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8">
 
-          <div>
+          <div className="min-w-0">
             <Carousel images={images} alt={listing.title} />
 
             <div className="flex items-start gap-3 mb-3 flex-wrap">
