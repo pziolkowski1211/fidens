@@ -49,7 +49,7 @@ export async function submitContactForm(formData: FormData) {
 
   try {
     await resend.emails.send({
-      from: "Fidens <onboarding@resend.dev>",
+      from: "Fidens <kontakt@fidens.pl>",
       to: "p.ziolkowski1211@gmail.com",
       subject: `Nowe zapytanie: ${name}`,
       text: `Nowe zapytanie ofertowe.
