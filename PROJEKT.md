@@ -216,42 +216,44 @@ Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyc
 - [x] Wgrane na Vercel -> fidens.pl
 - [x] **Panel admina /admin - KOMPLETNY** (auth, logowanie, layout, CRUD ogloszen,
       upload zdjec z kompresja/okladka/kolejnoscia, usuwanie, lista zapytan z notatkami)
+- [x] **Resend - wysylka maili z /kontakt** - nadawca zmieniony z sandboxowego
+      onboarding@resend.dev na kontakt@fidens.pl (domena zweryfikowana w Resend).
+      Odbiorca powiadomien na razie prywatny mail wlasciciela (patrz sekcja Poczta).
+- [x] Wskazowka w formularzu "nowe ogloszenie" ze zdjecia dodaje sie dopiero po zapisaniu
+- [x] **"Od X zl" na kartach ogloszen** - dynamiczne liczenie (lib/leasing/calculator.ts,
+      calculateShowcaseRate) wariantem B (wplata 20%, okres 60 msc, wykup max dla okresu),
+      podpiete na stronie glownej i liscie /ogloszenia. Zatwierdzone z klientem.
+- [x] **Import z OtoMoto** (lib/otomoto/scraper.ts + app/admin/ogloszenia/otomoto-actions.ts):
+  - Pole "Link OtoMoto" + przycisk "Importuj dane" w formularzu nowego ogloszenia
+  - Parsuje __NEXT_DATA__ ze strony OtoMoto (marker "financingAdCarDetailsWidget", fallback
+    "financingSimulatorWidget") -> tytul, cena, marka, model, rok, przebieg, paliwo
+  - Dodatkowo z "cepikWidget" (gdy ogloszenie ma zweryfikowane dane CEPIK): kolor, skrzynia
+    biegow, moc (KM), pojemnosc silnika (cm3), kraj pochodzenia
+  - Wariant (wersja wyposazenia) NIE jest wyciagany - uzupelnia sie recznie
+  - Import zdjec: osobny przycisk "Importuj zdjecia z OtoMoto" w ImageUploader.tsx (widoczny
+    tylko gdy ogloszenie ma link OtoMoto) - wyciaga adresy zdjec z CDN OtoMoto
+    (ireland.apollo.olxcdn.com), pobiera w rozmiarze 1600px, wgrywa do Supabase Storage
+  - Parser jest best-effort: jesli OtoMoto zmieni strukture strony, zwraca puste pola +
+    warnings zamiast bledu - trzeba wtedy uzupelnic dane recznie
+  - Uwaga: pole otomoto_id NIE jest jeszcze automatycznie ustawiane przy imporcie (zawsze null)
 
 ### Do zrobienia (priorytety)
 
-1. **Resend - wysylka maili z formularza /kontakt** <-- NASTEPNY KROK
-   - DNS verification dla fidens.pl przez Hostido bylo w toku, sprawdzic status
-   - Mail do wlasciciela z parametrami pojazdu i leasingu przy nowym contact_request
-
-2. **Drobne dopiecia panelu admina**
-   - Formularz "nowe" ogloszenie: dodac widoczna wskazowke ze zdjecia dodaje sie
-     dopiero po zapisaniu (bo ImageUploader wymaga listing_id)
-   - Rozwazyc email admina docelowo na ...@fidens.pl (patrz sekcja Poczta)
-
-3. **"Od X zl" na kartach ogloszen** (obecnie pokazuje leasing_rate_pln z bazy)
-   - Zamiast statycznej raty z bazy - liczyc dynamicznie "najatrakcyjniejsza" rate
-   - Wariant B (realistyczny): wplata 20%, okres 60 msc, wykup MAX dla okresu (35% dla 60)
-   - Wariant A (skrajny): max wplata 45%, max okres 72 msc, max wykup 30% - agresywne "od X"
-   - Decyzja klienta: wariant B jesli chcemy uczciwie sprzedawac, A jesli agresywnie
-   - Alternatywnie: pole showcase_rate w bazie, klientka wpisuje recznie per pojazd
-
-4. **Import z OtoMoto**
-   - Pole "Wklej link OtoMoto" w panelu admina
-   - Scraping danych pojazdu (marka, model, rok, przebieg, cena, opis...)
-   - Stworzenie listingu z otomoto_url i otomoto_id
-   - Zdjecia ZAWSZE wgrywane recznie (osobno)
-
-5. **Synchronizacja z OtoMoto**
+1. **Synchronizacja z OtoMoto** <-- NASTEPNY KROK
    - Cron (Vercel Cron Jobs?) raz dziennie sprawdza wszystkie listings z otomoto_url
    - Jezeli OtoMoto zwraca 404 -> ustaw status='inactive' (nie usuwa, zachowuje historie)
+   - Przy okazji: rozwazyc zapisywanie otomoto_id podczas importu (przydatne do synchronizacji)
 
-6. **SEO i optymalizacja**
+2. **SEO i optymalizacja**
    - Przejsc z <img> na <next/image> (karuzela, karta ogloszen, cover images, ImageUploader
      w panelu admina) - wymaga next.config.ts z remotePatterns dla Supabase
    - Kalibracja kalkulatora (Opcja C) - tabela marz od klientki, wtedy odchylenia od prawdziwego systemu banku znikna (obecnie 4-5%)
    - Favicon z logo Fidens (favicon.io/favicon-converter)
    - Meta tagi (Open Graph + description per strona)
    - Strony statyczne: /o-nas, /leasing, /regulamin, /polityka
+
+3. **Drobne dopiecia panelu admina**
+   - Rozwazyc email admina docelowo na ...@fidens.pl (patrz sekcja Poczta)
 
 ## Konwencje pracy
 - **Pisanie kodu:** komendy w terminalu (PowerShell) z Out-File -Encoding utf8
