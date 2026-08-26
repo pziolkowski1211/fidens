@@ -151,8 +151,8 @@ Tabele utworzone (RLS wlaczone):
 - **Galeria zdjec:** karuzela z lightbox (kliknij zdjecie zeby powiekszyc)
 - **Kalkulator leasingu:** frontend only, parametry wysylane w URL do /kontakt
   - Automatycznie wybiera typ na podstawie vat_type: 'marza' = pozyczka leasingowa (bez wykupu), inaczej = leasing (z wykupem)
-  - Wzor: annuita z balonem, APR 5,2% (najkorzystniej) do 6,2% (najmniej korzystnie)
-  - Uklad "wariant A": rata jako hero (44px), cena drobno pod ratĂ„â€¦
+  - Wzor: annuita z balonem, APR 5,4% (najkorzystniej) do 7,3% (najmniej korzystnie)
+  - Uklad "wariant A": rata jako hero (44px), cena brutto/netto drobno pod rata
 - **Wyszukiwarka:** autocomplete typu Google ze statycznej listy (~50 marek + modele).
   Klik w sugestie -> /ogloszenia?marka=X&model=Y. Brak wynikow -> CTA "Zapytaj o ten pojazd" z prefilled marka/modelem.
 - **Mobile nawigacja:** logo + lupa + hamburger. Drawer wysuwany z prawej.
@@ -171,12 +171,28 @@ PV = kapital - wykup / (1+r)^n
 rata = PV * r / (1 - (1+r)^(-n))
 
 
-### APR zalezne od parametrow (5,2% - 6,2%)
+
+### Netto vs brutto (WAZNE)
+- price_pln w bazie to zawsze cena BRUTTO (tak jak importowana z OtoMoto - bez zadnej konwersji).
+- Dla VAT-23 (leasing, hasWykup=true): rata liczona jest od ceny NETTO (getNettoPrice() w calculator.ts,
+  dzieli przez 1.23). W kalkulatorze (LeasingCalculator.tsx) wyswietlane sa OBiE raty (netto - glowna,
+  duza liczba + 
+etto obok; brutto - mala linijka pod spodem) oraz obie ceny (Cena brutto: X zl .
+  Cena netto: Y zl). Kwoty przy suwakach Wplata/Wykup licza sie od ceny BRUTTO (realne pieniadze ktore
+  klient wplaca), mimo ze sama rata liczona jest od netto - to swiadoma decyzja produktowa (klient mysli
+  w realnych zlotowkach, nie w abstrakcyjnym procencie netto).
+- Dla VAT marza (pozyczka, hasWykup=false): brak podzialu netto/brutto - liczymy zawsze od pelnej ceny,
+  etykieta to po prostu Cena brutto: X zl . VAT marza.
+- Na kartach ogloszen (strona glowna + /ogloszenia): calculateShowcaseRate() tez liczy od netto dla
+  VAT-23, i przy racie dopisywane jest slowo 
+etto (warunek: !is_marza).
+
+### APR zalezne od parametrow (5,4% - 7,3%)
 Score liczony ze srednich 3 parametrow (2 dla pozyczki - bez wykupu):
 - wplata_score = 1 - wplata/45 (max wplata = najkorzystniej)
 - okres_score = (okres-24)/48 (krotszy okres = najkorzystniej)
 - wykup_score = (wykup - wykupMin) / (wykupMax - wykupMin) (min wykup = najkorzystniej)
-- APR = 5,2 + score * 1,0
+- APR = 5,4 + score * 1,9
 
 ### Limity suwakow
 - Wplata: 0-45%, default 20%
@@ -211,8 +227,11 @@ Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyc
 - [x] Karuzela zdjec + lightbox (strzalki, klawisze, swipe na mobile, klik zamyka poza zdjeciem)
 - [x] Cover images na stronie glownej (ogloszenie tygodnia + 3 najnowsze) i liscie /ogloszenia
 - [x] Zdjecia w Storage dla 3 testowych ogloszen (BMW, Mercedes, Caterpillar)
-- [x] Kalkulator leasingu/pozyczki (Opcja A - proste zalezne APR 5,2-6,2%)
-- [x] Formularz kontaktowy /kontakt (Supabase insert do contact_requests)
+- [x] Kalkulator leasingu/pozyczki (Opcja A - proste zalezne APR 5,4-7,3%)
+- [x] Formularz kontaktowy /kontakt (Supabase insert do contact_requests). Redesign:
+      Navbar + stopka + biala karta na jasnym tle (spojnie z reszta strony), wszystkie
+      etykiety/inputy z jawnym kolorem tekstu (text-gray-900), ekran "Dziekujemy" z
+      zielonym kolkiem + bialy haczyk (SVG, nie emoji) zamiast surowego domyslnego stylu.
 - [x] Wgrane na Vercel -> fidens.pl
 - [x] **Synchronizacja z OtoMoto (ZROBIONE)** - Vercel Cron Job (/api/cron/otomoto-sync),
       raz dziennie o 3:00 UTC (godzinne okno na planie Hobby). Sprawdza wszystkie

@@ -1,39 +1,3 @@
-﻿# Fidens.pl - Projekt strony
-
-## Cel projektu
-Strona dla brokera/dealera leasingowego (auta osobowe, ciezarowe, maszyny budowlane).
-Klienci wchodza glownie z social mediow -> mobile pierwszy priorytet.
-
-## Stack techniczny
-- **Next.js 16** (App Router) + TypeScript + Tailwind v4
-- **Supabase** - baza danych (Postgres), Auth (panel admina), Storage (zdjecia)
-- **Vercel** - hosting -> fidens.pl
-- **Resend** - planowane do wysylki maili z formularzy (3000/msc free)
-
-## Repo i srodowisko
-- **GitHub:** github.com/pziolkowski1211/fidens
-- **Lokalne:** `C:\Users\pziol\fidens`
-- **Edytor:** VS Code
-- **Terminal:** PowerShell
-- **Hostname dev (mobile testy):** `npx next dev -H 0.0.0.0`
-
-## Klucze i sekrety
-Plik `.env.local` (NIE w gitu) zawiera:
-- `NEXT_PUBLIC_SUPABASE_URL` - https://mglgfsaimktblkzjkmfg.supabase.co
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY` - sb_publishable_LgsGRj9uVhBigrIXMPY5Rw_89VdFLlN
-
-Te same klucze sa dodane na Vercel (Environment Variables -> Production/Preview/Development).
-
-## Identyfikacja wizualna
-- **Granat (primary):** `#1B2A4A`
-- **Pomaranczowy (accent):** `#F0A500`
-- **Tlo jasne:** `#f8f9fb`
-- **Bordery:** `#e8eaed`
-- **Logo jasne (na ciemne tlo):** `public/jasne.png` (1536x1024 px, transparent)
-- **Logo ciemne (na jasne tlo):** `public/ciemne.png` (1536x1024 px, transparent)
-
-## Struktura folderow
-@'
 # AGENTS.md - Instrukcje dla AI asystenta
 
 ## Profil uzytkownika
@@ -69,6 +33,14 @@ Te same klucze sa dodane na Vercel (Environment Variables -> Production/Preview/
 - **NIE pisz** "stworz plik X w VS Code" - uzyj terminala
 - **NIE uzywaj** polskich znakow w komendach PowerShell (encoding utf8 czasem psuje)
 - **NIE uzywaj** `regex replace` na duzych plikach - lepiej nadpisz caly plik
+- **NIE uzywaj** `Get-Content -Raw` bez `-Encoding UTF8` na plikach z polskimi znakami - psuje je (mojibake typu "Ĺ‚" zamiast "ł")
+- **NIE zapominaj** sprawdzic BOM po zapisie plikow .json/.ts/.tsx/.md (pierwsze 3 bajty NIE powinny byc `EF BB BF`) - BOM w vercel.json powoduje blad "Invalid vercel.json file provided" na Vercelu
+
+## Kodowanie plikow (wazne, kosztowalo juz kilka bledow)
+- Odczyt pliku z polskimi znakami: `Get-Content -Raw -Encoding UTF8 "sciezka"`
+- Zapis pliku: `[System.IO.File]::WriteAllText("$PWD\sciezka", $content, (New-Object System.Text.UTF8Encoding $false))` - ten `$false` = bez BOM
+- Po kazdym zapisie sprawdz BOM: `$bytes = [System.IO.File]::ReadAllBytes("sciezka"); "{0:X2} {1:X2} {2:X2}" -f $bytes[0],$bytes[1],$bytes[2]` - nie powinno wyjsc `EF BB BF`
+- Najbezpieczniej: gdy trzeba zmienic wiele miejsc w pliku z polskimi znakami, NADPISZ caly plik (heredoc @''...''@) zamiast robic `Get-Content -Raw` + `-replace` + zapis - ryzyko podwojnego bledu kodowania przy odczycie
 
 ## Czego trzymac sie
 - Zaczynaj nowy etap od krotkiego planu (co robimy, jak)
