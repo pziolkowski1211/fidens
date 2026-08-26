@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from "react";
 import imageCompression from "browser-image-compression";
 import { createClient } from "@/lib/supabase/client";
 
+import { importOtomotoPhotos } from "@/app/admin/ogloszenia/otomoto-actions";
+
 type ListingImage = {
   id: string;
   listing_id: string;
@@ -16,15 +18,19 @@ type ListingImage = {
 export default function ImageUploader({
   listingId,
   slug,
+  otomotoUrl,
 }: {
   listingId: string;
   slug: string;
+  otomotoUrl?: string;
 }) {
   const [images, setImages] = useState<ListingImage[]>([]);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [dragOver, setDragOver] = useState(false);
+  const [importingPhotos, setImportingPhotos] = useState(false);
+  const [importPhotosMessage, setImportPhotosMessage] = useState<string | null>(null);
 
   const loadImages = useCallback(async () => {
     const supabase = createClient();
@@ -107,6 +113,27 @@ export default function ImageUploader({
     loadImages();
   }
 
+  async function handleImportOtomotoPhotos() {
+    if (!otomotoUrl) return;
+    setImportingPhotos(true);
+    setImportPhotosMessage(null);
+    setError(null);
+
+    const result = await importOtomotoPhotos(listingId, slug, otomotoUrl);
+
+    setImportingPhotos(false);
+
+    if (!result.success) {
+      setError(result.error);
+      return;
+    }
+
+    setImportPhotosMessage(
+      `Zaimportowano ${result.imported} zdjec` + (result.failed > 0 ? ` (${result.failed} nie udalo sie)` : "")
+    );
+    loadImages();
+  }
+
   async function handleSetCover(imageId: string) {
     const supabase = createClient();
 
@@ -161,6 +188,24 @@ export default function ImageUploader({
 
   return (
     <div className="space-y-4">
+      {otomotoUrl && (
+        <div className="rounded-lg border border-gray-200 bg-white p-4">
+          <p className="mb-2 text-sm text-gray-600">
+            To ogloszenie ma podpiety link OtoMoto - mozesz zaimportowac stamtad zdjecia zamiast (albo obok) wgrywac je recznie.
+          </p>
+          <button
+            type="button"
+            onClick={handleImportOtomotoPhotos}
+            disabled={importingPhotos}
+            className="rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+            style={{ backgroundColor: "#F0A500" }}
+          >
+            {importingPhotos ? "Importowanie zdjec..." : "Importuj zdjecia z OtoMoto"}
+          </button>
+          {importPhotosMessage && <p className="mt-2 text-sm" style={{ color: "#1B2A4A" }}>{importPhotosMessage}</p>}
+        </div>
+      )}
+
       <div
         onDragOver={(e) => {
           e.preventDefault();

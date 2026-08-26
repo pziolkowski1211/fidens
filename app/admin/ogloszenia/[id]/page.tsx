@@ -468,7 +468,7 @@ export default function EdytujOgloszeniePage() {
 
         <section className="rounded-lg border border-gray-200 bg-white p-4">
           <h2 className="mb-3 text-sm font-semibold text-gray-500">Zdjecia</h2>
-          <ImageUploader listingId={id} slug={slug} />
+          <ImageUploader listingId={id} slug={slug} otomotoUrl={otomotoUrl} />
         </section>
 
         {error && <p className="text-sm text-red-600">{error}</p>}

@@ -100,12 +100,42 @@ function mapTransmission(raw: unknown): OtomotoScrapedData["transmission"] {
   return null
 }
 
-// "149 KM" -> 149 ; "1 969 cm3" -> 1969
+// "149 KM" -> 149 ; "1 969 cm3" -> 1969 (nie 19693 - "cm3" konczy sie cyfra!)
 function parseFirstNumber(raw: unknown): number | null {
   if (typeof raw !== "string") return null
-  const digits = raw.replace(/[^\d]/g, "")
-  if (!digits) return null
-  return Number(digits)
+  const compact = raw.replace(/\s+/g, "")
+  const match = compact.match(/^(\d+)/)
+  if (!match) return null
+  return Number(match[1])
+}
+
+// Wyciaga adresy zdjec galerii ze strony OtoMoto. Zdjecia sa serwowane przez
+// CDN (ireland.apollo.olxcdn.com) z parametrem rozmiaru w adresie
+// (np. ";s=5120x0;q=100" dla pelnego rozmiaru, ";s=148x110" dla miniaturki).
+// Kazde zdjecie wystepuje na stronie kilka razy w roznych rozmiarach - bierzemy
+// unikalny identyfikator pliku i budujemy WLASNY adres w rozmiarze ~1600px,
+// zeby nie sciagac ogromnych oryginalow (CDN sam przeskaluje na zadanie).
+const OTOMOTO_IMAGE_PATTERN =
+  /https:\/\/ireland\.apollo\.olxcdn\.com\/v1\/files\/([A-Za-z0-9_\-.]+)\/image;s=(\d+)x\d+/g
+
+export function extractOtomotoImageUrls(html: string): string[] {
+  const seenFileIds = new Set<string>()
+  const urls: string[] = []
+
+  let match: RegExpExecArray | null
+  OTOMOTO_IMAGE_PATTERN.lastIndex = 0
+  while ((match = OTOMOTO_IMAGE_PATTERN.exec(html)) !== null) {
+    const fileId = match[1]
+    const width = Number(match[2])
+    // Pomijamy male miniaturki (np. 148x110, 5x5) - interesuja nas tylko
+    // warianty, ktore wskazuja na zdjecie galerii (szerokosc >= 1000).
+    if (width < 1000) continue
+    if (seenFileIds.has(fileId)) continue
+    seenFileIds.add(fileId)
+    urls.push(`https://ireland.apollo.olxcdn.com/v1/files/${fileId}/image;s=1600x0;q=75`)
+  }
+
+  return urls
 }
 
 export async function fetchOtomotoListing(url: string): Promise<OtomotoScrapedData> {
