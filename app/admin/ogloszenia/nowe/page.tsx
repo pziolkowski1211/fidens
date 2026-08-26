@@ -121,6 +121,14 @@ export default function NoweOgloszeniePage() {
         Nowe ogloszenie
       </h1>
 
+      <div
+        className="mb-4 rounded-md border px-4 py-3 text-sm"
+        style={{ borderColor: "#F0A500", backgroundColor: "#FFF8E8", color: "#1B2A4A" }}
+      >
+        Zdjecia bedzie mozna dodac dopiero po zapisaniu ogloszenia
+        (nastapi automatyczne przekierowanie do edycji, gdzie znajduje sie sekcja Zdjecia).
+      </div>
+
       <form onSubmit={handleSubmit} className="space-y-6">
         <section className="rounded-lg border border-gray-200 bg-white p-4">
           <h2 className="mb-3 text-sm font-semibold text-gray-500">Podstawowe</h2>
