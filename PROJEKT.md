@@ -24,6 +24,12 @@ Plik .env.local (NIE w gitu) zawiera:
 
 Te same klucze sa dodane na Vercel (Environment Variables -> Production/Preview/Development).
 
+## Poczta / domena
+- Domena fidens.pl kupiona u Hostido, ale BEZ pakietu hostingowego (brak poczty).
+- Admin loguje sie na razie zwyklym istniejacym mailem (nie @fidens.pl).
+- W przyszlosci: dokupic hosting/Zoho Mail/Google Workspace dla ...@fidens.pl,
+  wtedy podmienic email admina w Supabase Auth (Authentication -> Users).
+
 ## Identyfikacja wizualna
 - **Granat (primary):** #1B2A4A
 - **Pomaranczowy (accent):** #F0A500
@@ -41,6 +47,19 @@ fidens/
     - SearchAutocomplete.tsx (wyszukiwarka z autocomplete)
     - Carousel.tsx (karuzela zdjec + lightbox z klawiszami i swipe)
     - LeasingCalculator.tsx (kalkulator leasingu/pozyczki z suwakami)
+    - ImageUploader.tsx (upload+kompresja zdjec, okladka, kolejnosc, usuwanie - uzywany w adminie)
+  - admin/
+    - layout.tsx (gorny pasek nawigacji: Ogloszenia / Zapytania / Wyloguj, ukryty na /admin/login)
+    - login/
+      - page.tsx (logowanie Supabase Auth email+haslo)
+    - ogloszenia/
+      - page.tsx (lista ogloszen w tabeli, link Edytuj, przycisk Dodaj nowe)
+      - nowe/
+        - page.tsx (formularz dodawania ogloszenia)
+      - [id]/
+        - page.tsx (formularz edycji + ImageUploader + usuwanie ogloszenia)
+    - zapytania/
+      - page.tsx (lista contact_requests, oznaczanie przeczytane, notatki z potwierdzeniem zapisu)
   - ogloszenia/
     - page.tsx (lista ogloszen z filtrami z URL + cover images)
     - [slug]/
@@ -52,13 +71,14 @@ fidens/
 - lib/
   - supabase/
     - client.ts (klient browser)
-    - server.ts (klient server, cookies)
+    - server.ts (klient server, cookies, async createClient)
     - types.ts (typy TS dla bazy)
   - vehicles/
     - catalog.ts (statyczna lista marek/modeli)
 - public/
   - jasne.png (logo na ciemne tlo)
   - ciemne.png (logo na jasne tlo)
+- proxy.ts (dawniej middleware.ts - patrz Konwencje pracy; chroni /admin/*, redirect do /admin/login)
 - .env.local (klucze, poza git)
 - PROJEKT.md (ten plik)
 - AGENTS.md (instrukcje dla AI)
@@ -76,8 +96,8 @@ Tabele utworzone (RLS wlaczone):
 - price_pln, leasing_rate_pln, leasing_initial_pct, leasing_months, leasing_residual_pct
 - is_featured (Ogloszenie tygodnia), badge ("Nowe"/"Promocja"/null)
 - otomoto_url, otomoto_id (do importu/synchronizacji)
-- description, location_city
-- vat_type ('marza' lub '23'/null - decyduje typ kalkulatora)
+- description, location_city (NIEUZYWANE w formularzach admina - zawsze wysylane jako null)
+- vat_type ('marza' lub 'vat23' - UWAGA: nie '23', tylko 'vat23'! decyduje typ kalkulatora)
 - search_vector (TSVECTOR + GIN index dla pelnotekstowego wyszukiwania)
 
 ### listing_images (galeria zdjec)
@@ -85,9 +105,12 @@ Tabele utworzone (RLS wlaczone):
 - Partial unique index: max 1 cover per listing (WHERE is_cover=true)
 
 ### contact_requests (zapytania z formularza)
-- id, listing_id (FK, nullable), name, phone, email
+- id, listing_id (FK, nullable), name, phone, email, nip, message
 - leasing_initial_pct, leasing_months, leasing_residual_pct
 - is_read, notes (admin)
+- UWAGA: typ TS ContactRequestUpdate (Partial<ContactRequestInsert>) NIE zawiera
+  is_read ani notes bo ContactRequestInsert je pomija. Update tych 2 pol wymaga
+  rzutowania "as never" w .update(). Nie jest to blad kodu, tylko ograniczenie typow.
 
 ### Storage bucket
 - listing-images - publiczny odczyt, upload tylko zalogowany admin
@@ -96,6 +119,33 @@ Tabele utworzone (RLS wlaczone):
 ### RLS policies
 - Public: SELECT na active listings + ich images, INSERT na contact_requests
 - Authenticated (admin): pelny dostep do wszystkich tabel
+
+## Panel admina /admin (ZROBIONE - sesja z 26.08.2026)
+- **Auth:** proxy.ts (Next.js 16 - middleware.ts jest deprecated, patrz Konwencje pracy)
+  sprawdza sesje Supabase przy kazdym /admin/*, redirect do /admin/login jesli brak sesji,
+  redirect do /admin/ogloszenia jesli zalogowany wejdzie na /admin/login.
+- **Logowanie:** /admin/login - email+haslo, Supabase Auth signInWithPassword.
+  Admin zalozony recznie w Supabase Dashboard (Authentication -> Users -> Add user,
+  Auto Confirm User). Na razie zwykly istniejacy mail, nie @fidens.pl (patrz sekcja Poczta).
+- **Layout:** gorny pasek (nie sidebar - lepszy na mobile), granatowy, linki
+  Ogloszenia/Zapytania podswietlane pomaranczowo gdy aktywne, przycisk Wyloguj.
+- **Lista ogloszen** /admin/ogloszenia: tabela tytul/marka-model/cena/status (kolorowe
+  badge: aktywne=zielony/nieaktywne=szary/sprzedane=czerwony), link Edytuj, przycisk Dodaj nowe.
+- **Dodawanie** /admin/ogloszenia/nowe: formularz z sekcjami (Podstawowe, Techniczne,
+  Cena i leasing, Dodatkowe). Auto-slug z tytulu (edytowalny recznie). Po zapisie redirect
+  do /admin/ogloszenia/[id] (tam dopiero mozna dodac zdjecia, bo trzeba miec listing_id).
+- **Edycja** /admin/ogloszenia/[id]: ten sam uklad co "nowe", wczytuje dane z bazy,
+  zawiera sekcje Zdjecia (ImageUploader) i przycisk Usun ogloszenie (z potwierdzeniem).
+- **Upload zdjec** (ImageUploader.tsx, komponent uzywany w [id]/page.tsx):
+  - drag&drop + zwykly input file, multi-file
+  - kompresja w przegladarce (browser-image-compression: maxWidthOrHeight 1600, maxSizeMB 0.4)
+  - upload do Storage bucket listing-images pod folder=slug
+  - zapis rekordu do listing_images, pierwsze wgrane zdjecie automatycznie = okladka
+  - przyciski: strzalki kolejnosci (podpisane "left"/"right" - unikalismy strzalek Unicode
+    bo namieszaly w PowerShell heredoc), Ustaw okladke, Usun
+- **Zapytania** /admin/zapytania: lista contact_requests (najnowsze first), pomaranczowa
+  ramka gdy nieprzeczytane, przycisk toggle Przeczytane/Nieprzeczytane, pole notatek
+  z przyciskiem Zapisz + potwierdzenie "Zapisano" (znika po 2s).
 
 ## Decyzje produktowe (zatwierdzone z klientem)
 - **Galeria zdjec:** karuzela z lightbox (kliknij zdjecie zeby powiekszyc)
@@ -107,6 +157,7 @@ Tabele utworzone (RLS wlaczone):
   Klik w sugestie -> /ogloszenia?marka=X&model=Y. Brak wynikow -> CTA "Zapytaj o ten pojazd" z prefilled marka/modelem.
 - **Mobile nawigacja:** logo + lupa + hamburger. Drawer wysuwany z prawej.
 - **Logo klikalne** (powrot na strone glowna).
+- **Panel admina:** gorny pasek nawigacji (nie sidebar) - decyzja pod kontem uzytkowania z telefonu.
 - **Import z OtoMoto:** scraping po URL ogloszenia (brak oficjalnego API).
   Zdjecia uploadowane RECZNIE (osobno od OtoMoto) - inne kadry/jakosc.
   Synchronizacja: jak ogloszenie znika z OtoMoto -> znika z Fidens.
@@ -161,40 +212,28 @@ Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyc
 - [x] Cover images na stronie glownej (ogloszenie tygodnia + 3 najnowsze) i liscie /ogloszenia
 - [x] Zdjecia w Storage dla 3 testowych ogloszen (BMW, Mercedes, Caterpillar)
 - [x] Kalkulator leasingu/pozyczki (Opcja A - proste zalezne APR 5,2-6,2%)
-  - Rata jako hero (44px), cena drobno pod ratą
-  - Suwaki z dynamicznymi limitami wykupu
-  - Automatyczny wybor typu (leasing/pozyczka) na podstawie vat_type
-  - Link do /kontakt z parametrami w URL
+- [x] Formularz kontaktowy /kontakt (Supabase insert do contact_requests)
 - [x] Wgrane na Vercel -> fidens.pl
+- [x] **Panel admina /admin - KOMPLETNY** (auth, logowanie, layout, CRUD ogloszen,
+      upload zdjec z kompresja/okladka/kolejnoscia, usuwanie, lista zapytan z notatkami)
 
 ### Do zrobienia (priorytety)
 
-1. **Formularz kontaktowy** /kontakt - KOMPLETNIE ZROBIONE
-   - [x] Pola: imie, telefon, email, NIP, wiadomosc
-   - [x] Odczyt query params z kalkulatora, zapis do contact_requests
-   - [x] Link w Navbar juz podpiety
-   - [x] Naprawiono typy Supabase (lib/supabase/types.ts)
-   - [x] Wysylka maila przez Resend (RESEND_API_KEY w .env.local i na Vercel)
-   - [x] Domena fidens.pl w trakcie weryfikacji w Resend (rekordy DNS dodane w Hostido)
-   - [ ] BRAKUJE: zmiana adresu "from" na @fidens.pl gdy domena sie zweryfikuje w Resend
-   - [ ] BRAKUJE: zmiana adresu "to" z prywatnego maila na docelowy adres @fidens.pl
-   - [ ] BRAKUJE: stylizacja formularza pod reszte strony
+1. **Resend - wysylka maili z formularza /kontakt** <-- NASTEPNY KROK
+   - DNS verification dla fidens.pl przez Hostido bylo w toku, sprawdzic status
+   - Mail do wlasciciela z parametrami pojazdu i leasingu przy nowym contact_request
 
-2. **"Od X zl" na kartach ogloszen** - ZROBIONE
-   - [x] Decyzja klienta: Wariant B (realistyczny) - wplata 20%, okres 60 msc, wykup MAX dla okresu
-   - [x] Wspolny wzor w lib/leasing/calculator.ts (uzywany przez karty ORAZ LeasingCalculator.tsx)
-   - [x] Zaktualizowane: strona glowna (ogloszenie tygodnia + najnowsze), lista /ogloszenia
-   - [x] LeasingCalculator.tsx startuje z tymi samymi parametrami (60 msc, max wykup) - spojna rata karta/kalkulator
+2. **Drobne dopiecia panelu admina**
+   - Formularz "nowe" ogloszenie: dodac widoczna wskazowke ze zdjecia dodaje sie
+     dopiero po zapisaniu (bo ImageUploader wymaga listing_id)
+   - Rozwazyc email admina docelowo na ...@fidens.pl (patrz sekcja Poczta)
 
-3. **Panel admina** /admin
-   - Logowanie przez Supabase Auth (tylko 1 user)
-   - CRUD na ogloszeniach (tworzenie, edycja, usuwanie)
-   - Upload zdjec do Supabase Storage (drag and drop, multi-file)
-   - AUTO-RESIZE zdjec w przegladarce przed uploadem (biblioteka browser-image-compression)
-     - Klient wgrywa 8 MB z iPhona, system kompresuje do ~1600 px / 400 KB
-     - Bez tego klientka wgra ogromne zdjecia i strona bedzie sie ladowac 10 sek
-   - Ustawianie cover image, kolejnosci zdjec
-   - Lista contact_requests z mozliwoscia oznaczania jako przeczytane + notatki
+3. **"Od X zl" na kartach ogloszen** (obecnie pokazuje leasing_rate_pln z bazy)
+   - Zamiast statycznej raty z bazy - liczyc dynamicznie "najatrakcyjniejsza" rate
+   - Wariant B (realistyczny): wplata 20%, okres 60 msc, wykup MAX dla okresu (35% dla 60)
+   - Wariant A (skrajny): max wplata 45%, max okres 72 msc, max wykup 30% - agresywne "od X"
+   - Decyzja klienta: wariant B jesli chcemy uczciwie sprzedawac, A jesli agresywnie
+   - Alternatywnie: pole showcase_rate w bazie, klientka wpisuje recznie per pojazd
 
 4. **Import z OtoMoto**
    - Pole "Wklej link OtoMoto" w panelu admina
@@ -207,7 +246,8 @@ Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyc
    - Jezeli OtoMoto zwraca 404 -> ustaw status='inactive' (nie usuwa, zachowuje historie)
 
 6. **SEO i optymalizacja**
-   - Przejsc z <img> na <next/image> (karuzela, karta ogloszen, cover images) - wymaga next.config.ts z remotePatterns dla Supabase
+   - Przejsc z <img> na <next/image> (karuzela, karta ogloszen, cover images, ImageUploader
+     w panelu admina) - wymaga next.config.ts z remotePatterns dla Supabase
    - Kalibracja kalkulatora (Opcja C) - tabela marz od klientki, wtedy odchylenia od prawdziwego systemu banku znikna (obecnie 4-5%)
    - Favicon z logo Fidens (favicon.io/favicon-converter)
    - Meta tagi (Open Graph + description per strona)
@@ -220,14 +260,22 @@ Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyc
 - **Wgranie:** git add . && git commit -m "opis" && git push -> Vercel auto-rebuild
 - **Wszystkie zmiany testujemy lokalnie ZANIM git push** (zeby fidens.pl sie nie zepsul)
 - **PRZED KAZDYM PUSHEM:** npm run build lokalnie (Vercel wywala deployment na warningach TypeScript/ESLint)
+- **Next.js 16: middleware.ts jest DEPRECATED, uzywamy proxy.ts** (funkcja musi nazywac sie
+  "proxy" nie "middleware"). Plik w repo to juz proxy.ts, nie tworzyc ponownie middleware.ts.
 
 ## Znane problemy/uwagi
 - **Hydration warning** od rozszerzenia Bitdefender (atrybuty bis_register, bis_skin_checked).
-  To NIE jest blad kodu - tylko deweloperski warning w trybie dev. W produkcji niewidoczny.
+  To NIE jest blad kodu - tylko deweloperski warning w trybie dev (widoczny tez jako
+  czerwony badge "1 Issue" w rogu ekranu w dev mode). W produkcji niewidoczny. Ignorowac.
 - **PowerShell + polskie znaki w komendach:** nie dziala (encoding sie rozjezdza).
   Uzywamy komend BEZ polskich znakow (np. "Wplata wstepna"), potem w VS Code przez Ctrl+H
   przywracamy ogonki. Zawartosc plikow z -Encoding utf8 dziala OK.
-- **W folderach z nawiasami kwadratowymi ([slug]):** uzywac Set-Content -LiteralPath zamiast Out-File -FilePath.
+- **W folderach z nawiasami kwadratowymi ([slug], [id]):** uzywac Set-Content -LiteralPath
+  (nie Out-File -FilePath, bo interpretuje nawiasy jako wildcard i wywala blad
+  "did not resolve to a file").
+- **Znaki specjalne (strzalki Unicode itp.) w duzych blokach @'...'@ w PowerShell:**
+  potrafia namieszac przy wklejaniu i urwac string. Bezpieczniej uzywac zwyklych
+  slow/ASCII (np. "left"/"right" zamiast strzalek) w kodzie generowanym przez heredoc.
 - **VS Code + literka M na zakladce:** to normalne "modified vs commit", nie "buforowany".
   Widok Git Local Changes (Working Tree) pokazuje dokladnie roznice.
 - **Dev serwer nie chodzi po push -> stare wersje w cache:** ubijac procesy przez taskkill /IM node.exe /F
@@ -237,6 +285,12 @@ Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyc
 - **URL nie moze miec polskich znakow:** przy Ctrl+H uwaga zeby nie zmienic href="/ogloszenia"
   na href="/Ogloszenia" ani "/ogłoszenia". Klikac pojedynczo Replace, nie Replace All.
   Widok Git Local Changes (Working Tree) w VS Code = szybki sprawdzian co poszlo nie tak.
-
-
-
+- **Supabase generuje scisle typy dla pol enumowych** (np. vehicle_type, status, fuel,
+  transmission) - zwykly string trzeba rzutowac "as ...typ..." przy insert/update.
+- **vat_type w bazie to 'marza' lub 'vat23'** (NIE '23' - constraint listings_vat_type_check
+  odrzuci cokolwiek innego).
+- **ContactRequestUpdate (typy generowane) nie zawiera is_read/notes** - update tych pol
+  wymaga rzutowania "as never" w .update({...} as never). Dziala poprawnie mimo warningu typow.
+- **Domena fidens.pl kupiona, ale BRAK pakietu hostingowego** - wiec brak mozliwosci
+  zalozenia ...@fidens.pl bez dodatkowego zakupu (hosting Hostido / Zoho Mail / Google Workspace).
+  Admin loguje sie na razie zwyklym istniejacym mailem.
