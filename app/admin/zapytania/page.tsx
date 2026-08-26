@@ -24,7 +24,6 @@ export default function AdminZapytaniaPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [notesDraft, setNotesDraft] = useState<Record<string, string>>({});
-  const [savedId, setSavedId] = useState<string | null>(null);
 
   const loadRequests = useCallback(async () => {
     const supabase = createClient();
@@ -65,6 +64,12 @@ export default function AdminZapytaniaPage() {
       .from("contact_requests")
       .update({ notes: notesDraft[id] || null } as never)
       .eq("id", id);
+    loadRequests();
+  }
+
+  async function deleteRequest(id: string) {
+    const supabase = createClient();
+    await supabase.from("contact_requests").delete().eq("id", id);
     loadRequests();
   }
 
@@ -110,16 +115,26 @@ export default function AdminZapytaniaPage() {
                   {formatDate(req.created_at)}
                 </p>
               </div>
-              <button
-                type="button"
-                onClick={() => toggleRead(req.id, req.is_read)}
-                className="shrink-0 rounded-full px-3 py-1 text-xs font-medium text-white"
-                style={{
-                  backgroundColor: req.is_read ? "#9ca3af" : "#F0A500",
-                }}
-              >
-                {req.is_read ? "Przeczytane" : "Nieprzeczytane"}
-              </button>
+              <div className="flex shrink-0 gap-2">
+                <button
+                  type="button"
+                  onClick={() => toggleRead(req.id, req.is_read)}
+                  className="rounded-full px-3 py-1 text-xs font-medium text-white"
+                  style={{
+                    backgroundColor: req.is_read ? "#9ca3af" : "#F0A500",
+                  }}
+                >
+                  {req.is_read ? "Przeczytane" : "Nieprzeczytane"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => deleteRequest(req.id)}
+                  className="rounded-full px-3 py-1 text-xs font-medium text-white"
+                  style={{ backgroundColor: "#dc2626" }}
+                >
+                  Usun
+                </button>
+              </div>
             </div>
 
             <div className="mb-2 grid grid-cols-1 gap-1 text-sm text-gray-700 sm:grid-cols-2">
