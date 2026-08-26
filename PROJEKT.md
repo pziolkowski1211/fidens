@@ -152,7 +152,7 @@ Tabele utworzone (RLS wlaczone):
 - **Kalkulator leasingu:** frontend only, parametry wysylane w URL do /kontakt
   - Automatycznie wybiera typ na podstawie vat_type: 'marza' = pozyczka leasingowa (bez wykupu), inaczej = leasing (z wykupem)
   - Wzor: annuita z balonem, APR 5,2% (najkorzystniej) do 6,2% (najmniej korzystnie)
-  - Uklad "wariant A": rata jako hero (44px), cena drobno pod ratą
+  - Uklad "wariant A": rata jako hero (44px), cena drobno pod ratÄ…
 - **Wyszukiwarka:** autocomplete typu Google ze statycznej listy (~50 marek + modele).
   Klik w sugestie -> /ogloszenia?marka=X&model=Y. Brak wynikow -> CTA "Zapytaj o ten pojazd" z prefilled marka/modelem.
 - **Mobile nawigacja:** logo + lupa + hamburger. Drawer wysuwany z prawej.
@@ -293,7 +293,7 @@ Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyc
 - **Klasy Tailwinda w kwadratowych nawiasach (np. text-[10px]):** czasem sypia sie w Next 16.2.4.
   Uzywac standardowych klas Tailwinda (text-xs, text-sm) gdzie mozna.
 - **URL nie moze miec polskich znakow:** przy Ctrl+H uwaga zeby nie zmienic href="/ogloszenia"
-  na href="/Ogloszenia" ani "/ogłoszenia". Klikac pojedynczo Replace, nie Replace All.
+  na href="/Ogloszenia" ani "/ogĹ‚oszenia". Klikac pojedynczo Replace, nie Replace All.
   Widok Git Local Changes (Working Tree) w VS Code = szybki sprawdzian co poszlo nie tak.
 - **Supabase generuje scisle typy dla pol enumowych** (np. vehicle_type, status, fuel,
   transmission) - zwykly string trzeba rzutowac "as ...typ..." przy insert/update.
@@ -304,3 +304,8 @@ Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyc
 - **Domena fidens.pl kupiona, ale BRAK pakietu hostingowego** - wiec brak mozliwosci
   zalozenia ...@fidens.pl bez dodatkowego zakupu (hosting Hostido / Zoho Mail / Google Workspace).
   Admin loguje sie na razie zwyklym istniejacym mailem.
+- **Ogloszenie tygodnia** (is_featured=true) nie ma automatycznego zastepstwa: jesli
+  cron ustawi mu status=inactive (bo zniknelo z OtoMoto), sekcja "Ogloszenie tygodnia"
+  po prostu znika ze strony glownej (.maybeSingle() zwraca null, reszta strony dziala
+  normalnie) - system NIE wybiera automatycznie innego ogloszenia. Trzeba recznie
+  ustawic is_featured=true na innym w panelu admina.
