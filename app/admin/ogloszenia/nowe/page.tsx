@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { importOtomotoListing } from "../otomoto-actions";
 
 function slugify(text: string) {
   return text
@@ -46,7 +47,49 @@ export default function NoweOgloszeniePage() {
   const [isFeatured, setIsFeatured] = useState(false);
   const [badge, setBadge] = useState("");
   const [otomotoUrl, setOtomotoUrl] = useState("");
+    const [importUrl, setImportUrl] = useState("");
+  const [importing, setImporting] = useState(false);
+  const [importWarnings, setImportWarnings] = useState<string[]>([]);
+  const [importError, setImportError] = useState<string | null>(null);
 
+    async function handleImportOtomoto() {
+    setImportError(null);
+    setImportWarnings([]);
+
+    if (!importUrl) {
+      setImportError("Wklej najpierw link do ogloszenia OtoMoto");
+      return;
+    }
+
+    setImporting(true);
+    const result = await importOtomotoListing(importUrl);
+    setImporting(false);
+
+    if (!result.success) {
+      setImportError(result.error);
+      return;
+    }
+
+    const data = result.data;
+
+    if (data.title) {
+      handleTitleChange(data.title);
+    }
+    if (data.brand) setBrand(data.brand);
+    if (data.model) setModel(data.model);
+    if (data.year) setYear(String(data.year));
+    if (data.pricePln) setPricePln(String(data.pricePln));
+    if (data.mileageKm) setMileageKm(String(data.mileageKm));
+    if (data.fuel) setFuel(data.fuel);
+    if (data.transmission) setTransmission(data.transmission);
+    if (data.color) setColor(data.color);
+    if (data.powerHp) setPowerHp(String(data.powerHp));
+    if (data.engineCc) setEngineCc(String(data.engineCc));
+    if (data.countryOrigin) setCountryOrigin(data.countryOrigin);
+    setOtomotoUrl(data.otomotoUrl);
+
+    setImportWarnings(data.warnings);
+  }
   function handleTitleChange(value: string) {
     setTitle(value);
     if (!slugTouched) {
@@ -120,7 +163,34 @@ export default function NoweOgloszeniePage() {
       <h1 className="mb-4 text-lg font-semibold" style={{ color: "#1B2A4A" }}>
         Nowe ogloszenie
       </h1>
-
+      <div className="mb-4 rounded-lg border border-gray-200 bg-white p-4">
+        <h2 className="mb-3 text-sm font-semibold text-gray-500">Import z OtoMoto</h2>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <input
+            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2"
+            placeholder="Wklej link do ogloszenia OtoMoto"
+            value={importUrl}
+            onChange={(e) => setImportUrl(e.target.value)}
+          />
+          <button
+            type="button"
+            onClick={handleImportOtomoto}
+            disabled={importing}
+            className="whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+            style={{ backgroundColor: "#F0A500" }}
+          >
+            {importing ? "Importowanie..." : "Importuj dane"}
+          </button>
+        </div>
+        {importError && <p className="mt-2 text-sm text-red-600">{importError}</p>}
+        {importWarnings.length > 0 && (
+          <ul className="mt-2 list-disc pl-5 text-sm text-gray-600">
+            {importWarnings.map((w, i) => (
+              <li key={i}>{w}</li>
+            ))}
+          </ul>
+        )}
+      </div>
       <div
         className="mb-4 rounded-md border px-4 py-3 text-sm"
         style={{ borderColor: "#F0A500", backgroundColor: "#FFF8E8", color: "#1B2A4A" }}
