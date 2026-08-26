@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import ImageUploader from "@/app/components/ImageUploader";
 
 export default function EdytujOgloszeniePage() {
   const router = useRouter();
@@ -465,6 +466,11 @@ export default function EdytujOgloszeniePage() {
           </div>
         </section>
 
+        <section className="rounded-lg border border-gray-200 bg-white p-4">
+          <h2 className="mb-3 text-sm font-semibold text-gray-500">Zdjecia</h2>
+          <ImageUploader listingId={id} slug={slug} />
+        </section>
+
         {error && <p className="text-sm text-red-600">{error}</p>}
 
         <div className="flex items-center justify-between gap-3">
@@ -490,3 +496,4 @@ export default function EdytujOgloszeniePage() {
     </div>
   );
 }
+
