@@ -8,7 +8,7 @@ Klienci wchodza glownie z social mediow -> mobile pierwszy priorytet.
 - **Next.js 16** (App Router, Turbopack) + TypeScript + Tailwind v4
 - **Supabase** - baza danych (Postgres), Auth (panel admina), Storage (zdjecia)
 - **Vercel** - hosting -> fidens.pl
-- **Resend** - planowane do wysylki maili z formularzy (3000/msc free)
+- **Resend** - wysylka maili z formularzy (3000/msc free), domena fidens.pl zweryfikowana
 
 ## Repo i srodowisko
 - **GitHub:** github.com/pziolkowski1211/fidens
@@ -152,7 +152,7 @@ Tabele utworzone (RLS wlaczone):
 - **Kalkulator leasingu:** frontend only, parametry wysylane w URL do /kontakt
   - Automatycznie wybiera typ na podstawie vat_type: 'marza' = pozyczka leasingowa (bez wykupu), inaczej = leasing (z wykupem)
   - Wzor: annuita z balonem, APR 5,2% (najkorzystniej) do 6,2% (najmniej korzystnie)
-  - Uklad "wariant A": rata jako hero (44px), cena drobno pod ratÄ…
+  - Uklad "wariant A": rata jako hero (44px), cena drobno pod ratĂ„â€¦
 - **Wyszukiwarka:** autocomplete typu Google ze statycznej listy (~50 marek + modele).
   Klik w sugestie -> /ogloszenia?marka=X&model=Y. Brak wynikow -> CTA "Zapytaj o ten pojazd" z prefilled marka/modelem.
 - **Mobile nawigacja:** logo + lupa + hamburger. Drawer wysuwany z prawej.
@@ -293,7 +293,7 @@ Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyc
 - **Klasy Tailwinda w kwadratowych nawiasach (np. text-[10px]):** czasem sypia sie w Next 16.2.4.
   Uzywac standardowych klas Tailwinda (text-xs, text-sm) gdzie mozna.
 - **URL nie moze miec polskich znakow:** przy Ctrl+H uwaga zeby nie zmienic href="/ogloszenia"
-  na href="/Ogloszenia" ani "/ogĹ‚oszenia". Klikac pojedynczo Replace, nie Replace All.
+  na href="/Ogloszenia" ani "/ogÄąâ€šoszenia". Klikac pojedynczo Replace, nie Replace All.
   Widok Git Local Changes (Working Tree) w VS Code = szybki sprawdzian co poszlo nie tak.
 - **Supabase generuje scisle typy dla pol enumowych** (np. vehicle_type, status, fuel,
   transmission) - zwykly string trzeba rzutowac "as ...typ..." przy insert/update.
