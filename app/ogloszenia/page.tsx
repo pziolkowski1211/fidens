@@ -1,4 +1,4 @@
-﻿import Link from "next/link"
+import Link from "next/link"
 import Navbar from "../components/Navbar"
 import { createClient } from "@/lib/supabase/server"
 import { calculateShowcaseRate } from "@/lib/leasing/calculator"
@@ -23,6 +23,7 @@ interface ListingCard {
   badge: string | null
   vehicle_type: string | null
   cover_url: string | null
+  is_marza: boolean
 }
 
 interface RawListingRow {
@@ -83,6 +84,7 @@ export default async function OgloszeniaPage({ searchParams }: PageProps) {
     badge: row.badge,
     vehicle_type: row.vehicle_type,
     cover_url: extractCoverUrl(row.listing_images),
+    is_marza: row.vat_type === "marza",
   }))
 
   let title = "Wszystkie ogłoszenia"
@@ -154,7 +156,7 @@ export default async function OgloszeniaPage({ searchParams }: PageProps) {
                     </div>
                     {auto.rate && (
                       <div className="text-[22px] font-bold" style={{ color: "#1B2A4A" }}>
-                        od {formatNumber(Math.round(auto.rate))} zl <span className="text-[13px] font-normal" style={{ color: "#888" }}>/msc</span>
+                        od {formatNumber(Math.round(auto.rate))} zl <span className="text-[13px] font-normal" style={{ color: "#888" }}>/msc{!auto.is_marza && " netto"}</span>
                       </div>
                     )}
                   </div>

@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import Navbar from "./components/Navbar";
 import { createClient } from "@/lib/supabase/server";
 import { calculateShowcaseRate } from "@/lib/leasing/calculator";
@@ -14,6 +14,7 @@ interface FeaturedListing {
   rate: number | null;
   badge: string | null;
   cover_url: string | null;
+  is_marza: boolean;
 }
 
 interface LatestListing {
@@ -26,6 +27,7 @@ interface LatestListing {
   rate: number | null;
   badge: string | null;
   cover_url: string | null;
+  is_marza: boolean;
 }
 
 export default async function Home() {
@@ -53,6 +55,7 @@ export default async function Home() {
         rate: featuredRaw.price_pln ? calculateShowcaseRate(featuredRaw.price_pln, featuredRaw.vat_type === "marza") : null,
         badge: featuredRaw.badge,
         cover_url: extractCoverUrl(featuredRaw.listing_images),
+        is_marza: featuredRaw.vat_type === "marza",
       }
     : null;
 
@@ -78,6 +81,7 @@ export default async function Home() {
     rate: row.price_pln ? calculateShowcaseRate(row.price_pln, row.vat_type === "marza") : null,
     badge: row.badge,
     cover_url: extractCoverUrl(row.listing_images),
+    is_marza: row.vat_type === "marza",
   }));
 
   return (
@@ -139,7 +143,7 @@ export default async function Home() {
                 </p>
                 {featured.rate && (
                   <div className="text-[28px] sm:text-3xl lg:text-[36px] font-bold mb-5" style={{ color: "#1B2A4A" }}>
-                    od {formatNumber(Math.round(featured.rate))} zl <span className="text-base font-normal" style={{ color: "#888" }}>/miesiąc</span>
+                    od {formatNumber(Math.round(featured.rate))} zl <span className="text-base font-normal" style={{ color: "#888" }}>/miesiąc{!featured.is_marza && " netto"}</span>
                   </div>
                 )}
                 <span className="font-bold rounded-lg py-3.5 px-6 sm:px-8 text-sm sm:text-[15px] self-start" style={{ backgroundColor: "#F0A500", color: "#1B2A4A" }}>
@@ -197,7 +201,7 @@ export default async function Home() {
                     </div>
                     {auto.rate && (
                       <div className="text-[22px] font-bold" style={{ color: "#1B2A4A" }}>
-                        od {formatNumber(Math.round(auto.rate))} zl <span className="text-[13px] font-normal" style={{ color: "#888" }}>/msc</span>
+                        od {formatNumber(Math.round(auto.rate))} zl <span className="text-[13px] font-normal" style={{ color: "#888" }}>/msc{!auto.is_marza && " netto"}</span>
                       </div>
                     )}
                   </div>

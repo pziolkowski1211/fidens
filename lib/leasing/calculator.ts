@@ -1,4 +1,4 @@
-﻿// lib/leasing/calculator.ts
+// lib/leasing/calculator.ts
 // Wspolny wzor liczenia raty leasingu/pozyczki - uzywany przez
 // LeasingCalculator.tsx (interaktywny kalkulator) oraz karty ogloszen
 // (statyczne "od X zl" liczone wariantem realistycznym).
@@ -7,8 +7,9 @@ export const OKRES_MIN = 24
 export const OKRES_MAX = 72
 export const WPLATA_MIN = 0
 export const WPLATA_MAX = 45
-export const APR_MIN = 5.2
-export const APR_MAX = 6.2
+export const APR_MIN = 5.4
+export const VAT_RATE = 0.23
+export const APR_MAX = 7.3
 
 export function getWykupLimits(okres: number): { min: number; max: number } {
   if (okres <= 24) return { min: 16, max: 55 }
@@ -55,8 +56,16 @@ export function calculateRata(cena: number, wplataProc: number, okresMsc: number
 const SHOWCASE_WPLATA_PROC = 20
 const SHOWCASE_OKRES_MSC = 60
 
+export function getNettoPrice(cenaBrutto: number): number {
+  return cenaBrutto / (1 + VAT_RATE)
+}
+
 export function calculateShowcaseRate(cenaPln: number, isMarza: boolean): number {
   const hasWykup = !isMarza
   const wykupProc = hasWykup ? getWykupLimits(SHOWCASE_OKRES_MSC).max : 0
-  return calculateRata(cenaPln, SHOWCASE_WPLATA_PROC, SHOWCASE_OKRES_MSC, wykupProc, hasWykup)
+  // Dla VAT-23 (leasing) rata liczona jest od ceny netto (cena bez VAT) -
+  // tak wyglada realny leasing dla firm, ktore odliczaja VAT. Dla VAT-marza
+  // (pozyczka) nie ma podzialu netto/brutto, liczymy od pelnej ceny.
+  const cenaDoWyliczenia = hasWykup ? getNettoPrice(cenaPln) : cenaPln
+  return calculateRata(cenaDoWyliczenia, SHOWCASE_WPLATA_PROC, SHOWCASE_OKRES_MSC, wykupProc, hasWykup)
 }
