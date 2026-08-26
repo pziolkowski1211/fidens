@@ -1,7 +1,7 @@
-# AGENTS.md - Instrukcje dla AI asystenta
+﻿# AGENTS.md - Instrukcje dla AI asystenta
 
 ## Profil uzytkownika
-**Wazne:** Uzytkownik (Pawel) jest **laikiem technicznym**.
+**Wazne:** Uzytkownik (Piotr) jest **laikiem technicznym**.
 - Nie pisze kodu samodzielnie - tylko wkleja komendy do terminala
 - Nie zna React, TypeScript, Git poza podstawami
 - Trzeba **tlumaczyc prosto**, krok po kroku, jak komus z zewnatrz
