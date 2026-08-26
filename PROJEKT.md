@@ -1,4 +1,4 @@
-﻿# Fidens.pl - Projekt strony
+# Fidens.pl - Projekt strony
 
 ## Cel projektu
 Strona dla brokera/dealera leasingowego (auta osobowe, ciezarowe, maszyny budowlane).
@@ -214,6 +214,14 @@ Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyc
 - [x] Kalkulator leasingu/pozyczki (Opcja A - proste zalezne APR 5,2-6,2%)
 - [x] Formularz kontaktowy /kontakt (Supabase insert do contact_requests)
 - [x] Wgrane na Vercel -> fidens.pl
+- [x] **Synchronizacja z OtoMoto (ZROBIONE)** - Vercel Cron Job (/api/cron/otomoto-sync),
+      raz dziennie o 3:00 UTC (godzinne okno na planie Hobby). Sprawdza wszystkie
+      ogloszenia ze statusem active/inactive (pomija sold) ktore maja otomoto_url.
+      Jesli zniknelo z OtoMoto (HTTP 404/410 lub tekst o wygasnieciu) -> status=inactive
+      (RLS automatycznie chowa je ze strony). Jesli wrocilo -> status=active z powrotem.
+      Klient service-role (lib/supabase/service.ts, pomija RLS) + sekret CRON_SECRET
+      (Vercel dodaje naglowek Authorization automatycznie). Nowe zmienne srodowiskowe:
+      SUPABASE_SERVICE_ROLE_KEY, CRON_SECRET (dodane w .env.local i na Vercelu).
 - [x] **Panel admina /admin - KOMPLETNY** (auth, logowanie, layout, CRUD ogloszen,
       upload zdjec z kompresja/okladka/kolejnoscia, usuwanie, lista zapytan z notatkami)
 - [x] **Resend - wysylka maili z /kontakt** - nadawca zmieniony z sandboxowego
