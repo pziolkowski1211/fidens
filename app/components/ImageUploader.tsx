@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useCallback } from "react";
 import imageCompression from "browser-image-compression";
@@ -81,7 +81,7 @@ export default function ImageUploader({
           .upload(path, compressed);
 
         if (uploadError) {
-          setError("Blad uploadu: " + uploadError.message);
+          setError("Błąd uploadu: " + uploadError.message);
           continue;
         }
 
@@ -100,12 +100,12 @@ export default function ImageUploader({
           });
 
         if (insertError) {
-          setError("Blad zapisu zdjecia: " + insertError.message);
+          setError("Błąd zapisu zdjęcia: " + insertError.message);
         }
 
         nextPosition++;
       } catch {
-        setError("Nie udalo sie skompresowac zdjecia: " + file.name);
+        setError("Nie udało się skompresować zdjęcia: " + file.name);
       }
     }
 
@@ -129,7 +129,7 @@ export default function ImageUploader({
     }
 
     setImportPhotosMessage(
-      `Zaimportowano ${result.imported} zdjec` + (result.failed > 0 ? ` (${result.failed} nie udalo sie)` : "")
+      `Zaimportowano ${result.imported} zdjęć` + (result.failed > 0 ? ` (${result.failed} nie udało się)` : "")
     );
     loadImages();
   }
@@ -151,7 +151,7 @@ export default function ImageUploader({
   }
 
   async function handleDelete(image: ListingImage) {
-    if (!confirm("Usunac to zdjecie?")) return;
+    if (!confirm("Usunąć to zdjęcie?")) return;
 
     const supabase = createClient();
 
@@ -183,7 +183,7 @@ export default function ImageUploader({
   }
 
   if (loading) {
-    return <p className="text-sm text-gray-500">Wczytywanie zdjec...</p>;
+    return <p className="text-sm text-gray-500">Wczytywanie zdjęć...</p>;
   }
 
   return (
@@ -191,7 +191,7 @@ export default function ImageUploader({
       {otomotoUrl && (
         <div className="rounded-lg border border-gray-200 bg-white p-4">
           <p className="mb-2 text-sm text-gray-600">
-            To ogloszenie ma podpiety link OtoMoto - mozesz zaimportowac stamtad zdjecia zamiast (albo obok) wgrywac je recznie.
+            To ogłoszenie ma podpięty link OtoMoto - możesz zaimportować stamtąd zdjęcia zamiast (albo obok) wgrywać je ręcznie.
           </p>
           <button
             type="button"
@@ -200,7 +200,7 @@ export default function ImageUploader({
             className="rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
             style={{ backgroundColor: "#F0A500" }}
           >
-            {importingPhotos ? "Importowanie zdjec..." : "Importuj zdjecia z OtoMoto"}
+            {importingPhotos ? "Importowanie zdjęć..." : "Importuj zdjęcia z OtoMoto"}
           </button>
           {importPhotosMessage && <p className="mt-2 text-sm" style={{ color: "#1B2A4A" }}>{importPhotosMessage}</p>}
         </div>
@@ -224,7 +224,7 @@ export default function ImageUploader({
         }}
       >
         <p className="mb-2 text-sm text-gray-600">
-          Przeciagnij zdjecia tutaj lub wybierz plik
+          Przeciągnij zdjęcia tutaj lub wybierz plik
         </p>
         <input
           type="file"
@@ -236,7 +236,7 @@ export default function ImageUploader({
         />
         {uploading && (
           <p className="mt-2 text-sm" style={{ color: "#F0A500" }}>
-            Wysylanie i kompresowanie zdjec...
+            Wysyłanie i kompresowanie zdjęć...
           </p>
         )}
       </div>
@@ -261,7 +261,7 @@ export default function ImageUploader({
                     className="absolute left-1 top-1 rounded px-2 py-0.5 text-xs font-medium text-white"
                     style={{ backgroundColor: "#F0A500" }}
                   >
-                    Okladka
+                    Okładka
                   </span>
                 )}
               </div>
@@ -281,7 +281,7 @@ export default function ImageUploader({
                     className="text-xs font-medium"
                     style={{ color: "#1B2A4A" }}
                   >
-                    Ustaw okladke
+                    Ustaw okładkę
                   </button>
                 )}
                 <button
@@ -298,7 +298,7 @@ export default function ImageUploader({
                 onClick={() => handleDelete(image)}
                 className="w-full border-t border-gray-100 py-1 text-xs text-red-600"
               >
-                Usun
+                Usuń
               </button>
             </div>
           ))}

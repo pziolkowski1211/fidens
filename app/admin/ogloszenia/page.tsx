@@ -1,31 +1,26 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-
 const statusLabels: Record<string, string> = {
   active: "Aktywne",
   inactive: "Nieaktywne",
   sold: "Sprzedane",
 };
-
 const statusColors: Record<string, string> = {
   active: "#16a34a",
   inactive: "#9ca3af",
   sold: "#dc2626",
 };
-
 export default async function AdminOgloszeniaPage() {
   const supabase = await createClient();
-
   const { data: listings, error } = await supabase
     .from("listings")
     .select("*")
     .order("created_at", { ascending: false });
-
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-lg font-semibold" style={{ color: "#1B2A4A" }}>
-          Ogloszenia
+          Ogłoszenia
         </h1>
         <Link
           href="/admin/ogloszenia/nowe"
@@ -35,23 +30,20 @@ export default async function AdminOgloszeniaPage() {
           + Dodaj nowe
         </Link>
       </div>
-
       {error && (
         <p className="text-sm text-red-600">
-          Blad wczytywania ogloszen: {error.message}
+          Błąd wczytywania ogłoszeń: {error.message}
         </p>
       )}
-
       {!error && listings && listings.length === 0 && (
-        <p className="text-sm text-gray-500">Brak ogloszen.</p>
+        <p className="text-sm text-gray-500">Brak ogłoszeń.</p>
       )}
-
       {!error && listings && listings.length > 0 && (
         <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
           <table className="w-full text-left text-sm">
             <thead className="bg-gray-50 text-xs uppercase text-gray-500">
               <tr>
-                <th className="px-4 py-3">Tytul</th>
+                <th className="px-4 py-3">Tytuł</th>
                 <th className="px-4 py-3">Marka / Model</th>
                 <th className="px-4 py-3">Cena</th>
                 <th className="px-4 py-3">Status</th>
@@ -69,7 +61,7 @@ export default async function AdminOgloszeniaPage() {
                   </td>
                   <td className="px-4 py-3 text-gray-600">
                     {listing.price_pln
-                      ? `${listing.price_pln.toLocaleString("pl-PL")} zl`
+                      ? `${listing.price_pln.toLocaleString("pl-PL")} zł`
                       : "-"}
                   </td>
                   <td className="px-4 py-3">

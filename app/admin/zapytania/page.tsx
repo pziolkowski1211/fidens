@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
@@ -96,7 +96,7 @@ export default function AdminZapytaniaPage() {
       {error && <p className="text-sm text-red-600">{error}</p>}
 
       {requests.length === 0 && !error && (
-        <p className="text-sm text-gray-500">Brak zapytan.</p>
+        <p className="text-sm text-gray-500">Brak zapytań.</p>
       )}
 
       <div className="space-y-4">
@@ -132,7 +132,7 @@ export default function AdminZapytaniaPage() {
                   className="rounded-full px-3 py-1 text-xs font-medium text-white"
                   style={{ backgroundColor: "#dc2626" }}
                 >
-                  Usun
+                  Usuń
                 </button>
               </div>
             </div>

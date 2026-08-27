@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
@@ -54,7 +54,7 @@ export default function EdytujOgloszeniePage() {
         .single();
 
       if (error || !data) {
-        setError("Nie znaleziono ogloszenia");
+        setError("Nie znaleziono ogłoszenia");
         setFetching(false);
         return;
       }
@@ -97,7 +97,7 @@ export default function EdytujOgloszeniePage() {
     setError(null);
 
     if (!title || !slug || !brand || !model || !year || !pricePln) {
-      setError("Wypelnij wymagane pola: tytul, slug, marka, model, rok, cena");
+      setError("Wypełnij wymagane pola: tytuł, slug, marka, model, rok, cena");
       return;
     }
 
@@ -139,7 +139,7 @@ export default function EdytujOgloszeniePage() {
     setLoading(false);
 
     if (error) {
-      setError("Blad zapisu: " + error.message);
+      setError("Błąd zapisu: " + error.message);
       return;
     }
 
@@ -148,7 +148,7 @@ export default function EdytujOgloszeniePage() {
   }
 
   async function handleDelete() {
-    if (!confirm("Na pewno usunac to ogloszenie? Tej operacji nie mozna cofnac.")) {
+    if (!confirm("Na pewno usunąć to ogłoszenie? Tej operacji nie można cofnąć.")) {
       return;
     }
 
@@ -160,7 +160,7 @@ export default function EdytujOgloszeniePage() {
     setLoading(false);
 
     if (error) {
-      setError("Blad usuwania: " + error.message);
+      setError("Błąd usuwania: " + error.message);
       return;
     }
 
@@ -179,7 +179,7 @@ export default function EdytujOgloszeniePage() {
   return (
     <div className="mx-auto max-w-3xl">
       <h1 className="mb-4 text-lg font-semibold" style={{ color: "#1B2A4A" }}>
-        Edytuj ogloszenie
+        Edytuj ogłoszenie
       </h1>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -187,7 +187,7 @@ export default function EdytujOgloszeniePage() {
           <h2 className="mb-3 text-sm font-semibold text-gray-500">Podstawowe</h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="sm:col-span-2">
-              <label className={labelClass}>Tytul *</label>
+              <label className={labelClass}>Tytuł *</label>
               <input
                 className={inputClass}
                 value={title}
@@ -212,7 +212,7 @@ export default function EdytujOgloszeniePage() {
                 onChange={(e) => setVehicleType(e.target.value)}
               >
                 <option value="osobowe">Osobowe</option>
-                <option value="ciezarowe">Ciezarowe</option>
+                <option value="ciezarowe">Ciężarowe</option>
                 <option value="maszyna">Maszyna</option>
               </select>
             </div>
@@ -327,7 +327,7 @@ export default function EdytujOgloszeniePage() {
               />
             </div>
             <div>
-              <label className={labelClass}>Pojemnosc (cm3)</label>
+              <label className={labelClass}>Pojemność (cm3)</label>
               <input
                 type="number"
                 className={inputClass}
@@ -377,7 +377,7 @@ export default function EdytujOgloszeniePage() {
               />
             </div>
             <div>
-              <label className={labelClass}>Wplata wstepna (%)</label>
+              <label className={labelClass}>Wpłata wstępna (%)</label>
               <input
                 type="number"
                 className={inputClass}
@@ -411,7 +411,7 @@ export default function EdytujOgloszeniePage() {
                 onChange={(e) => setVatType(e.target.value)}
               >
                 <option value="">-- wybierz --</option>
-                <option value="marza">Marza</option>
+                <option value="marza">Marża</option>
                 <option value="vat23">VAT 23%</option>
               </select>
             </div>
@@ -460,14 +460,14 @@ export default function EdytujOgloszeniePage() {
                 onChange={(e) => setIsFeatured(e.target.checked)}
               />
               <label htmlFor="featured" className="text-sm text-gray-700">
-                Ogloszenie tygodnia
+                Ogłoszenie tygodnia
               </label>
             </div>
           </div>
         </section>
 
         <section className="rounded-lg border border-gray-200 bg-white p-4">
-          <h2 className="mb-3 text-sm font-semibold text-gray-500">Zdjecia</h2>
+          <h2 className="mb-3 text-sm font-semibold text-gray-500">Zdjęcia</h2>
           <ImageUploader listingId={id} slug={slug} otomotoUrl={otomotoUrl} />
         </section>
 
@@ -489,11 +489,10 @@ export default function EdytujOgloszeniePage() {
             disabled={loading}
             className="rounded-md px-4 py-2 text-sm font-medium text-red-600 disabled:opacity-50"
           >
-            Usun ogloszenie
+            Usuń ogłoszenie
           </button>
         </div>
       </form>
     </div>
   );
 }
-
