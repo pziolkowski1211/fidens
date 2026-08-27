@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import Navbar from "./components/Navbar";
 import { createClient } from "@/lib/supabase/server";
 import { calculateShowcaseRate } from "@/lib/leasing/calculator";
@@ -117,10 +118,9 @@ export default async function Home() {
               className="rounded-xl overflow-hidden flex flex-col lg:flex-row hover:shadow-lg transition-shadow block"
               style={{ backgroundColor: "#f8f9fb", border: "1px solid #e8eaed" }}
             >
-              <div className="w-full lg:w-[400px] h-48 sm:h-64 lg:h-auto flex-shrink-0 flex items-center justify-center overflow-hidden" style={{ backgroundColor: "#e8eaed" }}>
+              <div className="relative w-full lg:w-[400px] h-48 sm:h-64 lg:h-auto flex-shrink-0 flex items-center justify-center overflow-hidden" style={{ backgroundColor: "#e8eaed" }}>
                 {featured.cover_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={featured.cover_url} alt={featured.title} className="w-full h-full object-cover" />
+                  <Image src={featured.cover_url} alt={featured.title} fill sizes="(max-width: 1024px) 100vw, 400px" className="object-cover" priority />
                 ) : (
                   <span className="text-sm" style={{ color: "#aaa" }}>Brak zdjęcia</span>
                 )}
@@ -143,7 +143,7 @@ export default async function Home() {
                 </p>
                 {featured.rate && (
                   <div className="text-[28px] sm:text-3xl lg:text-[36px] font-bold mb-5" style={{ color: "#1B2A4A" }}>
-                    od {formatNumber(Math.round(featured.rate))} zl <span className="text-base font-normal" style={{ color: "#888" }}>/miesiąc{!featured.is_marza && " netto"}</span>
+                    od {formatNumber(Math.round(featured.rate))} zł <span className="text-base font-normal" style={{ color: "#888" }}>/miesiąc{!featured.is_marza && " netto"}</span>
                   </div>
                 )}
                 <span className="font-bold rounded-lg py-3.5 px-6 sm:px-8 text-sm sm:text-[15px] self-start" style={{ backgroundColor: "#F0A500", color: "#1B2A4A" }}>
@@ -174,10 +174,9 @@ export default async function Home() {
                   className="rounded-xl overflow-hidden cursor-pointer hover:shadow-lg transition-shadow block"
                   style={{ backgroundColor: "#ffffff", border: "1px solid #e8eaed" }}
                 >
-                  <div className="h-44 sm:h-48 flex items-center justify-center overflow-hidden" style={{ backgroundColor: "#e8eaed" }}>
+                  <div className="relative h-44 sm:h-48 flex items-center justify-center overflow-hidden" style={{ backgroundColor: "#e8eaed" }}>
                     {auto.cover_url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={auto.cover_url} alt={auto.title} className="w-full h-full object-cover" />
+                      <Image src={auto.cover_url} alt={auto.title} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover" />
                     ) : (
                       <span className="text-sm" style={{ color: "#aaa" }}>Brak zdjęcia</span>
                     )}
@@ -201,7 +200,7 @@ export default async function Home() {
                     </div>
                     {auto.rate && (
                       <div className="text-[22px] font-bold" style={{ color: "#1B2A4A" }}>
-                        od {formatNumber(Math.round(auto.rate))} zl <span className="text-[13px] font-normal" style={{ color: "#888" }}>/msc{!auto.is_marza && " netto"}</span>
+                        od {formatNumber(Math.round(auto.rate))} zł <span className="text-[13px] font-normal" style={{ color: "#888" }}>/msc{!auto.is_marza && " netto"}</span>
                       </div>
                     )}
                   </div>
