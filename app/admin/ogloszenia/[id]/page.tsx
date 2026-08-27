@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import ImageUploader from "@/app/components/ImageUploader";
+import ConfirmDialog from "@/app/components/ConfirmDialog";
 
 export default function EdytujOgloszeniePage() {
   const router = useRouter();
@@ -13,6 +14,7 @@ export default function EdytujOgloszeniePage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
@@ -147,11 +149,8 @@ export default function EdytujOgloszeniePage() {
     router.refresh();
   }
 
-  async function handleDelete() {
-    if (!confirm("Na pewno usunąć to ogłoszenie? Tej operacji nie można cofnąć.")) {
-      return;
-    }
-
+  async function confirmDelete() {
+    setShowDeleteConfirm(false);
     setLoading(true);
     const supabase = createClient();
 
@@ -178,6 +177,14 @@ export default function EdytujOgloszeniePage() {
 
   return (
     <div className="mx-auto max-w-3xl">
+      <ConfirmDialog
+        open={showDeleteConfirm}
+        title="Usunąć to ogłoszenie?"
+        message="Tej operacji nie można cofnąć. Ogłoszenie wraz z jego danymi zostanie trwale usunięte."
+        onConfirm={confirmDelete}
+        onCancel={() => setShowDeleteConfirm(false)}
+      />
+
       <h1 className="mb-4 text-lg font-semibold" style={{ color: "#1B2A4A" }}>
         Edytuj ogłoszenie
       </h1>
@@ -485,10 +492,18 @@ export default function EdytujOgloszeniePage() {
 
           <button
             type="button"
-            onClick={handleDelete}
+            onClick={() => setShowDeleteConfirm(true)}
             disabled={loading}
-            className="rounded-md px-4 py-2 text-sm font-medium text-red-600 disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-md border px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-600 hover:text-white disabled:opacity-50"
+            style={{ borderColor: "#dc2626" }}
           >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+              <path d="M10 11v6"></path>
+              <path d="M14 11v6"></path>
+              <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path>
+            </svg>
             Usuń ogłoszenie
           </button>
         </div>

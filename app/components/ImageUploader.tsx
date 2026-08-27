@@ -151,8 +151,6 @@ export default function ImageUploader({
   }
 
   async function handleDelete(image: ListingImage) {
-    if (!confirm("Usunąć to zdjęcie?")) return;
-
     const supabase = createClient();
 
     await supabase.storage.from("listing-images").remove([image.storage_path]);
@@ -185,6 +183,9 @@ export default function ImageUploader({
   if (loading) {
     return <p className="text-sm text-gray-500">Wczytywanie zdjęć...</p>;
   }
+
+  const arrowBtnClass =
+    "flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-gray-200 text-gray-500 transition hover:bg-gray-100 disabled:opacity-30 disabled:hover:bg-transparent";
 
   return (
     <div className="space-y-4">
@@ -270,33 +271,40 @@ export default function ImageUploader({
                   type="button"
                   onClick={() => handleMove(index, -1)}
                   disabled={index === 0}
-                  className="text-xs text-gray-500 disabled:opacity-30"
+                  title="Przesuń w lewo"
+                  className={arrowBtnClass}
                 >
-                  left
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                  </svg>
                 </button>
-                {!image.is_cover && (
-                  <button
-                    type="button"
-                    onClick={() => handleSetCover(image.id)}
-                    className="text-xs font-medium"
-                    style={{ color: "#1B2A4A" }}
-                  >
-                    Ustaw okładkę
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={() => handleSetCover(image.id)}
+                  disabled={image.is_cover}
+                  title={image.is_cover ? "To jest okładka" : "Ustaw jako okładkę"}
+                  className="flex-1 truncate rounded-md px-1 py-1 text-xs font-semibold transition hover:bg-gray-100 disabled:hover:bg-transparent"
+                  style={{ color: "#F0A500" }}
+                >
+                  Okładka
+                </button>
                 <button
                   type="button"
                   onClick={() => handleMove(index, 1)}
                   disabled={index === images.length - 1}
-                  className="text-xs text-gray-500 disabled:opacity-30"
+                  title="Przesuń w prawo"
+                  className={arrowBtnClass}
                 >
-                  right
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                  </svg>
                 </button>
               </div>
               <button
                 type="button"
                 onClick={() => handleDelete(image)}
-                className="w-full border-t border-gray-100 py-1 text-xs text-red-600"
+                title="Usuń zdjęcie"
+                className="w-full border-t border-gray-100 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-600 hover:text-white"
               >
                 Usuń
               </button>
