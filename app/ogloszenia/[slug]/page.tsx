@@ -1,5 +1,7 @@
-﻿import { notFound } from "next/navigation"
+import { notFound } from "next/navigation"
 import Link from "next/link"
+import { cache } from "react"
+import type { Metadata } from "next"
 import Navbar from "../../components/Navbar"
 import Carousel from "../../components/Carousel"
 import LeasingCalculator from "../../components/LeasingCalculator"
@@ -33,23 +35,75 @@ interface Listing {
 interface ListingImage {
   url: string
   position: number
+  is_cover?: boolean
 }
 
-export default async function OgloszenieDetailPage({ params }: PageProps) {
-  const { slug } = await params
+const getListing = cache(async (slug: string) => {
   const supabase = await createClient()
 
   const { data, error } = await supabase.from("listings").select("*").eq("slug", slug).eq("status", "active").single()
 
   if (error || !data) {
-    notFound()
+    return null
   }
 
   const listing = data as Listing
 
-  const { data: imagesData } = await supabase.from("listing_images").select("url, position").eq("listing_id", listing.id).order("position", { ascending: true })
+  const { data: imagesData } = await supabase.from("listing_images").select("url, position, is_cover").eq("listing_id", listing.id).order("position", { ascending: true })
 
   const images: ListingImage[] = imagesData || []
+
+  return { listing, images }
+})
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params
+  const result = await getListing(slug)
+
+  if (!result) {
+    return {
+      title: "Ogłoszenie nie znalezione — Fidens",
+    }
+  }
+
+  const { listing, images } = result
+  const cover = images.find((i) => i.is_cover)?.url || images[0]?.url
+
+  const priceText = listing.price_pln ? `${listing.price_pln.toLocaleString("pl-PL")} zł` : ""
+  const description = listing.description
+    ? listing.description.slice(0, 155)
+    : `${listing.brand ?? ""} ${listing.model ?? ""} ${listing.year ?? ""} — ${priceText}. Sprawdź ofertę leasingu i finansowania na Fidens.pl.`.trim()
+
+  return {
+    title: `${listing.title} — Fidens`,
+    description,
+    openGraph: {
+      title: listing.title,
+      description,
+      url: `https://fidens.pl/ogloszenia/${listing.slug}`,
+      siteName: "Fidens",
+      locale: "pl_PL",
+      type: "website",
+      images: cover ? [{ url: cover, width: 1200, height: 630, alt: listing.title }] : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: listing.title,
+      description,
+      images: cover ? [cover] : undefined,
+    },
+  }
+}
+
+export default async function OgloszenieDetailPage({ params }: PageProps) {
+  const { slug } = await params
+  const result = await getListing(slug)
+
+  if (!result) {
+    notFound()
+  }
+
+  const { listing, images } = result
 
   const formatNumber = (n: number | null | undefined): string => {
     if (n === null || n === undefined) return ""

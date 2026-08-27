@@ -1,4 +1,5 @@
 import Link from "next/link"
+import type { Metadata } from "next"
 import Navbar from "../components/Navbar"
 import { createClient } from "@/lib/supabase/server"
 import { calculateShowcaseRate } from "@/lib/leasing/calculator"
@@ -39,6 +40,45 @@ interface RawListingRow {
   badge: string | null
   vehicle_type: string | null
   listing_images: { url: string; is_cover: boolean }[] | null
+}
+
+export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
+  const params = await searchParams
+  const { marka, model, q } = params
+
+  let title = "Wszystkie ogłoszenia — Fidens"
+  let description = "Przeglądaj aktualną ofertę pojazdów osobowych, ciężarowych i maszyn budowlanych dostępnych w leasingu i finansowaniu na Fidens.pl."
+
+  if (marka && model) {
+    title = `Oferty: ${capitalize(marka)} ${capitalize(model)} — Fidens`
+    description = `Sprawdź dostępne oferty ${capitalize(marka)} ${capitalize(model)} w leasingu i finansowaniu na Fidens.pl.`
+  } else if (marka) {
+    title = `Oferty: ${capitalize(marka)} — Fidens`
+    description = `Sprawdź dostępne oferty ${capitalize(marka)} w leasingu i finansowaniu na Fidens.pl.`
+  } else if (q) {
+    title = `Wyniki wyszukiwania: "${q}" — Fidens`
+    description = `Wyniki wyszukiwania dla "${q}" wśród ofert leasingu i finansowania na Fidens.pl.`
+  }
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: "https://fidens.pl/ogloszenia",
+      siteName: "Fidens",
+      locale: "pl_PL",
+      type: "website",
+      images: [{ url: "https://fidens.pl/og-image.png", width: 1200, height: 630, alt: title }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: ["https://fidens.pl/og-image.png"],
+    },
+  }
 }
 
 export default async function OgloszeniaPage({ searchParams }: PageProps) {
@@ -156,7 +196,7 @@ export default async function OgloszeniaPage({ searchParams }: PageProps) {
                     </div>
                     {auto.rate && (
                       <div className="text-[22px] font-bold" style={{ color: "#1B2A4A" }}>
-                        od {formatNumber(Math.round(auto.rate))} zl <span className="text-[13px] font-normal" style={{ color: "#888" }}>/msc{!auto.is_marza && " netto"}</span>
+                        od {formatNumber(Math.round(auto.rate))} zł <span className="text-[13px] font-normal" style={{ color: "#888" }}>/msc{!auto.is_marza && " netto"}</span>
                       </div>
                     )}
                   </div>
