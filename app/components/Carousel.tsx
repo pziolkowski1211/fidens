@@ -1,6 +1,7 @@
-﻿"use client"
+"use client"
 
 import { useState, useEffect, useRef } from "react"
+import Image from "next/image"
 
 interface CarouselImage {
   url: string
@@ -71,7 +72,7 @@ export default function Carousel({ images, alt }: CarouselProps) {
         className="rounded-xl overflow-hidden mb-6 flex items-center justify-center"
         style={{ backgroundColor: "#e8eaed", aspectRatio: "16 / 10" }}
       >
-        <span className="text-sm" style={{ color: "#aaa" }}>Brak zdjec</span>
+        <span className="text-sm" style={{ color: "#aaa" }}>Brak zdjęć</span>
       </div>
     )
   }
@@ -88,12 +89,14 @@ export default function Carousel({ images, alt }: CarouselProps) {
           onTouchEnd={handleTouchEnd}
           onClick={openLightbox}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <Image
             src={images[current].url}
-            alt={`${alt} - zdjecie ${current + 1}`}
-            className="w-full h-full object-cover"
+            alt={`${alt} - zdjęcie ${current + 1}`}
+            fill
+            sizes="(max-width: 1024px) 100vw, 700px"
+            className="object-cover"
             draggable={false}
+            priority={current === 0}
           />
 
           {total > 1 && (
@@ -102,7 +105,7 @@ export default function Carousel({ images, alt }: CarouselProps) {
                 type="button"
                 onClick={(e) => { e.stopPropagation(); goPrev() }}
                 aria-label="Poprzednie zdjecie"
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center cursor-pointer border-none transition-opacity hover:opacity-100"
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center cursor-pointerborder-none transition-opacity hover:opacity-100"
                 style={{ backgroundColor: "rgba(0,0,0,0.5)", color: "white", opacity: 0.85 }}
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -140,7 +143,7 @@ export default function Carousel({ images, alt }: CarouselProps) {
                 type="button"
                 onClick={() => setCurrent(idx)}
                 aria-label={`Pokaz zdjecie ${idx + 1}`}
-                className="flex-shrink-0 rounded-lg overflow-hidden cursor-pointer transition-all"
+                className="relative flex-shrink-0 rounded-lg overflow-hidden cursor-pointer transition-all"
                 style={{
                   width: "90px",
                   height: "60px",
@@ -148,8 +151,7 @@ export default function Carousel({ images, alt }: CarouselProps) {
                   opacity: idx === current ? 1 : 0.7,
                 }}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={img.url} alt="" className="w-full h-full object-cover" draggable={false} />
+                <Image src={img.url} alt="" fill sizes="90px" className="object-cover" draggable={false} />
               </button>
             ))}
           </div>
@@ -216,7 +218,7 @@ export default function Carousel({ images, alt }: CarouselProps) {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={images[current].url}
-              alt={`${alt} - zdjecie ${current + 1}`}
+              alt={`${alt} - zdjęcie ${current + 1}`}
               className="max-w-full max-h-[90vh] object-contain"
               draggable={false}
             />

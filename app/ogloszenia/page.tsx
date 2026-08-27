@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Image from "next/image"
 import type { Metadata } from "next"
 import Navbar from "../components/Navbar"
 import { createClient } from "@/lib/supabase/server"
@@ -172,10 +173,9 @@ export default async function OgloszeniaPage({ searchParams }: PageProps) {
                   className="rounded-xl overflow-hidden cursor-pointer hover:shadow-lg transition-shadow block"
                   style={{ backgroundColor: "#ffffff", border: "1px solid #e8eaed" }}
                 >
-                  <div className="h-44 sm:h-48 flex items-center justify-center overflow-hidden" style={{ backgroundColor: "#e8eaed" }}>
+                  <div className="relative h-44 sm:h-48 flex items-center justify-center overflow-hidden" style={{ backgroundColor: "#e8eaed" }}>
                     {auto.cover_url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={auto.cover_url} alt={auto.title} className="w-full h-full object-cover" />
+                      <Image src={auto.cover_url} alt={auto.title} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover" />
                     ) : (
                       <span className="text-sm" style={{ color: "#aaa" }}>Brak zdjęcia</span>
                     )}
