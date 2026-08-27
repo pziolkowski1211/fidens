@@ -48,6 +48,7 @@ fidens/
     - Carousel.tsx (karuzela zdjec + lightbox z klawiszami i swipe)
     - LeasingCalculator.tsx (kalkulator leasingu/pozyczki z suwakami)
     - ImageUploader.tsx (upload+kompresja zdjec, okladka, kolejnosc, usuwanie - uzywany w adminie)
+    - ConfirmDialog.tsx (wlasny modal potwierdzenia - uzywany przy usuwaniu ogloszenia)
   - admin/
     - layout.tsx (gorny pasek nawigacji: Ogloszenia / Zapytania / Wyloguj, ukryty na /admin/login)
     - login/
@@ -57,7 +58,7 @@ fidens/
       - nowe/
         - page.tsx (formularz dodawania ogloszenia)
       - [id]/
-        - page.tsx (formularz edycji + ImageUploader + usuwanie ogloszenia)
+        - page.tsx (formularz edycji + ImageUploader + usuwanie ogloszenia z ConfirmDialog)
     - zapytania/
       - page.tsx (lista contact_requests, oznaczanie przeczytane, notatki z potwierdzeniem zapisu)
   - ogloszenia/
@@ -135,17 +136,20 @@ Tabele utworzone (RLS wlaczone):
   Cena i leasing, Dodatkowe). Auto-slug z tytulu (edytowalny recznie). Po zapisie redirect
   do /admin/ogloszenia/[id] (tam dopiero mozna dodac zdjecia, bo trzeba miec listing_id).
 - **Edycja** /admin/ogloszenia/[id]: ten sam uklad co "nowe", wczytuje dane z bazy,
-  zawiera sekcje Zdjecia (ImageUploader) i przycisk Usun ogloszenie (z potwierdzeniem).
+  zawiera sekcje Zdjecia (ImageUploader) i przycisk Usun ogloszenie (z ConfirmDialog -
+  wlasny modal potwierdzenia, nie natywny confirm()).
 - **Upload zdjec** (ImageUploader.tsx, komponent uzywany w [id]/page.tsx):
   - drag&drop + zwykly input file, multi-file
   - kompresja w przegladarce (browser-image-compression: maxWidthOrHeight 1600, maxSizeMB 0.4)
   - upload do Storage bucket listing-images pod folder=slug
   - zapis rekordu do listing_images, pierwsze wgrane zdjecie automatycznie = okladka
-  - przyciski: strzalki kolejnosci (podpisane "left"/"right" - unikalismy strzalek Unicode
-    bo namieszaly w PowerShell heredoc), Ustaw okladke, Usun
+  - przyciski: strzalki kolejnosci (ikony SVG w kwadratowych przyciskach), przycisk
+    tekstowy "Okladka" (pomaranczowy, nieaktywny gdy zdjecie juz jest okladka),
+    Usun (bez potwierdzenia - swiadoma decyzja, usuwanie zdjecia jest odwracalne
+    przez ponowny upload, w przeciwienstwie do usuwania calego ogloszenia)
 - **Zapytania** /admin/zapytania: lista contact_requests (najnowsze first), pomaranczowa
   ramka gdy nieprzeczytane, przycisk toggle Przeczytane/Nieprzeczytane, pole notatek
-  z przyciskiem Zapisz + potwierdzenie "Zapisano" (znika po 2s).
+  z przyciskiem Zapisz + potwierdzenie "Zapisano" (znika po 2s), przycisk Usun.
 
 ## Decyzje produktowe (zatwierdzone z klientem)
 - **Galeria zdjec:** karuzela z lightbox (kliknij zdjecie zeby powiekszyc)
@@ -153,13 +157,17 @@ Tabele utworzone (RLS wlaczone):
   - Automatycznie wybiera typ na podstawie vat_type: 'marza' = pozyczka leasingowa (bez wykupu), inaczej = leasing (z wykupem)
   - Wzor: annuita z balonem, APR 5,4% (najkorzystniej) do 7,3% (najmniej korzystnie)
   - Uklad "wariant A": rata jako hero (44px), cena brutto/netto drobno pod rata
+  - Kalibracja zaakceptowana przez klienta jako finalna (prosty model zalezny od parametrow,
+    Opcja C - tabela marz z realnego banku - NIE jest potrzebna)
 - **Wyszukiwarka:** autocomplete typu Google ze statycznej listy (~50 marek + modele).
   Klik w sugestie -> /ogloszenia?marka=X&model=Y. Brak wynikow -> CTA "Zapytaj o ten pojazd" z prefilled marka/modelem.
 - **Mobile nawigacja:** logo + lupa + hamburger. Drawer wysuwany z prawej.
 - **Logo klikalne** (powrot na strone glowna).
 - **Panel admina:** gorny pasek nawigacji (nie sidebar) - decyzja pod kontem uzytkowania z telefonu.
 - **Import z OtoMoto:** scraping po URL ogloszenia (brak oficjalnego API).
-  Zdjecia uploadowane RECZNIE (osobno od OtoMoto) - inne kadry/jakosc.
+  Zdjecia uploadowane RECZNIE (osobno od OtoMoto) - inne kadry/jakosc. Zdjecia sa
+  automatycznie przycinane o 6% wysokosci od dolu przy imporcie (usuwa watermark "otomoto"
+  wypalony w pliku, patrz OTOMOTO_WATERMARK_CROP_RATIO w otomoto-actions.ts).
   Synchronizacja: jak ogloszenie znika z OtoMoto -> znika z Fidens.
 
 ## Kalkulator leasingu - szczegoly
@@ -176,16 +184,14 @@ rata = PV * r / (1 - (1+r)^(-n))
 - price_pln w bazie to zawsze cena BRUTTO (tak jak importowana z OtoMoto - bez zadnej konwersji).
 - Dla VAT-23 (leasing, hasWykup=true): rata liczona jest od ceny NETTO (getNettoPrice() w calculator.ts,
   dzieli przez 1.23). W kalkulatorze (LeasingCalculator.tsx) wyswietlane sa OBiE raty (netto - glowna,
-  duza liczba + 
-etto obok; brutto - mala linijka pod spodem) oraz obie ceny (Cena brutto: X zl .
+  duza liczba + netto obok; brutto - mala linijka pod spodem) oraz obie ceny (Cena brutto: X zl.
   Cena netto: Y zl). Kwoty przy suwakach Wplata/Wykup licza sie od ceny BRUTTO (realne pieniadze ktore
   klient wplaca), mimo ze sama rata liczona jest od netto - to swiadoma decyzja produktowa (klient mysli
   w realnych zlotowkach, nie w abstrakcyjnym procencie netto).
 - Dla VAT marza (pozyczka, hasWykup=false): brak podzialu netto/brutto - liczymy zawsze od pelnej ceny,
-  etykieta to po prostu Cena brutto: X zl . VAT marza.
+  etykieta to po prostu Cena brutto: X zl. VAT marza.
 - Na kartach ogloszen (strona glowna + /ogloszenia): calculateShowcaseRate() tez liczy od netto dla
-  VAT-23, i przy racie dopisywane jest slowo 
-etto (warunek: !is_marza).
+  VAT-23, i przy racie dopisywane jest slowo netto (warunek: !is_marza).
 
 ### APR zalezne od parametrow (5,4% - 7,3%)
 Score liczony ze srednich 3 parametrow (2 dla pozyczki - bez wykupu):
@@ -227,7 +233,9 @@ Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyc
 - [x] Karuzela zdjec + lightbox (strzalki, klawisze, swipe na mobile, klik zamyka poza zdjeciem)
 - [x] Cover images na stronie glownej (ogloszenie tygodnia + 3 najnowsze) i liscie /ogloszenia
 - [x] Zdjecia w Storage dla 3 testowych ogloszen (BMW, Mercedes, Caterpillar)
-- [x] Kalkulator leasingu/pozyczki (Opcja A - proste zalezne APR 5,4-7,3%)
+- [x] Kalkulator leasingu/pozyczki (Opcja A - zalezne APR 5,4-7,3%, podzial netto/brutto).
+      Zaakceptowane przez klienta jako finalne rozwiazanie - Opcja C (tabela marz z banku)
+      nie jest potrzebna.
 - [x] Formularz kontaktowy /kontakt (Supabase insert do contact_requests). Redesign:
       Navbar + stopka + biala karta na jasnym tle (spojnie z reszta strony), wszystkie
       etykiety/inputy z jawnym kolorem tekstu (text-gray-900), ekran "Dziekujemy" z
@@ -259,27 +267,32 @@ Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyc
   - Wariant (wersja wyposazenia) NIE jest wyciagany - uzupelnia sie recznie
   - Import zdjec: osobny przycisk "Importuj zdjecia z OtoMoto" w ImageUploader.tsx (widoczny
     tylko gdy ogloszenie ma link OtoMoto) - wyciaga adresy zdjec z CDN OtoMoto
-    (ireland.apollo.olxcdn.com), pobiera w rozmiarze 1600px, wgrywa do Supabase Storage
+    (ireland.apollo.olxcdn.com), pobiera w rozmiarze 1600px, PRZYCINA 6% wysokosci od dolu
+    (usuwa watermark "otomoto" wypalony w pliku, sharp), wgrywa do Supabase Storage
   - Parser jest best-effort: jesli OtoMoto zmieni strukture strony, zwraca puste pola +
     warnings zamiast bledu - trzeba wtedy uzupelnic dane recznie
   - Uwaga: pole otomoto_id NIE jest jeszcze automatycznie ustawiane przy imporcie (zawsze null)
+- [x] **Naprawa polskich znakow (ogonkow)** w panelu admina (wszystkie strony), formularzu
+      kontaktowym i kalkulatorze leasingu - brakowalo ich w wielu miejscach (efekt pisania
+      komend PowerShell bez polskich znakow bez pozniejszego przywrocenia, patrz Konwencje pracy)
+- [x] **UI usuwania zdjec i ogloszen w panelu admina**:
+  - ConfirmDialog.tsx - wlasny modal potwierdzenia (zamiast natywnego confirm()), uzywany
+    tylko przy usuwaniu calego ogloszenia (nieodwracalne)
+  - Usuwanie zdjecia w ImageUploader - bez potwierdzenia (swiadoma decyzja, szybkie
+    i odwracalne przez ponowny upload)
+  - Przyciski kolejnosci/okladki/usuwania zdjecia - spojny, ladniejszy wyglad (ikony SVG
+    dla strzalek, tekstowy przycisk "Okladka" w kolorze marki)
 
 ### Do zrobienia (priorytety)
 
-1. **Synchronizacja z OtoMoto** <-- NASTEPNY KROK
-   - Cron (Vercel Cron Jobs?) raz dziennie sprawdza wszystkie listings z otomoto_url
-   - Jezeli OtoMoto zwraca 404 -> ustaw status='inactive' (nie usuwa, zachowuje historie)
-   - Przy okazji: rozwazyc zapisywanie otomoto_id podczas importu (przydatne do synchronizacji)
-
-2. **SEO i optymalizacja**
+1. **SEO i optymalizacja** <-- NASTEPNY KROK
    - Przejsc z <img> na <next/image> (karuzela, karta ogloszen, cover images, ImageUploader
      w panelu admina) - wymaga next.config.ts z remotePatterns dla Supabase
-   - Kalibracja kalkulatora (Opcja C) - tabela marz od klientki, wtedy odchylenia od prawdziwego systemu banku znikna (obecnie 4-5%)
    - Favicon z logo Fidens (favicon.io/favicon-converter)
    - Meta tagi (Open Graph + description per strona)
    - Strony statyczne: /o-nas, /leasing, /regulamin, /polityka
 
-3. **Drobne dopiecia panelu admina**
+2. **Drobne dopiecia panelu admina**
    - Rozwazyc email admina docelowo na ...@fidens.pl (patrz sekcja Poczta)
 
 ## Konwencje pracy
@@ -291,6 +304,11 @@ Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyc
 - **PRZED KAZDYM PUSHEM:** npm run build lokalnie (Vercel wywala deployment na warningach TypeScript/ESLint)
 - **Next.js 16: middleware.ts jest DEPRECATED, uzywamy proxy.ts** (funkcja musi nazywac sie
   "proxy" nie "middleware"). Plik w repo to juz proxy.ts, nie tworzyc ponownie middleware.ts.
+- **Zapis plikow z polskimi znakami przez PowerShell:** heredoc @'...'@ w terminalu VS Code
+  potrafi sie urwac przy wklejaniu (PowerShell interpretuje poczatek nastepnej komendy jako
+  czesc stringa) - jesli build rzuci blad parsowania w miejscu, gdzie nie bylo edycji, to
+  najpewniej to. Naprawa: git checkout -- "sciezka/pliku" i wkleic komende ponownie, jednym
+  ruchem (zaznacz caly blok az do konca WriteAllText, wklej, jeden Enter, nie klikac w srodku).
 
 ## Znane problemy/uwagi
 - **Hydration warning** od rozszerzenia Bitdefender (atrybuty bis_register, bis_skin_checked).
@@ -301,7 +319,8 @@ Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyc
   przywracamy ogonki. Zawartosc plikow z -Encoding utf8 dziala OK.
 - **W folderach z nawiasami kwadratowymi ([slug], [id]):** uzywac Set-Content -LiteralPath
   (nie Out-File -FilePath, bo interpretuje nawiasy jako wildcard i wywala blad
-  "did not resolve to a file").
+  "did not resolve to a file"). Metoda [System.IO.File]::WriteAllText nie ma tego problemu
+  (nie jest cmdletem PowerShell, nawiasy w sciezce nie sa interpretowane jako wildcard).
 - **Znaki specjalne (strzalki Unicode itp.) w duzych blokach @'...'@ w PowerShell:**
   potrafia namieszac przy wklejaniu i urwac string. Bezpieczniej uzywac zwyklych
   slow/ASCII (np. "left"/"right" zamiast strzalek) w kodzie generowanym przez heredoc.
@@ -312,7 +331,7 @@ Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyc
 - **Klasy Tailwinda w kwadratowych nawiasach (np. text-[10px]):** czasem sypia sie w Next 16.2.4.
   Uzywac standardowych klas Tailwinda (text-xs, text-sm) gdzie mozna.
 - **URL nie moze miec polskich znakow:** przy Ctrl+H uwaga zeby nie zmienic href="/ogloszenia"
-  na href="/Ogloszenia" ani "/ogÄąâ€šoszenia". Klikac pojedynczo Replace, nie Replace All.
+  na href="/Ogloszenia" ani "/ogłoszenia". Klikac pojedynczo Replace, nie Replace All.
   Widok Git Local Changes (Working Tree) w VS Code = szybki sprawdzian co poszlo nie tak.
 - **Supabase generuje scisle typy dla pol enumowych** (np. vehicle_type, status, fuel,
   transmission) - zwykly string trzeba rzutowac "as ...typ..." przy insert/update.
