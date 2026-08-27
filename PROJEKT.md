@@ -9,6 +9,7 @@ Klienci wchodza glownie z social mediow -> mobile pierwszy priorytet.
 - **Supabase** - baza danych (Postgres), Auth (panel admina), Storage (zdjecia)
 - **Vercel** - hosting -> fidens.pl
 - **Resend** - wysylka maili z formularzy (3000/msc free), domena fidens.pl zweryfikowana
+- **sharp** - przetwarzanie zdjec (przycinanie watermarku OtoMoto przy imporcie)
 
 ## Repo i srodowisko
 - **GitHub:** github.com/pziolkowski1211/fidens
@@ -37,6 +38,11 @@ Te same klucze sa dodane na Vercel (Environment Variables -> Production/Preview/
 - **Bordery:** #e8eaed
 - **Logo jasne (na ciemne tlo):** public/jasne.png (1536x1024 px, transparent)
 - **Logo ciemne (na jasne tlo):** public/ciemne.png (1536x1024 px, transparent)
+- **Favicon/app icon:** app/favicon.ico, app/icon.png, app/apple-icon.png - motyw
+  litera "F" + zawijas drogi (wygenerowany graficznie, nie wycinek z jasne.png/ciemne.png)
+- **Obrazek Open Graph:** public/og-image.png (1200x630) - logo na granatowym tle +
+  haslo "Finansowanie dla firm: pojazdy, maszyny i sprzęt" (celowo pozycjonowane pod
+  klientele B2B, zeby odsiac zapytania od osob prywatnych)
 
 ## Struktura folderow
 
@@ -45,9 +51,11 @@ fidens/
   - components/
     - Navbar.tsx (nawigacja desktop/mobile + hamburger)
     - SearchAutocomplete.tsx (wyszukiwarka z autocomplete)
-    - Carousel.tsx (karuzela zdjec + lightbox z klawiszami i swipe)
+    - Carousel.tsx (karuzela zdjec + lightbox, next/image dla glownego zdjecia i miniatur,
+      zwykly <img> tylko w lightboxie - zdjecie bez ustalonych wymiarow, ladowane on-demand)
     - LeasingCalculator.tsx (kalkulator leasingu/pozyczki z suwakami)
-    - ImageUploader.tsx (upload+kompresja zdjec, okladka, kolejnosc, usuwanie - uzywany w adminie)
+    - ImageUploader.tsx (upload+kompresja zdjec, okladka, kolejnosc, usuwanie, next/image
+      do wyswietlania miniatur - uzywany w adminie)
     - ConfirmDialog.tsx (wlasny modal potwierdzenia - uzywany przy usuwaniu ogloszenia)
   - admin/
     - layout.tsx (gorny pasek nawigacji: Ogloszenia / Zapytania / Wyloguj, ukryty na /admin/login)
@@ -59,26 +67,42 @@ fidens/
         - page.tsx (formularz dodawania ogloszenia)
       - [id]/
         - page.tsx (formularz edycji + ImageUploader + usuwanie ogloszenia z ConfirmDialog)
+      - otomoto-actions.ts (importOtomotoListing - dane; importOtomotoPhotos - zdjecia,
+        z automatycznym przycinaniem watermarku przez sharp)
     - zapytania/
       - page.tsx (lista contact_requests, oznaczanie przeczytane, notatki z potwierdzeniem zapisu)
   - ogloszenia/
-    - page.tsx (lista ogloszen z filtrami z URL + cover images)
+    - page.tsx (lista ogloszen z filtrami z URL + cover images przez next/image + generateMetadata
+      z dynamicznym tytulem/opisem zaleznym od filtrow marka/model/q)
     - [slug]/
-      - page.tsx (strona pojedynczego ogloszenia + karuzela + kalkulator)
-  - favicon.ico
+      - page.tsx (strona pojedynczego ogloszenia + karuzela + kalkulator + generateMetadata
+        z tytulem/opisem/obrazkiem OG konkretnego ogloszenia, dane pobierane przez cache()
+        zeby nie odpytywac bazy dwa razy dla meta tagow i dla strony)
+  - kontakt/
+    - page.tsx (Suspense wrapper + export const metadata statyczny)
+    - KontaktForm.tsx ("use client" - formularz kontaktowy)
+    - actions.ts (submitContactForm - insert do bazy + wysylka maila przez Resend)
+  - favicon.ico, icon.png, apple-icon.png (favicon/app icon, patrz Identyfikacja wizualna)
   - globals.css
-  - layout.tsx
-  - page.tsx (strona glowna z cover images w ogloszeniu tygodnia i najnowszych)
+  - layout.tsx (metadata: title/description/keywords/openGraph/twitter dla calej strony)
+  - page.tsx (strona glowna z cover images przez next/image w ogloszeniu tygodnia i najnowszych)
 - lib/
   - supabase/
     - client.ts (klient browser)
     - server.ts (klient server, cookies, async createClient)
+    - service.ts (klient service-role, pomija RLS - uzywany w cron jobie synchronizacji)
     - types.ts (typy TS dla bazy)
   - vehicles/
     - catalog.ts (statyczna lista marek/modeli)
+  - leasing/
+    - calculator.ts (calculateRata, getWykupLimits, getNettoPrice, calculateShowcaseRate)
+  - otomoto/
+    - scraper.ts (fetchOtomotoListing, extractOtomotoImageUrls)
 - public/
   - jasne.png (logo na ciemne tlo)
   - ciemne.png (logo na jasne tlo)
+  - og-image.png (obrazek Open Graph, patrz Identyfikacja wizualna)
+- next.config.ts (images.remotePatterns dla Supabase Storage - wymagane dla next/image)
 - proxy.ts (dawniej middleware.ts - patrz Konwencje pracy; chroni /admin/*, redirect do /admin/login)
 - .env.local (klucze, poza git)
 - PROJEKT.md (ten plik)
@@ -143,6 +167,7 @@ Tabele utworzone (RLS wlaczone):
   - kompresja w przegladarce (browser-image-compression: maxWidthOrHeight 1600, maxSizeMB 0.4)
   - upload do Storage bucket listing-images pod folder=slug
   - zapis rekordu do listing_images, pierwsze wgrane zdjecie automatycznie = okladka
+  - miniatury wyswietlane przez next/image
   - przyciski: strzalki kolejnosci (ikony SVG w kwadratowych przyciskach), przycisk
     tekstowy "Okladka" (pomaranczowy, nieaktywny gdy zdjecie juz jest okladka),
     Usun (bez potwierdzenia - swiadoma decyzja, usuwanie zdjecia jest odwracalne
@@ -169,6 +194,9 @@ Tabele utworzone (RLS wlaczone):
   automatycznie przycinane o 6% wysokosci od dolu przy imporcie (usuwa watermark "otomoto"
   wypalony w pliku, patrz OTOMOTO_WATERMARK_CROP_RATIO w otomoto-actions.ts).
   Synchronizacja: jak ogloszenie znika z OtoMoto -> znika z Fidens.
+- **Pozycjonowanie marki:** komunikacja (haslo strony, obrazek OG) celowo kierowana
+  do firm/przedsiebiorcow, nie klientow indywidualnych - odsiewa niechciane zapytania
+  juz na etapie podgladu linku w social mediach.
 
 ## Kalkulator leasingu - szczegoly
 
@@ -177,8 +205,6 @@ Klasyczna annuita z balonem:
 kapital = cena - wplata
 PV = kapital - wykup / (1+r)^n
 rata = PV * r / (1 - (1+r)^(-n))
-
-
 
 ### Netto vs brutto (WAZNE)
 - price_pln w bazie to zawsze cena BRUTTO (tak jak importowana z OtoMoto - bez zadnej konwersji).
@@ -214,6 +240,37 @@ Score liczony ze srednich 3 parametrow (2 dla pozyczki - bez wykupu):
 ### Link "Zapytaj o ten pojazd"
 Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyczka), wstepna, msc, wykup, rata
 
+## SEO i meta tagi (ZROBIONE - sesja z 27.08.2026)
+- **app/layout.tsx:** title, description, keywords, openGraph (z obrazkiem 1200x630),
+  twitter card (summary_large_image) - dane globalne dla calej strony, tekst pozycjonowany
+  pod klientele B2B ("Finansowanie dla firm: pojazdy, maszyny i sprzęt")
+- **app/ogloszenia/[slug]/page.tsx:** generateMetadata dynamiczny per ogloszenie - tytul
+  z nazwa pojazdu, opis z description ogloszenia (albo wygenerowany z marki/modelu/roku/ceny
+  jesli description puste), obrazek OG = zdjecie okladkowe tego ogloszenia. Dane pobierane
+  raz przez funkcje owinieta w cache() z React, wspoldzielone miedzy generateMetadata
+  a samym komponentem strony (bez podwojnego zapytania do bazy).
+- **app/ogloszenia/page.tsx:** generateMetadata reagujacy na filtry z URL (marka/model/q) -
+  np. "Oferty: BMW — Fidens" zamiast ogolnego tytulu.
+- **app/kontakt/page.tsx:** statyczny export const metadata (KontaktForm.tsx jest "use client"
+  wiec metadata musi byc w tym wrapperze, nie w komponencie klienckim).
+- **Favicon/app icon:** wygenerowany graficznie (litera F + zawijas drogi), pliki
+  app/favicon.ico, app/icon.png (512x512), app/apple-icon.png (180x180, biale tlo bo
+  Apple wymaga opaque). Zrodlowy plik PNG (logo_biale.png) NIE jest w repo - zapisany
+  lokalnie u Piotra poza projektem, do ew. przyszlych zmian faviconu.
+- **Obrazek Open Graph:** public/og-image.png (1200x630), logo na granatowym tle + haslo.
+
+## next/image (ZROBIONE - sesja z 27.08.2026)
+Wszystkie kluczowe miejsca przeszly z <img> na next/image (wymaga next.config.ts
+z images.remotePatterns dla domeny Supabase Storage):
+- Carousel.tsx - glowne zdjecie i miniatury (fill + sizes). WYJATEK: zdjecie w lightboxie
+  zostalo jako zwykly <img> (celowo) - ladowane on-demand dopiero po kliknieciu, kontener
+  bez ustalonych wymiarow (dopasowuje sie do proporcji kazdego zdjecia), next/image
+  wymagalby fill+rodzic o stalym rozmiarze co niepotrzebnie skomplikowaloby kod.
+- app/ogloszenia/page.tsx - karty ogloszen na liscie (fill + sizes responsywne)
+- app/page.tsx - ogloszenie tygodnia (fill + priority, laduje sie pierwsze) i najnowsze
+  oferty (fill + sizes)
+- ImageUploader.tsx - miniatury wgranych zdjec w panelu admina (fill + sizes)
+
 ## Stan prac
 
 ### Zrobione
@@ -241,7 +298,7 @@ Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyc
       etykiety/inputy z jawnym kolorem tekstu (text-gray-900), ekran "Dziekujemy" z
       zielonym kolkiem + bialy haczyk (SVG, nie emoji) zamiast surowego domyslnego stylu.
 - [x] Wgrane na Vercel -> fidens.pl
-- [x] **Synchronizacja z OtoMoto (ZROBIONE)** - Vercel Cron Job (/api/cron/otomoto-sync),
+- [x] **Synchronizacja z OtoMoto** - Vercel Cron Job (/api/cron/otomoto-sync),
       raz dziennie o 3:00 UTC (godzinne okno na planie Hobby). Sprawdza wszystkie
       ogloszenia ze statusem active/inactive (pomija sold) ktore maja otomoto_url.
       Jesli zniknelo z OtoMoto (HTTP 404/410 lub tekst o wygasnieciu) -> status=inactive
@@ -273,8 +330,11 @@ Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyc
     warnings zamiast bledu - trzeba wtedy uzupelnic dane recznie
   - Uwaga: pole otomoto_id NIE jest jeszcze automatycznie ustawiane przy imporcie (zawsze null)
 - [x] **Naprawa polskich znakow (ogonkow)** w panelu admina (wszystkie strony), formularzu
-      kontaktowym i kalkulatorze leasingu - brakowalo ich w wielu miejscach (efekt pisania
-      komend PowerShell bez polskich znakow bez pozniejszego przywrocenia, patrz Konwencje pracy)
+      kontaktowym, kalkulatorze leasingu i Carousel.tsx - brakowalo ich w wielu miejscach
+      (efekt pisania komend PowerShell bez polskich znakow bez pozniejszego przywrocenia,
+      patrz Konwencje pracy). Poprawiono tez literowke "zl" -> "zł" (kilka wystapien:
+      LeasingCalculator, karty ogloszen na /ogloszenia i stronie glownej) oraz zdublowany
+      link w komponencie BrakOfert (app/ogloszenia/page.tsx).
 - [x] **UI usuwania zdjec i ogloszen w panelu admina**:
   - ConfirmDialog.tsx - wlasny modal potwierdzenia (zamiast natywnego confirm()), uzywany
     tylko przy usuwaniu calego ogloszenia (nieodwracalne)
@@ -282,18 +342,30 @@ Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyc
     i odwracalne przez ponowny upload)
   - Przyciski kolejnosci/okladki/usuwania zdjecia - spojny, ladniejszy wyglad (ikony SVG
     dla strzalek, tekstowy przycisk "Okladka" w kolorze marki)
+- [x] **Favicon i app icon** - wygenerowany graficznie (litera F + zawijas drogi na bialym
+      tle), pliki app/favicon.ico, app/icon.png, app/apple-icon.png
+- [x] **Meta tagi + Open Graph + Twitter Card** - patrz sekcja "SEO i meta tagi" wyzej.
+      Przetestowane w Facebook Sharing Debugger - dziala poprawnie (ostrzezenie o
+      brakujacym fb:app_id jest nieistotne, nie wplywa na wyglad podgladu linku).
+- [x] **next/image wdrozony wszedzie** - patrz sekcja "next/image" wyzej.
 
 ### Do zrobienia (priorytety)
 
-1. **SEO i optymalizacja** <-- NASTEPNY KROK
-   - Przejsc z <img> na <next/image> (karuzela, karta ogloszen, cover images, ImageUploader
-     w panelu admina) - wymaga next.config.ts z remotePatterns dla Supabase
-   - Favicon z logo Fidens (favicon.io/favicon-converter)
-   - Meta tagi (Open Graph + description per strona)
-   - Strony statyczne: /o-nas, /leasing, /regulamin, /polityka
+1. **Strony statyczne** <-- NASTEPNY KROK
+   - /o-nas, /leasing, /regulamin, /polityka
+   - Tresc do ustalenia z Piotrem (co dokladnie ma sie znalezc na kazdej)
 
-2. **Drobne dopiecia panelu admina**
+2. **Drobna poprawka do zrobienia przy okazji**
+   - Stopka na stronie glownej: link "O mnie" prowadzi do /o-nas, ale to strona firmowa
+     (nie osobista) - prawdopodobnie powinno byc "O nas". Nie zmienione, czeka na decyzje.
+
+3. **Drobne dopiecia panelu admina**
    - Rozwazyc email admina docelowo na ...@fidens.pl (patrz sekcja Poczta)
+
+4. **Import z OtoMoto - do rozbudowy**
+   - Sprawdzic dlaczego niektore pola (skrzynia, moc, pojemnosc, kolor, kraj pochodzenia)
+     czasem nie importuja sie mimo dostepnych danych na OtoMoto - do zbadania z realnymi
+     przykladami (zglaszane przez Piotra przy okazji dodawania Mercedes-Benz Klasa B)
 
 ## Konwencje pracy
 - **Pisanie kodu:** komendy w terminalu (PowerShell) z Out-File -Encoding utf8
@@ -304,11 +376,26 @@ Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyc
 - **PRZED KAZDYM PUSHEM:** npm run build lokalnie (Vercel wywala deployment na warningach TypeScript/ESLint)
 - **Next.js 16: middleware.ts jest DEPRECATED, uzywamy proxy.ts** (funkcja musi nazywac sie
   "proxy" nie "middleware"). Plik w repo to juz proxy.ts, nie tworzyc ponownie middleware.ts.
+- **Male, punktowe poprawki (1-2 miejsca w pliku):** uzywac find-replace zamiast nadpisywania
+  calego pliku - szybsze, mniej do wklejania, mniejsze ryzyko literowki:
+  $content = Get-Content -Raw -Encoding UTF8 "sciezka\do\pliku"
+  $content = $content -replace [regex]::Escape("STARY TEKST"), "NOWY TEKST"
+  [System.IO.File]::WriteAllText("$PWD\sciezka\do\pliku", $content, (New-Object System.Text.UTF8Encoding $false))
+  Po wykonaniu ZAWSZE sprawdzic czy zamiana faktycznie zaszla (np. Select-String -Path ... -Pattern ...) -
+  build moze przejsc czysto nawet jesli -replace nic nie znalazl i plik zostal bez zmian.
+- **Duze zmiany (wiele miejsc w pliku, nowy plik, przebudowa struktury):** nadpisywanie
+  calego pliku przez heredoc @'...'@ + WriteAllText nadal ma sens - szybsze niz wiele
+  osobnych find-replace.
 - **Zapis plikow z polskimi znakami przez PowerShell:** heredoc @'...'@ w terminalu VS Code
   potrafi sie urwac przy wklejaniu (PowerShell interpretuje poczatek nastepnej komendy jako
   czesc stringa) - jesli build rzuci blad parsowania w miejscu, gdzie nie bylo edycji, to
   najpewniej to. Naprawa: git checkout -- "sciezka/pliku" i wkleic komende ponownie, jednym
   ruchem (zaznacz caly blok az do konca WriteAllText, wklej, jeden Enter, nie klikac w srodku).
+- **UWAGA - wypadek z 27.08.2026:** PROJEKT.md i AGENTS.md zostaly przypadkowo nadpisane/
+  zmieszane (prawdopodobnie przez pomylke przy kopiowaniu tresci miedzy plikami lokalnie,
+  potem zapushowane do gita). Odzyskane i zaktualizowane recznie tego samego dnia. Wniosek:
+  po kazdej zmianie w PROJEKT.md/AGENTS.md warto zrobic szybkie Get-Content i sprawdzic czy
+  tresc sie zgadza, ZANIM sie zrobi commit + push.
 
 ## Znane problemy/uwagi
 - **Hydration warning** od rozszerzenia Bitdefender (atrybuty bis_register, bis_skin_checked).
@@ -347,3 +434,9 @@ Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyc
   po prostu znika ze strony glownej (.maybeSingle() zwraca null, reszta strony dziala
   normalnie) - system NIE wybiera automatycznie innego ogloszenia. Trzeba recznie
   ustawic is_featured=true na innym w panelu admina.
+- **next/image wymaga next.config.ts z images.remotePatterns** dla hosta Supabase Storage
+  (mglgfsaimktblkzjkmfg.supabase.co) - jesli kiedys zmieni sie projekt Supabase (nowy URL),
+  trzeba zaktualizowac remotePatterns, inaczej obrazki przestana sie ladowac z bledem
+  "Invalid src prop, hostname not configured".
+- **Zdjecie w lightboxie (Carousel.tsx) to celowo zwykly <img>, nie next/image** - patrz
+  sekcja "next/image" wyzej po wyjasnienie.
