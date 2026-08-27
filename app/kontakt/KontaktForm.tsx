@@ -25,7 +25,7 @@ export default function KontaktForm() {
       setStatus("sent")
     } else {
       setStatus("error")
-      setErrorMsg(result.error || "Cos poszlo nie tak")
+      setErrorMsg(result.error || "Coś poszło nie tak")
     }
   }
 
@@ -45,13 +45,13 @@ export default function KontaktForm() {
                 </svg>
               </div>
             </div>
-            <h1 className="text-2xl font-bold mb-3" style={{ color: "#1B2A4A" }}>Dziekujemy!</h1>
-            <p className="text-sm" style={{ color: "#666" }}>Skontaktujemy sie z Toba wkrotce.</p>
+            <h1 className="text-2xl font-bold mb-3" style={{ color: "#1B2A4A" }}>Dziękujemy!</h1>
+            <p className="text-sm" style={{ color: "#666" }}>Skontaktujemy się z Tobą wkrótce.</p>
           </div>
         </section>
         <footer className="px-4 sm:px-6 py-8 sm:py-10" style={{ backgroundColor: "#1B2A4A" }}>
           <div className="max-w-[1100px] mx-auto text-center text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
-            (c) 2026 Fidens. Wszelkie prawa zastrzezone.
+            (c) 2026 Fidens. Wszelkie prawa zastrzeżone.
           </div>
         </footer>
       </main>
@@ -68,14 +68,14 @@ export default function KontaktForm() {
             Zapytanie ofertowe
           </h1>
           <p className="text-sm mb-6" style={{ color: "#888" }}>
-            Wypelnij ponizszy formularz, a nasz doradca skontaktuje sie z Toba tak szybko, jak to mozliwe.
+            Wypełnij poniższy formularz, a nasz doradca skontaktuje się z Tobą tak szybko, jak to możliwe.
           </p>
 
           {marka && model && (
             <div className="rounded-lg px-4 py-3 mb-6 text-sm" style={{ backgroundColor: "#f8f9fb", border: "1px solid #e8eaed", color: "#1B2A4A" }}>
               Zapytanie o: <strong>{marka} {model}</strong>
               {typ && <> ({typ})</>}
-              {rata && <> &middot; rata od {rata} zl/msc</>}
+              {rata && <> &middot; rata od {rata} zł/msc</>}
             </div>
           )}
 
@@ -86,7 +86,7 @@ export default function KontaktForm() {
             <input type="hidden" name="wykup" value={wykup} />
 
             <div>
-              <label className={labelClass} style={{ color: "#1B2A4A" }}>Imie i nazwisko *</label>
+              <label className={labelClass} style={{ color: "#1B2A4A" }}>Imię i nazwisko *</label>
               <input type="text" name="name" required className={inputClass} style={{ borderColor: "#e8eaed", outlineColor: "#F0A500" }} />
             </div>
 
@@ -97,8 +97,7 @@ export default function KontaktForm() {
 
             <div>
               <label className={labelClass} style={{ color: "#1B2A4A" }}>Email *</label>
-              <input type="email" name="email" required className={inputClass} style={{ borderColor: "#e8eaed", outlineColor: "#F0A500" }} />
-            </div>
+              <input type="email" name="email" required className={inputClass} style={{ borderColor: "#e8eaed", outlineColor: "#F0A500" }} />            </div>
 
             <div>
               <label className={labelClass} style={{ color: "#1B2A4A" }}>NIP (opcjonalnie)</label>
@@ -106,7 +105,7 @@ export default function KontaktForm() {
             </div>
 
             <div>
-              <label className={labelClass} style={{ color: "#1B2A4A" }}>Wiadomosc (opcjonalnie)</label>
+              <label className={labelClass} style={{ color: "#1B2A4A" }}>Wiadomość (opcjonalnie)</label>
               <textarea name="message" rows={4} className={inputClass} style={{ borderColor: "#e8eaed", outlineColor: "#F0A500" }} />
             </div>
 
@@ -120,11 +119,11 @@ export default function KontaktForm() {
               className="w-full py-3 rounded-lg font-semibold transition disabled:opacity-50"
               style={{ backgroundColor: "#F0A500", color: "#1B2A4A" }}
             >
-              {status === "sending" ? "Wysylanie..." : "Wyslij zapytanie"}
+              {status === "sending" ? "Wysyłanie..." : "Wyślij zapytanie"}
             </button>
 
             <p className="text-xs text-center" style={{ color: "#aaa" }}>
-              Wysylajac formularz akceptujesz przetwarzanie danych w celu przygotowania oferty.
+              Wysyłając formularz akceptujesz przetwarzanie danych w celu przygotowania oferty.
             </p>
           </form>
         </div>
@@ -132,7 +131,7 @@ export default function KontaktForm() {
 
       <footer className="px-4 sm:px-6 py-8 sm:py-10" style={{ backgroundColor: "#1B2A4A" }}>
         <div className="max-w-[1100px] mx-auto text-center text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
-          (c) 2026 Fidens. Wszelkie prawa zastrzezone.
+          (c) 2026 Fidens. Wszelkie prawa zastrzeżone.
         </div>
       </footer>
     </main>

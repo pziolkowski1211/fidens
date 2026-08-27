@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -47,17 +47,17 @@ export default function NoweOgloszeniePage() {
   const [isFeatured, setIsFeatured] = useState(false);
   const [badge, setBadge] = useState("");
   const [otomotoUrl, setOtomotoUrl] = useState("");
-    const [importUrl, setImportUrl] = useState("");
+  const [importUrl, setImportUrl] = useState("");
   const [importing, setImporting] = useState(false);
   const [importWarnings, setImportWarnings] = useState<string[]>([]);
   const [importError, setImportError] = useState<string | null>(null);
 
-    async function handleImportOtomoto() {
+  async function handleImportOtomoto() {
     setImportError(null);
     setImportWarnings([]);
 
     if (!importUrl) {
-      setImportError("Wklej najpierw link do ogloszenia OtoMoto");
+      setImportError("Wklej najpierw link do ogłoszenia OtoMoto");
       return;
     }
 
@@ -102,7 +102,7 @@ export default function NoweOgloszeniePage() {
     setError(null);
 
     if (!title || !slug || !brand || !model || !year || !pricePln) {
-      setError("Wypelnij wymagane pola: tytul, slug, marka, model, rok, cena");
+      setError("Wypełnij wymagane pola: tytuł, slug, marka, model, rok, cena");
       return;
     }
 
@@ -147,7 +147,7 @@ export default function NoweOgloszeniePage() {
     setLoading(false);
 
     if (error) {
-      setError("Blad zapisu: " + error.message);
+      setError("Błąd zapisu: " + error.message);
       return;
     }
 
@@ -161,14 +161,14 @@ export default function NoweOgloszeniePage() {
   return (
     <div className="mx-auto max-w-3xl">
       <h1 className="mb-4 text-lg font-semibold" style={{ color: "#1B2A4A" }}>
-        Nowe ogloszenie
+        Nowe ogłoszenie
       </h1>
       <div className="mb-4 rounded-lg border border-gray-200 bg-white p-4">
         <h2 className="mb-3 text-sm font-semibold text-gray-500">Import z OtoMoto</h2>
         <div className="flex flex-col gap-2 sm:flex-row">
           <input
             className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2"
-            placeholder="Wklej link do ogloszenia OtoMoto"
+            placeholder="Wklej link do ogłoszenia OtoMoto"
             value={importUrl}
             onChange={(e) => setImportUrl(e.target.value)}
           />
@@ -195,8 +195,8 @@ export default function NoweOgloszeniePage() {
         className="mb-4 rounded-md border px-4 py-3 text-sm"
         style={{ borderColor: "#F0A500", backgroundColor: "#FFF8E8", color: "#1B2A4A" }}
       >
-        Zdjecia bedzie mozna dodac dopiero po zapisaniu ogloszenia
-        (nastapi automatyczne przekierowanie do edycji, gdzie znajduje sie sekcja Zdjecia).
+        Zdjęcia będzie można dodać dopiero po zapisaniu ogłoszenia
+        (nastąpi automatyczne przekierowanie do edycji, gdzie znajduje się sekcja Zdjęcia).
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -204,7 +204,7 @@ export default function NoweOgloszeniePage() {
           <h2 className="mb-3 text-sm font-semibold text-gray-500">Podstawowe</h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="sm:col-span-2">
-              <label className={labelClass}>Tytul *</label>
+              <label className={labelClass}>Tytuł *</label>
               <input
                 className={inputClass}
                 value={title}
@@ -232,7 +232,7 @@ export default function NoweOgloszeniePage() {
                 onChange={(e) => setVehicleType(e.target.value)}
               >
                 <option value="osobowe">Osobowe</option>
-                <option value="ciezarowe">Ciezarowe</option>
+                <option value="ciezarowe">Ciężarowe</option>
                 <option value="maszyna">Maszyna</option>
               </select>
             </div>
@@ -347,7 +347,7 @@ export default function NoweOgloszeniePage() {
               />
             </div>
             <div>
-              <label className={labelClass}>Pojemnosc (cm3)</label>
+              <label className={labelClass}>Pojemność (cm3)</label>
               <input
                 type="number"
                 className={inputClass}
@@ -397,7 +397,7 @@ export default function NoweOgloszeniePage() {
               />
             </div>
             <div>
-              <label className={labelClass}>Wplata wstepna (%)</label>
+              <label className={labelClass}>Wpłata wstępna (%)</label>
               <input
                 type="number"
                 className={inputClass}
@@ -431,7 +431,7 @@ export default function NoweOgloszeniePage() {
                 onChange={(e) => setVatType(e.target.value)}
               >
                 <option value="">-- wybierz --</option>
-                <option value="marza">Marza</option>
+                <option value="marza">Marża</option>
                 <option value="vat23">VAT 23%</option>
               </select>
             </div>
@@ -480,7 +480,7 @@ export default function NoweOgloszeniePage() {
                 onChange={(e) => setIsFeatured(e.target.checked)}
               />
               <label htmlFor="featured" className="text-sm text-gray-700">
-                Ogloszenie tygodnia
+                Ogłoszenie tygodnia
               </label>
             </div>
           </div>
@@ -495,7 +495,7 @@ export default function NoweOgloszeniePage() {
             className="rounded-md px-6 py-2 text-sm font-medium text-white disabled:opacity-50"
             style={{ backgroundColor: "#1B2A4A" }}
           >
-            {loading ? "Zapisywanie..." : "Zapisz ogloszenie"}
+            {loading ? "Zapisywanie..." : "Zapisz ogłoszenie"}
           </button>
         </div>
       </form>
