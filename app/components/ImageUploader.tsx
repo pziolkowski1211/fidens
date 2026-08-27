@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import imageCompression from "browser-image-compression";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 
 import { importOtomotoPhotos } from "@/app/admin/ogloszenia/otomoto-actions";
@@ -252,10 +253,12 @@ export default function ImageUploader({
               className="overflow-hidden rounded-lg border border-gray-200 bg-white"
             >
               <div className="relative aspect-square bg-gray-100">
-                <img
+                <Image
                   src={image.url}
                   alt=""
-                  className="h-full w-full object-cover"
+                  fill
+                  sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
+                  className="object-cover"
                 />
                 {image.is_cover && (
                   <span
