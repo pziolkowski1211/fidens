@@ -7,7 +7,7 @@ Klienci wchodza glownie z social mediow -> mobile pierwszy priorytet.
 ## Stack techniczny
 - **Next.js 16** (App Router, Turbopack) + TypeScript + Tailwind v4
 - **Supabase** - baza danych (Postgres), Auth (panel admina), Storage (zdjecia)
-- **Vercel** - hosting -> fidens.pl
+- **Vercel** - hosting -> fidens.pl (+ Vercel Cron Jobs dla synchronizacji OtoMoto)
 - **Resend** - planowane do wysylki maili z formularzy (3000/msc free)
 
 ## Repo i srodowisko
@@ -41,6 +41,15 @@ fidens/
     - SearchAutocomplete.tsx (wyszukiwarka z autocomplete)
     - Carousel.tsx (karuzela zdjec + lightbox z klawiszami i swipe)
     - LeasingCalculator.tsx (kalkulator leasingu/pozyczki z suwakami)
+  - admin/
+    - login/ (logowanie admina przez Supabase Auth)
+    - ogloszenia/ (lista + CRUD)
+      - nowe/ (formularz dodawania)
+      - [id]/ (edycja pojedynczego ogloszenia)
+    - zapytania/ (lista contact_requests)
+  - api/
+    - cron/
+      - otomoto-sync/route.ts (codzienna synchronizacja o 3:00 - dezaktywuje znikniete ogloszenia)
   - ogloszenia/
     - page.tsx (lista ogloszen z filtrami z URL + cover images)
     - [slug]/
@@ -49,6 +58,8 @@ fidens/
     - page.tsx (strona "Dlaczego Fidens?" - zaufanie, benefity, CTA)
   - leasing/
     - page.tsx (strona "Leasing dla firm" - edukacyjna, VAT-23 vs VAT-marza, proces)
+  - kontakt/
+    - page.tsx (formularz kontaktowy)
   - favicon.ico
   - globals.css
   - layout.tsx
@@ -64,6 +75,7 @@ fidens/
   - jasne.png (logo na ciemne tlo)
   - ciemne.png (logo na jasne tlo)
 - .env.local (klucze, poza git)
+- vercel.json (konfiguracja crona)
 - PROJEKT.md (ten plik)
 - AGENTS.md (instrukcje dla AI)
 - CLAUDE.md (jak wyzej)
@@ -107,6 +119,7 @@ Tabele utworzone (RLS wlaczone):
   - Automatycznie wybiera typ na podstawie vat_type: 'marza' = pozyczka leasingowa (bez wykupu), inaczej = leasing (z wykupem)
   - Wzor: annuita z balonem, APR 5,2% (najkorzystniej) do 6,2% (najmniej korzystnie)
   - Uklad "wariant A": rata jako hero (44px), cena drobno pod ratą
+  - PLANOWANE: mini-link "co to znaczy?" przy typie finansowania -> /leasing (patrz TODO)
 - **Wyszukiwarka:** autocomplete typu Google ze statycznej listy (~50 marek + modele).
   Klik w sugestie -> /ogloszenia?marka=X&model=Y. Brak wynikow -> CTA "Zapytaj o ten pojazd" z prefilled marka/modelem.
 - **Mobile nawigacja:** logo + lupa + hamburger. Drawer wysuwany z prawej.
@@ -121,6 +134,13 @@ Tabele utworzone (RLS wlaczone):
   prawna - znaki towarowe), tylko nazwy tekstowo. Model biznesowy: Fidens promuje przedmioty
   od zewnetrznych dostawcow (salony/komisy/firmy handlowe) i zarabia na prowizji z finansowania,
   nie na marzy ze sprzedazy pojazdu.
+- **Nowe kategorie produktowe (ustalone, do zaprojektowania w osobnej sesji):**
+  - **"Inne"** - pawilony, fotowoltaika, pompy ciepla, magazyny energii. Rozne parametry
+    techniczne niz pojazdy (bez roku/przebiegu/paliwa) - podejscie portfolio: zdjecia z
+    produkcji + opis, bez sztywnych filtrow jak w /ogloszenia. Klient ma dostawcow pawilonow.
+  - **Import z zagranicy** (250-300k+ PLN) - podejscie portfolio, NIE rozbudowana strona
+    z detalami operacyjnymi (clo/homologacja). Kazdy przypadek indywidualny, omawiany z
+    klientem osobno - strona ma tylko pokazac ze usluga istnieje + kilka zdjec.
 
 ## Strony statyczne
 
@@ -133,11 +153,26 @@ osobisty kontakt) + CTA do /ogloszenia i /kontakt. Link w Navbar i stopce: "Pozn
 Zrobione. Strona edukacyjno-sprzedazowa dla klientow B2B: sekcja "Dlaczego leasing przez
 Fidens" (dobor finansowania, kompleksowa obsluga w jednym miejscu), tabela leasing operacyjny
 (VAT-23) vs pozyczka leasingowa (VAT-marza), proces krok po kroku (wybor przedmiotu -> parametry
-w kalkulatorze -> zapytanie -> podpisanie umowy). Link w Navbar i stopce: "Leasing".
+w kalkulatorze -> zapytanie -> podpisanie umowy).
+WAZNE: usunieta z gownego Navbara (desktop i mobile) - zostaje TYLKO w stopce (cel: SEO,
+strona nie zachecala do klikniecia jako pozycja menu). Do rozwazenia: mini-link "co to
+znaczy?" w kalkulatorze prowadzacy tutaj.
 
 ### /regulamin i /polityka
 Do zrobienia - nastepna sesja. Dokumenty prawne, wymagaja spokojnej, osobnej uwagi (i docelowo
 weryfikacji przez kogos z uprawnieniami prawniczymi, nie tylko AI).
+
+## Navbar - struktura (zaktualizowana)
+
+### Desktop (top menu)
+Ogloszenia -> Poznaj Fidens -> Kontakt -> CTA "Zamow bezplatna kalkulacje"
+
+### Mobile (drawer)
+Strona glowna -> Ogloszenia -> Poznaj Fidens -> Kontakt -> CTA
+(ujednolicone z desktop - wczesniej mobile mial "Wszystkie oferty" zamiast "Ogloszenia")
+
+### Stopka (kopiowana per-strona, patrz "Znane problemy")
+Poznaj Fidens, Leasing, Kontakt, Regulamin, Polityka prywatnosci
 
 ## Kalkulator leasingu - szczegoly
 
@@ -196,6 +231,13 @@ Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyc
 - [x] Formularz kontaktowy /kontakt (Supabase + rozpoczete DNS pod Resend)
 - [x] Strona /o-nas ("Dlaczego Fidens?")
 - [x] Strona /leasing ("Leasing dla firm")
+- [x] Panel admina /admin (login, CRUD ogloszen w /admin/ogloszenia + /nowe + /[id],
+  lista zapytan w /admin/zapytania)
+- [x] Import z OtoMoto (mechanizm istnieje, powiazany z otomoto_url/otomoto_id w bazie)
+- [x] Synchronizacja z OtoMoto - Vercel Cron (app/api/cron/otomoto-sync/route.ts),
+  harmonogram w vercel.json: codziennie o 3:00
+- [x] Reorganizacja Navbara: dodano "Ogloszenia", usunieto "Leasing" z gownego menu
+  (zostaje w stopce - cel SEO), ujednolicono desktop/mobile
 - [x] Wgrane na Vercel -> fidens.pl
 
 ### Do zrobienia (priorytety)
@@ -211,47 +253,31 @@ Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyc
    - Dodac link "Leasing" do stopki na pozostalych stronach (glowna, /ogloszenia, /kontakt,
      [slug]) - obecnie stopka jest kopiowana recznie do kazdej strony, wiec trzeba
      zaktualizowac wszedzie tam gdzie brakuje linku do /leasing
+   - Mini-link "co to znaczy?" w LeasingCalculator.tsx przy typie finansowania -> /leasing
 
 2. **Regulamin i polityka prywatnosci** (/regulamin, /polityka)
    - Osobna sesja - dokumenty prawne wymagaja spokojnej uwagi
    - Docelowo do weryfikacji przez osobe z uprawnieniami prawniczymi
 
-3. **"Od X zl" na kartach ogloszen** (obecnie pokazuje leasing_rate_pln z bazy)
+3. **Nowa kategoria "Inne"** (pawilony, fotowoltaika, pompy ciepla, magazyny energii)
+   - Podejscie portfolio (zdjecia z produkcji + opis), nie pelna struktura /ogloszenia
+     z filtrami - te produkty nie maja roku/przebiegu/paliwa
+   - Do zaprojektowania: struktura danych (elastyczne pola zamiast sztywnych kolumn),
+     wyglad karty, gdzie w Navbarze/menu
+
+4. **Import z zagranicy - strona portfolio** (250-300k+ PLN)
+   - Podejscie portfolio: zdjecia + krotki opis "zajmujemy sie tym od A do Z",
+     bez szczegolow operacyjnych (clo/homologacja) - kazdy przypadek indywidualny
+   - Prostsze niz pierwotnie zakladano - NIE wymaga sesji planistycznej o formalnosciach
+
+5. **"Od X zl" na kartach ogloszen** (obecnie pokazuje leasing_rate_pln z bazy)
    - Zamiast statycznej raty z bazy - liczyc dynamicznie "najatrakcyjniejsza" rate
    - Wariant B (realistyczny): wplata 20%, okres 60 msc, wykup MAX dla okresu (35% dla 60)
    - Wariant A (skrajny): max wplata 45%, max okres 72 msc, max wykup 30% - agresywne "od X"
    - Decyzja klienta: wariant B jesli chcemy uczciwie sprzedawac, A jesli agresywnie
    - Alternatywnie: pole showcase_rate w bazie, klientka wpisuje recznie per pojazd
 
-4. **Panel admina** /admin
-   - Logowanie przez Supabase Auth (tylko 1 user)
-   - CRUD na ogloszeniach (tworzenie, edycja, usuwanie)
-   - Upload zdjec do Supabase Storage (drag and drop, multi-file)
-   - AUTO-RESIZE zdjec w przegladarce przed uploadem (biblioteka browser-image-compression)
-     - Klient wgrywa 8 MB z iPhona, system kompresuje do ~1600 px / 400 KB
-     - Bez tego klientka wgra ogromne zdjecia i strona bedzie sie ladowac 10 sek
-   - Ustawianie cover image, kolejnosci zdjec
-   - Lista contact_requests z mozliwoscia oznaczania jako przeczytane + notatki
-
-5. **Import z OtoMoto**
-   - Pole "Wklej link OtoMoto" w panelu admina
-   - Scraping danych pojazdu (marka, model, rok, przebieg, cena, opis...)
-   - Stworzenie listingu z otomoto_url i otomoto_id
-   - Zdjecia ZAWSZE wgrywane recznie (osobno)
-
-6. **Synchronizacja z OtoMoto**
-   - Cron (Vercel Cron Jobs?) raz dziennie sprawdza wszystkie listings z otomoto_url
-   - Jezeli OtoMoto zwraca 404 -> ustaw status='inactive' (nie usuwa, zachowuje historie)
-
-7. **Nowa uslugra: import pojazdow/maszyn z zagranicy (300k+ PLN)**
-   - Pomysl klienta: Fidens zajmuje sie sprowadzeniem przedmiotu z zagranicy "od A do Z"
-     dla wiekszych zakupow (300k+ PLN)
-   - Wymaga osobnej sesji biznesowej PRZED kodowaniem: clo, homologacja, transport,
-     podzial ryzyka, wymagane dokumenty, czy Fidens fizycznie sprowadza czy tylko
-     posredniczy w formalnosciach
-   - NIE robic "przy okazji" innej sesji - latwo o niescislosci/obietnice bez pokrycia
-
-8. **SEO i optymalizacja**
+6. **SEO i optymalizacja**
    - Przejsc z <img> na <next/image> (karuzela, karta ogloszen, cover images) - wymaga next.config.ts z remotePatterns dla Supabase
    - Kalibracja kalkulatora (Opcja C) - tabela marz od klientki, wtedy odchylenia od prawdziwego systemu banku znikna (obecnie 4-5%)
    - Favicon z logo Fidens (favicon.io/favicon-converter)
@@ -266,6 +292,8 @@ Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyc
 - **Wgranie:** git add . && git commit -m "opis" && git push -> Vercel auto-rebuild
 - **Wszystkie zmiany testujemy lokalnie ZANIM git push** (zeby fidens.pl sie nie zepsul)
 - **PRZED KAZDYM PUSHEM:** npm run build lokalnie (Vercel wywala deployment na warningach TypeScript/ESLint)
+- **PRZED ZALOZENIEM CZEGOS O STANIE PROJEKTU:** sprawdzic w kodzie (Get-ChildItem/Get-Content),
+  nie zgadywac na podstawie samej dokumentacji - PROJEKT.md moze byc nieaktualny
 
 ## Znane problemy/uwagi
 - **Hydration warning** od rozszerzenia Bitdefender (atrybuty bis_register, bis_skin_checked).
@@ -285,5 +313,5 @@ Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyc
   Widok Git Local Changes (Working Tree) w VS Code = szybki sprawdzian co poszlo nie tak.
 - **Stopka duplikowana per-strona:** stopka (footer) nie jest osobnym komponentem, jest
   wklejona recznie w kazdym page.tsx. Przy zmianie linkow w stopce trzeba pamietac o
-  aktualizacji wszedzie (glowna, /ogloszenia, [slug], /kontakt, /o-nas, /leasing).
+  aktualizacji wszedzie (glowna, /ogloszenia, [slug], /kontakt, /o-nas, /leasing, /admin).
   Do rozwazenia w przyszlosci: wydzielenie do wspolnego komponentu Footer.tsx.
