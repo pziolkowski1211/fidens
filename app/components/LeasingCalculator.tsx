@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState, useMemo, useEffect } from "react"
 import { getWykupLimits, calculateRata, getNettoPrice } from "@/lib/leasing/calculator"
@@ -16,7 +16,9 @@ function formatNumber(n: number): string {
 }
 
 export default function LeasingCalculator({ price, isMarza, slug, brand, model }: LeasingCalculatorProps) {
-  const hasWykup = !isMarza
+  const [financingChoice, setFinancingChoice] = useState<"leasing" | "pozyczka">(isMarza ? "pozyczka" : "leasing")
+  const hasWykup = !isMarza && financingChoice === "leasing"
+
   const [wplataProc, setWplataProc] = useState(20)
   const [okresMsc, setOkresMsc] = useState(60)
   const [wykupProc, setWykupProc] = useState(() => (hasWykup ? getWykupLimits(60).max : 10))
@@ -54,6 +56,36 @@ export default function LeasingCalculator({ price, isMarza, slug, brand, model }
   return (
     <div>
       <div className="text-xs uppercase tracking-wider font-semibold mb-2" style={{ color: "#888" }}>{label}</div>
+
+      {!isMarza && (
+        <div className="flex gap-2 mb-4">
+          <button
+            type="button"
+            onClick={() => setFinancingChoice("leasing")}
+            className="flex-1 py-2 rounded-lg text-sm font-semibold transition-colors"
+            style={
+              financingChoice === "leasing"
+                ? { backgroundColor: "#1B2A4A", color: "#fff", cursor: "pointer" }
+                : { backgroundColor: "#f0f0f2", color: "#1B2A4A", cursor: "pointer" }
+            }
+          >
+            Leasing operacyjny
+          </button>
+          <button
+            type="button"
+            onClick={() => setFinancingChoice("pozyczka")}
+            className="flex-1 py-2 rounded-lg text-sm font-semibold transition-colors"
+            style={
+              financingChoice === "pozyczka"
+                ? { backgroundColor: "#1B2A4A", color: "#fff", cursor: "pointer" }
+                : { backgroundColor: "#f0f0f2", color: "#1B2A4A", cursor: "pointer" }
+            }
+          >
+            Pożyczka
+          </button>
+        </div>
+      )}
+
       <div className="text-xs mb-1" style={{ color: "#888" }}>{ratalabel}</div>
       <div className="font-bold leading-none mb-1" style={{ color: "#1B2A4A", fontSize: "44px" }}>{formatNumber(rata)} zł<span className="text-base font-normal ml-1" style={{ color: "#888" }}>/msc</span>{hasWykup && (<span className="text-base font-normal ml-1" style={{ color: "#888" }}>netto</span>)}</div>
       {hasWykup && (
@@ -84,3 +116,6 @@ export default function LeasingCalculator({ price, isMarza, slug, brand, model }
     </div>
   )
 }
+
+
+
