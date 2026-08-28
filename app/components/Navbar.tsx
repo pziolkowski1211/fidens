@@ -36,7 +36,7 @@ export default function Navbar() {
   return (
     <>
       {/* GLOWNA NAWIGACJA */}
-      <nav style={{ backgroundColor: "#1B2A4A" }} className="px-4 sm:px-6 py-4 relative flex items-center">
+      <nav style={{ backgroundColor: "#1B2A4A" }} className="px-4 sm:px-6 py-4 sticky top-0 z-50 flex items-center">
 
         {/* Logo - lewa strona, klikalne */}
         <Link href="/" className="flex items-center shrink-0">
@@ -208,6 +208,7 @@ export default function Navbar() {
     </>
   )
 }
+
 
 
 
