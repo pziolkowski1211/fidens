@@ -58,6 +58,7 @@ export default function Navbar() {
         {/* DESKTOP: Menu prawa strona */}
         <div className="hidden lg:flex ml-auto items-center gap-8">
           <Link href="/ogloszenia" style={{ color: "rgba(255,255,255,0.8)", fontSize: "14px" }}>Ogłoszenia</Link>
+          <Link href="/pawilony" style={{ color: "rgba(255,255,255,0.8)", fontSize: "14px" }}>Pawilony</Link>
           <Link href="/o-nas" style={{ color: "rgba(255,255,255,0.8)", fontSize: "14px" }}>Poznaj Fidens</Link>
           <Link href="/kontakt" style={{ color: "rgba(255,255,255,0.8)", fontSize: "14px" }}>Kontakt</Link>
           <Link
@@ -158,6 +159,14 @@ export default function Navbar() {
               </Link>
 
               <Link
+                href="/pawilony"
+                onClick={() => setIsMenuOpen(false)}
+                className="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 text-base transition-colors"
+              >
+                Pawilony
+              </Link>
+
+              <Link
                 href="/o-nas"
                 onClick={() => setIsMenuOpen(false)}
                 className="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 text-base transition-colors"
@@ -208,6 +217,7 @@ export default function Navbar() {
     </>
   )
 }
+
 
 
 

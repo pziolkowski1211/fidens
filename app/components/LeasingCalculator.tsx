@@ -9,13 +9,14 @@ interface LeasingCalculatorProps {
   slug: string
   brand: string | null
   model: string | null
+  ctaLabel?: string
 }
 
 function formatNumber(n: number): string {
   return Math.round(n).toLocaleString("pl-PL").replace(/,/g, " ")
 }
 
-export default function LeasingCalculator({ price, isMarza, slug, brand, model }: LeasingCalculatorProps) {
+export default function LeasingCalculator({ price, isMarza, slug, brand, model, ctaLabel = "Zapytaj o ten pojazd" }: LeasingCalculatorProps) {
   const [financingChoice, setFinancingChoice] = useState<"leasing" | "pozyczka">(isMarza ? "pozyczka" : "leasing")
   const hasWykup = !isMarza && financingChoice === "leasing"
 
@@ -111,11 +112,14 @@ export default function LeasingCalculator({ price, isMarza, slug, brand, model }
         </div>
         {hasWykup ? (<div className="mb-5"><div className="flex justify-between items-baseline mb-2"><label className="text-sm font-semibold" style={{ color: "#1B2A4A" }}>Wykup</label><div className="text-sm font-bold" style={{ color: "#1B2A4A" }}>{wykupProc}% <span className="font-normal" style={{ color: "#888" }}>({formatNumber(wykupKwota)} zł brutto)</span></div></div><input type="range" min={wykupLimits.min} max={wykupLimits.max} step={1} value={wykupProc} onChange={(e) => setWykupProc(Number(e.target.value))} className="w-full" style={{ accentColor: "#F0A500" }} /><div className="flex justify-between text-xs mt-0.5" style={{ color: "#aaa" }}><span>{wykupLimits.min}%</span><span>{wykupLimits.max}%</span></div></div>) : null}
       </div>
-      <a href={kontaktUrl} className="block text-center w-full font-bold rounded-lg py-3.5 px-6 text-sm no-underline hover:opacity-90 transition-opacity" style={{ backgroundColor: "#F0A500", color: "#1B2A4A" }}>Zapytaj o ten pojazd</a>
+      <a href={kontaktUrl} className="block text-center w-full font-bold rounded-lg py-3.5 px-6 text-sm no-underline hover:opacity-90 transition-opacity" style={{ backgroundColor: "#F0A500", color: "#1B2A4A" }}>{ctaLabel}</a>
       <p className="text-xs leading-relaxed mt-3" style={{ color: "#aaa" }}>Kalkulacja orientacyjna. Ostateczna rata zależy od oferty banku.</p>
     </div>
   )
 }
+
+
+
 
 
 
