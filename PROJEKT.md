@@ -237,8 +237,7 @@ Score liczony ze srednich 3 parametrow (2 dla pozyczki - bez wykupu):
 
 ### Limity suwakow
 - Wplata: 0-45%, default 20%
-- Okres: 24-72 msc (krok 12), default 60 (wczesniej bylo 48, sprawdzic czy to nie kolejna
-  rozbieznosc dokumentacji - w kodzie useState(60))
+- Okres: 24-72 msc (krok 12), default 60
 - Wykup: dynamiczny min/max zalezny od okresu:
   - 24 msc: 16-55%
   - 36 msc: 1-45%
@@ -248,6 +247,11 @@ Score liczony ze srednich 3 parametrow (2 dla pozyczki - bez wykupu):
 
 ### Link "Zapytaj o ten pojazd"
 Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyczka), wstepna, msc, wykup, rata
+
+### Rata "od X zl" na kartach ogloszen (ZROBIONE, potwierdzone w kodzie 28.08)
+Funkcja calculateShowcaseRate() w lib/leasing/calculator.ts, uzywana w app/page.tsx
+(ogloszenie tygodnia + najnowsze) i app/ogloszenia/page.tsx (cala lista).
+Wariant B (realistyczny): wplata 20%, okres 60 msc, wykup MAX dla okresu.
 
 ## Stan prac
 
@@ -289,6 +293,7 @@ Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyc
 - [x] Tekst "zloz wniosek" -> "zloz zapytanie" na stronie glownej
 - [x] Strona ogloszenia: tytul przeniesiony nad karuzele, "Dane pojazdu" przed "Opisem"
 - [x] Ladniejsze okruszki (breadcrumb) na stronie ogloszenia
+- [x] Dynamiczna rata "od X zl" na kartach ogloszen (calculateShowcaseRate, wariant B)
 - [x] Wgrane na Vercel -> fidens.pl
 
 ### Do zrobienia (priorytety)
@@ -308,16 +313,7 @@ Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyc
      bez szczegolow operacyjnych (clo/homologacja) - kazdy przypadek indywidualny
    - Prostsze niz pierwotnie zakladano - NIE wymaga sesji planistycznej o formalnosciach
 
-4. **"Od X zl" na kartach ogloszen** (obecnie pokazuje leasing_rate_pln z bazy)
-   - Zamiast statycznej raty z bazy - liczyc dynamicznie "najatrakcyjniejsza" rate
-   - Wariant B (realistyczny): wplata 20%, okres 60 msc, wykup MAX dla okresu (35% dla 60)
-   - Wariant A (skrajny): max wplata 45%, max okres 72 msc, max wykup 30% - agresywne "od X"
-   - Decyzja klienta: wariant B jesli chcemy uczciwie sprzedawac, A jesli agresywnie
-   - Alternatywnie: pole showcase_rate w bazie, klientka wpisuje recznie per pojazd
-   - UWAGA: funkcja calculateShowcaseRate juz istnieje w lib/leasing/calculator.ts -
-     sprawdzic czy jest juz uzywana na kartach, czy to jeszcze "do zrobienia"
-
-5. **SEO i optymalizacja**
+4. **SEO i optymalizacja**
    - Przejsc z <img> na <next/image> (karuzela, karta ogloszen, cover images) - wymaga next.config.ts z remotePatterns dla Supabase
    - Kalibracja kalkulatora (Opcja C) - tabela marz od klientki, wtedy odchylenia od prawdziwego systemu banku znikna
    - Favicon z logo Fidens (favicon.io/favicon-converter)
@@ -339,7 +335,10 @@ Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyc
   metode po numerach linii ([System.Collections.Generic.List[string]] + RemoveRange/InsertRange),
   ZAWSZE najpierw wypisac fragment (Get-Content + petla Write-Host) zeby potwierdzic dokladne
   numery linii przed usunieciem/wstawieniem - liczenie "na oko" latwo pomylic o 1 linie
-  (bialy znak, pusta linia) i zepsuc skladnie JSX (patrz: incydent z breadcrumb 27.08)
+  i zepsuc skladnie/tresc. PO KAZDEJ takiej edycji zweryfikowac cala okolice zmiany
+  (nie tylko sama zmieniona fraze), bo RemoveRange o niewlasciwej dlugosci moze po cichu
+  skasowac sasiedni naglowek/sekcje (patrz: incydent 28.08 - zniknal caly punkt "SEO i
+  optymalizacja" oraz naglowek "Konwencje pracy" przy okazji drobnej zmiany numeracji)
 - **Server Components (strony pobierajace dane bezposrednio z Supabase, bez "use client")
   NIE MOGA miec event handlerow (onClick, onMouseEnter itp.) w JSX** - blad "Event handlers
   cannot be passed to Client Component props". Hover/interaktywnosc na Server Components
