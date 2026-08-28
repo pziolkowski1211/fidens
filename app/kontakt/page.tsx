@@ -1,10 +1,11 @@
-import { Suspense } from "react"
+﻿import { Suspense } from "react"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "Zapytanie ofertowe — Fidens",
   description: "Skontaktuj się z nami w sprawie leasingu lub finansowania pojazdu, maszyny lub sprzętu. Odpowiadamy szybko.",
 }
+
 import KontaktForm from "./KontaktForm"
 
 export default function KontaktPage() {

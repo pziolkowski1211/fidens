@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import Image from "next/image";
 import Navbar from "./components/Navbar";
 import { createClient } from "@/lib/supabase/server";
@@ -219,7 +219,7 @@ export default async function Home() {
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6 sm:gap-4">
             {[
-              { nr: "1", tekst: "Złóż wniosek online" },
+              { nr: "1", tekst: "Złóż zapytanie online" },
               { nr: "2", tekst: "Decyzja w 60 minut" },
               { nr: "3", tekst: "Podpisz umowę" },
               { nr: "4", tekst: "Wpłać opłatę wstępną" },
@@ -271,7 +271,8 @@ export default async function Home() {
         <div className="max-w-[1100px] mx-auto flex flex-col sm:flex-row justify-between items-center gap-6">
           <div className="text-xl font-bold tracking-widest" style={{ color: "#F0A500" }}>FIDENS</div>
           <div className="flex flex-wrap justify-center gap-4 sm:gap-8">
-            <a href="/o-nas" className="text-[13px]" style={{ color: "rgba(255,255,255,0.5)" }}>O mnie</a>
+            <a href="/o-nas" className="text-[13px]" style={{ color: "rgba(255,255,255,0.5)" }}>Poznaj Fidens</a>
+            <a href="/leasing" className="text-[13px]" style={{ color: "rgba(255,255,255,0.5)" }}>Leasing</a>
             <a href="/kontakt" className="text-[13px]" style={{ color: "rgba(255,255,255,0.5)" }}>Kontakt</a>
             <a href="/regulamin" className="text-[13px]" style={{ color: "rgba(255,255,255,0.5)" }}>Regulamin</a>
             <a href="/polityka" className="text-[13px]" style={{ color: "rgba(255,255,255,0.5)" }}>Polityka prywatności</a>
@@ -299,3 +300,4 @@ function extractCoverUrl(images: { url: string; is_cover: boolean }[] | null | u
   const cover = images.find((img) => img.is_cover === true);
   return cover ? cover.url : images[0].url;
 }
+

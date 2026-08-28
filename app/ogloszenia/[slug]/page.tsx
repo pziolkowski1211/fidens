@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation"
+﻿import { notFound } from "next/navigation"
 import Link from "next/link"
 import { cache } from "react"
 import type { Metadata } from "next"
@@ -182,8 +182,18 @@ export default async function OgloszenieDetailPage({ params }: PageProps) {
       </section>
 
       <footer className="px-4 sm:px-6 py-8 sm:py-10" style={{ backgroundColor: "#1B2A4A" }}>
-        <div className="max-w-[1100px] mx-auto text-center text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
-          (c) 2026 Fidens. Wszelkie prawa zastrzeżone.
+        <div className="max-w-[1100px] mx-auto flex flex-col sm:flex-row justify-between items-center gap-6">
+          <div className="text-xl font-bold tracking-widest" style={{ color: "#F0A500" }}>FIDENS</div>
+          <div className="flex flex-wrap justify-center gap-4 sm:gap-8">
+            <a href="/o-nas" className="text-[13px]" style={{ color: "rgba(255,255,255,0.5)" }}>Poznaj Fidens</a>
+            <a href="/leasing" className="text-[13px]" style={{ color: "rgba(255,255,255,0.5)" }}>Leasing</a>
+            <a href="/kontakt" className="text-[13px]" style={{ color: "rgba(255,255,255,0.5)" }}>Kontakt</a>
+            <a href="/regulamin" className="text-[13px]" style={{ color: "rgba(255,255,255,0.5)" }}>Regulamin</a>
+            <a href="/polityka" className="text-[13px]" style={{ color: "rgba(255,255,255,0.5)" }}>Polityka prywatności</a>
+          </div>
+          <div className="text-xs text-center" style={{ color: "rgba(255,255,255,0.3)" }}>
+            (c) 2026 Fidens. Wszelkie prawa zastrzeżone.
+          </div>
         </div>
       </footer>
     </main>
