@@ -154,7 +154,7 @@ export default function Navbar() {
                 onClick={() => setIsMenuOpen(false)}
                 className="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 text-base transition-colors"
               >
-                Ogoszenia
+                Ogłoszenia
               </Link>
 
               <Link
@@ -208,6 +208,7 @@ export default function Navbar() {
     </>
   )
 }
+
 
 
 
