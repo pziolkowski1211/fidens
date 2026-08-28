@@ -57,7 +57,7 @@ export default function Navbar() {
 
         {/* DESKTOP: Menu prawa strona */}
         <div className="hidden lg:flex ml-auto items-center gap-8">
-          <Link href="/leasing" style={{ color: "rgba(255,255,255,0.8)", fontSize: "14px" }}>Leasing</Link>
+          <Link href="/ogloszenia" style={{ color: "rgba(255,255,255,0.8)", fontSize: "14px" }}>Ogłoszenia</Link>
           <Link href="/o-nas" style={{ color: "rgba(255,255,255,0.8)", fontSize: "14px" }}>Poznaj Fidens</Link>
           <Link href="/kontakt" style={{ color: "rgba(255,255,255,0.8)", fontSize: "14px" }}>Kontakt</Link>
           <Link
@@ -154,15 +154,9 @@ export default function Navbar() {
                 onClick={() => setIsMenuOpen(false)}
                 className="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 text-base transition-colors"
               >
-                Wszystkie oferty
+                Ogoszenia
               </Link>
-              <Link
-                href="/leasing"
-                onClick={() => setIsMenuOpen(false)}
-                className="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 text-base transition-colors"
-              >
-                Leasing
-              </Link>
+
               <Link
                 href="/o-nas"
                 onClick={() => setIsMenuOpen(false)}
@@ -214,5 +208,8 @@ export default function Navbar() {
     </>
   )
 }
+
+
+
 
 
