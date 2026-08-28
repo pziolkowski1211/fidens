@@ -159,10 +159,21 @@ strona nie zachecala do klikniecia jako pozycja menu). Do rozwazenia: mini-link 
 znaczy?" w kalkulatorze prowadzacy tutaj.
 
 ### /regulamin i /polityka
-Do zrobienia - nastepna sesja. Dokumenty prawne, wymagaja spokojnej, osobnej uwagi (i docelowo
-weryfikacji przez kogos z uprawnieniami prawniczymi, nie tylko AI).
+Zrobione (szkic). Tresc oparta na standardowych praktykach dla posrednictwa finansowego,
+NIE zweryfikowana prawniczo. Placeholdery danych spolki oznaczone zoltym tlem na stronie
+(latwo zauwazalne): [NAZWA SPOLKI], [MIASTO], [ADRES], [NIP], [REGON], [KRS], [DATA].
 
-## Navbar - struktura (zaktualizowana)
+WAZNE PRZED PUBLIKACJA NA PRODUKCJI:
+- Uzupelnic dane spolki z o.o. (klient zdecydowal - robimy na spolke, nie JDG) po jej
+  zalozeniu/rejestracji
+- Skonsultowac oba dokumenty z prawnikiem/kancelaria - szczegolnie par.5 Odpowiedzialnosc
+  (Regulamin) i par.3-4 Cel/odbiorcy danych (Polityka)
+- Fidens zbiera WYLACZNIE: imie, nazwisko, NIP, telefon, e-mail (formularz kontaktowy).
+  Dane wrazliwe (PESEL, dowod, finanse, wspolmalzonek) zbiera bank/leasingodawca
+  bezposrednio, NIE Fidens - Polityka to odzwierciedla
+- Sekcja cookies (par.7 Polityki) opisuje stan faktyczny: brak GA/Meta Pixel. Klient chce
+  je wdrozyc w przyszlosci - GDY to nastapi, TRZEBA zaktualizowac Polityke + dodac
+  banner zgody na cookies PRZED zaladowaniem tych narzedzi (wymog RODO/ePrivacy)
 
 ### Desktop (top menu)
 Ogloszenia -> Poznaj Fidens -> Kontakt -> CTA "Zamow bezplatna kalkulacje"
