@@ -1,6 +1,6 @@
-"use client";
+﻿"use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import ImageUploader from "@/app/components/ImageUploader";
@@ -42,6 +42,36 @@ export default function EdytujOgloszeniePage() {
   const [vatType, setVatType] = useState("");
 
   const [description, setDescription] = useState("");
+  const descriptionRef = useRef<HTMLTextAreaElement>(null);
+  function insertBold() {
+    const el = descriptionRef.current;
+    if (!el) return;
+    const start = el.selectionStart;
+    const end = el.selectionEnd;
+    const selected = description.slice(start, end) || "pogrubiony tekst";
+    const newValue = description.slice(0, start) + "**" + selected + "**" + description.slice(end);
+    setDescription(newValue);
+    requestAnimationFrame(() => {
+      el.focus();
+      el.setSelectionRange(start + 2, start + 2 + selected.length);
+    });
+  }
+  function insertBullet() {
+    const el = descriptionRef.current;
+    if (!el) return;
+    const start = el.selectionStart;
+    const end = el.selectionEnd;
+    const selectedText = description.slice(start, end);
+    const lines = selectedText.length > 0 ? selectedText.split("\n") : [""];
+    const bulletedLines = lines.map((l) => (l.startsWith("- ") ? l : "- " + l)).join("\n");
+    const newValue = description.slice(0, start) + bulletedLines + description.slice(end);
+    setDescription(newValue);
+    requestAnimationFrame(() => {
+      el.focus();
+      const newPos = start + bulletedLines.length;
+      el.setSelectionRange(newPos, newPos);
+    });
+  }
   const [isFeatured, setIsFeatured] = useState(false);
   const [badge, setBadge] = useState("");
   const [otomotoUrl, setOtomotoUrl] = useState("");
@@ -430,12 +460,32 @@ export default function EdytujOgloszeniePage() {
           <div className="space-y-4">
             <div>
               <label className={labelClass}>Opis</label>
+              <div className="flex gap-2 mb-1">
+                <button
+                  type="button"
+                  onClick={insertBold}
+                  className="px-2 py-1 text-xs font-bold border rounded hover:bg-gray-100"
+                >
+                  B
+                </button>
+                <button
+                  type="button"
+                  onClick={insertBullet}
+                  className="px-2 py-1 text-xs border rounded hover:bg-gray-100"
+                >
+                  &bull; Lista
+                </button>
+              </div>
               <textarea
+                ref={descriptionRef}
                 className={inputClass}
                 rows={4}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
               />
+              <p className="text-xs text-gray-400 mt-1">
+                Formatowanie: **pogrubienie**, linie zaczynajace sie od &quot;- &quot; to punkty listy.
+              </p>
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>

@@ -1,11 +1,89 @@
 ﻿import { notFound } from "next/navigation"
 import Link from "next/link"
 import { cache } from "react"
+import type { ReactNode } from "react"
 import type { Metadata } from "next"
 import Navbar from "../../components/Navbar"
 import Carousel from "../../components/Carousel"
 import LeasingCalculator from "../../components/LeasingCalculator"
 import { createClient } from "@/lib/supabase/server"
+
+function parseInlineBold(text: string, keyPrefix: string): ReactNode[] {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g)
+  return parts.map((part, i) => {
+    if (part.startsWith("**") && part.endsWith("**") && part.length > 4) {
+      return <strong key={`${keyPrefix}-b-${i}`}>{part.slice(2, -2)}</strong>
+    }
+    return <span key={`${keyPrefix}-t-${i}`}>{part}</span>
+  })
+}
+
+function renderDescription(text: string): ReactNode {
+  const lines = text.split("\n")
+  const blocks: ReactNode[] = []
+  let currentList: string[] = []
+  let blockIndex = 0
+
+  function flushList() {
+    if (currentList.length > 0) {
+      const listIndex = blockIndex++
+      blocks.push(
+        <ul key={`ul-${listIndex}`} className="list-disc pl-5 space-y-1 my-2">
+          {currentList.map((item, i) => (
+            <li key={`li-${listIndex}-${i}`}>{parseInlineBold(item, `li-${listIndex}-${i}`)}</li>
+          ))}
+        </ul>
+      )
+      currentList = []
+    }
+  }
+
+  for (const line of lines) {
+    const trimmed = line.trim()
+    const boldHeadingMatch = trimmed.match(/^\*\*(.+):\*\*$/)
+    const hashHeadingMatch = trimmed.match(/^(#{1,3})\s+(.+)$/)
+    const isHr = trimmed === "---" || trimmed === "***"
+    if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
+      currentList.push(trimmed.slice(2))
+    } else if (isHr) {
+      flushList()
+      blocks.push(<hr key={`hr-${blockIndex++}`} className="my-4" style={{ borderColor: "#e8eaed" }} />)
+    } else if (hashHeadingMatch) {
+      flushList()
+      const level = hashHeadingMatch[1].length
+      const headingIndex = blockIndex++
+      const sizeClass = level === 1 ? "text-xl" : level === 2 ? "text-lg" : "text-base"
+      blocks.push(
+        <h3 key={`h-${headingIndex}`} className={`${sizeClass} font-bold mt-4 mb-2`} style={{ color: "#1B2A4A" }}>
+          {parseInlineBold(hashHeadingMatch[2], `h-${headingIndex}`)}
+        </h3>
+      )
+    } else if (boldHeadingMatch) {
+      flushList()
+      const headingIndex = blockIndex++
+      blocks.push(
+        <h3 key={`h-${headingIndex}`} className="text-lg font-bold mt-4 mb-2" style={{ color: "#1B2A4A" }}>
+          {boldHeadingMatch[1]}:
+        </h3>
+      )
+    } else {
+      flushList()
+      if (trimmed.length === 0) {
+        blocks.push(<br key={`br-${blockIndex++}`} />)
+      } else {
+        const pIndex = blockIndex++
+        blocks.push(
+          <p key={`p-${pIndex}`} className="mb-2">
+            {parseInlineBold(trimmed, `p-${pIndex}`)}
+          </p>
+        )
+      }
+    }
+  }
+  flushList()
+
+  return <div className="text-[15px] leading-relaxed" style={{ color: "#555" }}>{blocks}</div>
+}
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -165,7 +243,7 @@ export default async function OgloszenieDetailPage({ params }: PageProps) {
             {listing.description && (
               <div className="rounded-xl p-6" style={{ backgroundColor: "#ffffff", border: "1px solid #e8eaed" }}>
                 <h2 className="text-lg font-bold mb-3" style={{ color: "#1B2A4A" }}>Opis</h2>
-                <p className="text-[15px] leading-relaxed whitespace-pre-line" style={{ color: "#555" }}>{listing.description}</p>
+                {renderDescription(listing.description)}
               </div>
             )}
           </div>
@@ -203,3 +281,5 @@ export default async function OgloszenieDetailPage({ params }: PageProps) {
 function capitalizeFirst(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1)
 }
+
+
