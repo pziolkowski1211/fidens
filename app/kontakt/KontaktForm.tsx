@@ -126,7 +126,7 @@ export default function KontaktForm() {
             <button
               type="submit"
               disabled={status === "sending"}
-              className="w-full py-3 rounded-lg font-semibold transition disabled:opacity-50"
+              className="w-full py-3 rounded-lg font-semibold transition disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
               style={{ backgroundColor: "#F0A500", color: "#1B2A4A" }}
             >
               {status === "sending" ? "Wysyłanie..." : "Wyślij zapytanie"}
@@ -157,3 +157,4 @@ export default function KontaktForm() {
     </main>
   )
 }
+
