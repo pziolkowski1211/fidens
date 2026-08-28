@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
@@ -119,7 +119,7 @@ export default function AdminZapytaniaPage() {
                 <button
                   type="button"
                   onClick={() => toggleRead(req.id, req.is_read)}
-                  className="rounded-full px-3 py-1 text-xs font-medium text-white"
+                  className="rounded-full px-3 py-1 text-xs font-medium text-white cursor-pointer"
                   style={{
                     backgroundColor: req.is_read ? "#9ca3af" : "#F0A500",
                   }}
@@ -129,7 +129,7 @@ export default function AdminZapytaniaPage() {
                 <button
                   type="button"
                   onClick={() => deleteRequest(req.id)}
-                  className="rounded-full px-3 py-1 text-xs font-medium text-white"
+                  className="rounded-full px-3 py-1 text-xs font-medium text-white cursor-pointer"
                   style={{ backgroundColor: "#dc2626" }}
                 >
                   Usuń
@@ -174,7 +174,7 @@ export default function AdminZapytaniaPage() {
                 <button
                   type="button"
                   onClick={() => saveNotes(req.id)}
-                  className="shrink-0 self-start rounded-md px-3 py-1 text-xs font-medium text-white"
+                  className="shrink-0 self-start rounded-md px-3 py-1 text-xs font-medium text-white cursor-pointer"
                   style={{ backgroundColor: "#1B2A4A" }}
                 >
                   Zapisz

@@ -56,7 +56,7 @@ export default function AdminLayout({
 
         <button
           onClick={handleLogout}
-          className="text-sm font-medium opacity-80 hover:opacity-100"
+          className="text-sm font-medium opacity-80 hover:opacity-100 cursor-pointer"
         >
           Wyloguj
         </button>
@@ -66,3 +66,4 @@ export default function AdminLayout({
     </div>
   );
 }
+

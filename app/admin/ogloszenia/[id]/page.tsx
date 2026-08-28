@@ -464,14 +464,14 @@ export default function EdytujOgloszeniePage() {
                 <button
                   type="button"
                   onClick={insertBold}
-                  className="px-2 py-1 text-xs font-bold border rounded hover:bg-gray-100"
+                  className="px-2 py-1 text-xs font-bold border rounded hover:bg-gray-100 cursor-pointer"
                 >
                   B
                 </button>
                 <button
                   type="button"
                   onClick={insertBullet}
-                  className="px-2 py-1 text-xs border rounded hover:bg-gray-100"
+                  className="px-2 py-1 text-xs border rounded hover:bg-gray-100 cursor-pointer"
                 >
                   &bull; Lista
                 </button>
@@ -534,7 +534,7 @@ export default function EdytujOgloszeniePage() {
           <button
             type="submit"
             disabled={loading}
-            className="rounded-md px-6 py-2 text-sm font-medium text-white disabled:opacity-50"
+            className="rounded-md px-6 py-2 text-sm font-medium text-white disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
             style={{ backgroundColor: "#1B2A4A" }}
           >
             {loading ? "Zapisywanie..." : "Zapisz zmiany"}
@@ -544,7 +544,7 @@ export default function EdytujOgloszeniePage() {
             type="button"
             onClick={() => setShowDeleteConfirm(true)}
             disabled={loading}
-            className="flex items-center gap-1.5 rounded-md border px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-600 hover:text-white disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-md border px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-600 hover:text-white disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
             style={{ borderColor: "#dc2626" }}
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -561,3 +561,6 @@ export default function EdytujOgloszeniePage() {
     </div>
   );
 }
+
+
+

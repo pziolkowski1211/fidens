@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useCallback } from "react";
 import imageCompression from "browser-image-compression";
@@ -186,7 +186,7 @@ export default function ImageUploader({
   }
 
   const arrowBtnClass =
-    "flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-gray-200 text-gray-500 transition hover:bg-gray-100 disabled:opacity-30 disabled:hover:bg-transparent";
+    "flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-gray-200 text-gray-500 transition hover:bg-gray-100 disabled:opacity-30 disabled:hover:bg-transparent cursor-pointer disabled:cursor-not-allowed";
 
   return (
     <div className="space-y-4">
@@ -199,7 +199,7 @@ export default function ImageUploader({
             type="button"
             onClick={handleImportOtomotoPhotos}
             disabled={importingPhotos}
-            className="rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+            className="rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
             style={{ backgroundColor: "#F0A500" }}
           >
             {importingPhotos ? "Importowanie zdjęć..." : "Importuj zdjęcia z OtoMoto"}
@@ -286,7 +286,7 @@ export default function ImageUploader({
                   onClick={() => handleSetCover(image.id)}
                   disabled={image.is_cover}
                   title={image.is_cover ? "To jest okładka" : "Ustaw jako okładkę"}
-                  className="flex-1 truncate rounded-md px-1 py-1 text-xs font-semibold transition hover:bg-gray-100 disabled:hover:bg-transparent"
+                  className="flex-1 truncate rounded-md px-1 py-1 text-xs font-semibold transition hover:bg-gray-100 disabled:hover:bg-transparent cursor-pointer disabled:cursor-not-allowed"
                   style={{ color: "#F0A500" }}
                 >
                   Okładka
@@ -307,7 +307,7 @@ export default function ImageUploader({
                 type="button"
                 onClick={() => handleDelete(image)}
                 title="Usuń zdjęcie"
-                className="w-full border-t border-gray-100 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-600 hover:text-white"
+                className="w-full border-t border-gray-100 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-600 hover:text-white cursor-pointer"
               >
                 Usuń
               </button>
