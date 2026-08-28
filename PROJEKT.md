@@ -37,15 +37,15 @@ Te same klucze sa dodane na Vercel (Environment Variables -> Production/Preview/
 fidens/
 - app/
   - components/
-    - Navbar.tsx (nawigacja desktop/mobile + hamburger)
+    - Navbar.tsx (nawigacja desktop/mobile + hamburger, STICKY - sticky top-0 z-50)
     - SearchAutocomplete.tsx (wyszukiwarka z autocomplete)
     - Carousel.tsx (karuzela zdjec + lightbox z klawiszami i swipe)
     - LeasingCalculator.tsx (kalkulator leasingu/pozyczki z suwakami + wybor typu dla VAT-23)
   - admin/
     - login/ (logowanie admina przez Supabase Auth)
     - ogloszenia/ (lista + CRUD)
-      - nowe/ (formularz dodawania)
-      - [id]/ (edycja pojedynczego ogloszenia)
+      - nowe/ (formularz dodawania, import OtoMoto, toolbar Bold/Lista dla opisu)
+      - [id]/ (edycja pojedynczego ogloszenia, te same funkcje co nowe/)
     - zapytania/ (lista contact_requests)
   - api/
     - cron/
@@ -53,7 +53,8 @@ fidens/
   - ogloszenia/
     - page.tsx (lista ogloszen z filtrami z URL + cover images)
     - [slug]/
-      - page.tsx (strona pojedynczego ogloszenia: tytul -> karuzela -> Dane pojazdu -> Opis -> kalkulator)
+      - page.tsx (strona pojedynczego ogloszenia: tytul -> karuzela -> Dane pojazdu -> Opis
+        (renderowany z Markdown: naglowki #/##/###, pogrubienie, listy, ---) -> kalkulator)
   - o-nas/
     - page.tsx (strona "Dlaczego Fidens?" - zaufanie, benefity, CTA)
   - leasing/
@@ -66,7 +67,7 @@ fidens/
     - page.tsx (Suspense wrapper)
     - KontaktForm.tsx (Navbar + formularz + stopka, wlasciwy komponent)
   - favicon.ico
-  - globals.css (m.in. cursor:pointer na suwakach input[type=range] i ich pseudo-elementach thumb)
+  - globals.css (cursor:pointer na suwakach input[type=range] i pseudo-elementach thumb)
   - layout.tsx
   - page.tsx (strona glowna z cover images w ogloszeniu tygodnia i najnowszych)
 - lib/
@@ -76,6 +77,8 @@ fidens/
     - types.ts (typy TS dla bazy)
   - leasing/
     - calculator.ts (wspolny wzor raty - uzywany przez kalkulator interaktywny i karty ogloszen)
+  - otomoto/
+    - scraper.ts (import danych z OtoMoto - patrz sekcja "Import z OtoMoto" ponizej)
   - vehicles/
     - catalog.ts (statyczna lista marek/modeli)
 - public/
@@ -123,20 +126,28 @@ Tabele utworzone (RLS wlaczone):
 ## Decyzje produktowe (zatwierdzone z klientem)
 - **Galeria zdjec:** karuzela z lightbox (kliknij zdjecie zeby powiekszyc)
 - **Kalkulator leasingu:** frontend only, parametry wysylane w URL do /kontakt
-  - Dla VAT-marza: zawsze pozyczka leasingowa (bez wykupu) - bez wyboru, tak jak wczesniej
+  - Dla VAT-marza: zawsze pozyczka leasingowa (bez wykupu) - bez wyboru
   - Dla VAT-23: KLIENT WYBIERA miedzy "Leasing operacyjny" (z wykupem, cena liczona od netto)
     a "Pozyczka" (bez wykupu, cena liczona od brutto) - przelacznik nad kalkulatorem
   - Wzor: annuita z balonem, APR 5,4% (najkorzystniej) do 7,3% (najmniej korzystnie)
   - Uklad "wariant A": rata jako hero (44px), cena drobno pod ratą
   - Cursor pointer na suwakach (thumb) i przyciskach wyboru typu finansowania
-  - PLANOWANE: mini-link "co to znaczy?" przy typie finansowania -> /leasing
+  - Mini-link "co to znaczy?" w kalkulatorze - ODRZUCONE, klient zdecydowal ze niepotrzebne
 - **Wyszukiwarka:** autocomplete typu Google ze statycznej listy (~50 marek + modele).
   Klik w sugestie -> /ogloszenia?marka=X&model=Y. Brak wynikow -> CTA "Zapytaj o ten pojazd" z prefilled marka/modelem.
 - **Mobile nawigacja:** logo + lupa + hamburger. Drawer wysuwany z prawej.
 - **Logo klikalne** (powrot na strone glowna).
-- **Import z OtoMoto:** scraping po URL ogloszenia (brak oficjalnego API).
-  Zdjecia uploadowane RECZNIE (osobno od OtoMoto) - inne kadry/jakosc.
-  Synchronizacja: jak ogloszenie znika z OtoMoto -> znika z Fidens.
+- **Navbar sticky** - zostaje przyklejony na gorze podczas scrollowania (position: sticky,
+  nie fixed - dzieki temu content pod nim nie "skacze"). Dziala tez jako kontekst
+  pozycjonowania dla wyszukiwarki desktop (absolute, wycentrowana).
+- **Import z OtoMoto:** scraping po URL ogloszenia (brak oficjalnego API). Szczegoly nizej.
+- **Formatowanie opisu ogloszen:** wlasny, lekki parser Markdown (bez zewnetrznej biblioteki).
+  Obslugiwane: naglowki # ## ### (rozne rozmiary), **pogrubienie**, listy zaczynajace sie
+  od "- " lub "* ", linia poziona --- lub ***, calkowicie pogrubiona linia konczaca sie
+  dwukropkiem (**Tekst:**) tez traktowana jak naglowek. Funkcje renderDescription +
+  parseInlineBold w app/ogloszenia/[slug]/page.tsx. W panelu admina (oba formularze:
+  nowe/ i [id]/) przyciski "B" (pogrubienie) i "* Lista" nad polem Opis, dzialaja przez
+  manipulacje textarea (selectionStart/End + useRef), nie przez contentEditable/WYSIWYG.
 - **Strony statyczne - marka Fidens:** nie ujawniamy rozmiaru zespolu na stronie (marka pisana
   bezosobowo/w trzeciej osobie). Fidens = nowa marka, ale wlasciciel ma wieloletnie (6+ lat)
   doswiadczenie w branzy - komunikujemy to jako "wieloletnie doswiadczenie stojace za marka",
@@ -144,15 +155,29 @@ Tabele utworzone (RLS wlaczone):
   prawna - znaki towarowe), tylko nazwy tekstowo. Model biznesowy: Fidens promuje przedmioty
   od zewnetrznych dostawcow (salony/komisy/firmy handlowe) i zarabia na prowizji z finansowania,
   nie na marzy ze sprzedazy pojazdu.
-- **Nowe kategorie produktowe (ustalone, do zaprojektowania w osobnej sesji):**
-  - **"Inne"** - pawilony, fotowoltaika, pompy ciepla, magazyny energii. Rozne parametry
-    techniczne niz pojazdy (bez roku/przebiegu/paliwa) - podejscie portfolio: zdjecia z
-    produkcji + opis, bez sztywnych filtrow jak w /ogloszenia. Klient ma dostawcow pawilonow.
-  - **Import z zagranicy** (250-300k+ PLN) - podejscie portfolio, NIE rozbudowana strona
-    z detalami operacyjnymi (clo/homologacja). Kazdy przypadek indywidualny, omawiany z
-    klientem osobno - strona ma tylko pokazac ze usluga istnieje + kilka zdjec.
 - **Podmiot prawny:** klient zdecydowal - dokumenty prawne (Regulamin/Polityka) robimy na
   spolke z o.o. (jeszcze niezalozona/w trakcie), nie na obecna JDG.
+- **Nowe kategorie produktowe poza pojazdami (ustalone biznesowo, NIE zakodowane -
+  patrz "Do zrobienia"):**
+  - **Pojazdy/sprzet na kolach** (rozszerzenie istniejacego vehicle_type): dodac "dostawcze"
+    i "naczepy" do istniejacych osobowe/ciezarowe/maszyna. Zostaja w /ogloszenia, wspolny model danych.
+  - **"Maszyny przemyslowe"** (osobna kategoria/zakladka w Navbarze) - maszyny stolarskie
+    od wspolnika (firma Gantech, gantech-maszyny.pl - strugarki, piły panelowe, wielopily,
+    rebaki, frezarki CNC). NIE MYLIC z "maszynami budowlanymi" w /ogloszenia (koparki itp,
+    inne parametry: waga/wymiary/moc w kW zamiast motogodzin/mocy w KM). Mala skala na start
+    (kilka-kilkanascie pozycji) - elastyczne parametry (JSON), nie sztywne kolumny.
+  - **"Pawilony"** (osobna zakladka) - dostawcy klienta, ma zdjecia z produkcji. Podejscie
+    portfolio (male, bez pelnych filtrow jak /ogloszenia).
+  - **"Import"** (osobna zakladka, inna nazwa niz "Import" zeby klient wiedzial ze Fidens
+    sprowadza maszyne/pojazd dla niego - nazwa do ustalenia) - przedmioty 250-300k+ PLN
+    z zagranicy. Podejscie portfolio + kilka zdjec, KAZDY PRZYPADEK OMAWIANY INDYWIDUALNIE
+    z klientem (nie probowac zrobic ogolnej strony z detalami operacyjnymi clo/homologacja -
+    to bylo pierwotne zalozenie, klient je odrzucil na rzecz prostszego podejscia).
+  - Fotowoltaika/pompy ciepla/magazyny energii - NA RAZIE NIE ROBIMY (odrzucone przez klienta
+    w tej sesji, byla to wczesniejsza koncepcja w ramach "Inne").
+  - Architektura techniczna (do zaprojektowania w kolejnej sesji): prawdopodobnie nowa
+    tabela other_listings z elastycznymi specs (JSON key-value) zamiast sztywnych kolumn,
+    osobne strony per kategoria lub wspolna z filtrem kategorii, osobny/rozszerzony panel admina.
 
 ## Strony statyczne
 
@@ -167,8 +192,7 @@ Fidens" (dobor finansowania, kompleksowa obsluga w jednym miejscu), tabela leasi
 (VAT-23) vs pozyczka leasingowa (VAT-marza), proces krok po kroku (wybor przedmiotu -> parametry
 w kalkulatorze -> zapytanie -> podpisanie umowy).
 WAZNE: usunieta z gownego Navbara (desktop i mobile) - zostaje TYLKO w stopce (cel: SEO,
-strona nie zachecala do klikniecia jako pozycja menu). Do rozwazenia: mini-link "co to
-znaczy?" w kalkulatorze prowadzacy tutaj.
+strona nie zachecala do klikniecia jako pozycja menu).
 
 ### /regulamin i /polityka
 Zrobione (szkic). Tresc oparta na standardowych praktykach dla posrednictwa finansowego,
@@ -176,21 +200,20 @@ NIE zweryfikowana prawniczo. Placeholdery danych spolki oznaczone zoltym tlem na
 (latwo zauwazalne): [NAZWA SPOLKI], [MIASTO], [ADRES], [NIP], [REGON], [KRS], [DATA].
 
 WAZNE PRZED PUBLIKACJA NA PRODUKCJI:
-- Uzupelnic dane spolki z o.o. (klient zdecydowal - robimy na spolke, nie JDG) po jej
-  zalozeniu/rejestracji
-- Skonsultowac oba dokumenty z prawnikiem/kancelaria - szczegolnie par.5 Odpowiedzialnosc
-  (Regulamin) i par.3-4 Cel/odbiorcy danych (Polityka)
+- Uzupelnic dane spolki z o.o. po jej zalozeniu/rejestracji
+- Skonsultowac oba dokumenty z prawnikiem/kancelaria
 - Fidens zbiera WYLACZNIE: imie, nazwisko, NIP, telefon, e-mail (formularz kontaktowy).
   Dane wrazliwe (PESEL, dowod, finanse, wspolmalzonek) zbiera bank/leasingodawca
-  bezposrednio, NIE Fidens - Polityka to odzwierciedla
-- Sekcja cookies (par.7 Polityki) opisuje stan faktyczny: brak GA/Meta Pixel. Klient chce
-  je wdrozyc w przyszlosci - GDY to nastapi, TRZEBA zaktualizowac Polityke + dodac
-  banner zgody na cookies PRZED zaladowaniem tych narzedzi (wymog RODO/ePrivacy)
+  bezposrednio, NIE Fidens
+- Sekcja cookies opisuje stan faktyczny: brak GA/Meta Pixel. Klient chce je wdrozyc
+  w przyszlosci - GDY to nastapi, TRZEBA zaktualizowac Polityke + dodac banner zgody
+  na cookies PRZED zaladowaniem tych narzedzi (wymog RODO/ePrivacy)
 
 ## Navbar - struktura (zaktualizowana)
 
 ### Desktop (top menu)
 Ogloszenia -> Poznaj Fidens -> Kontakt -> CTA "Zamow bezplatna kalkulacje"
+STICKY - przyklejony do gory ekranu przy scrollowaniu (sticky top-0 z-50).
 
 ### Mobile (drawer)
 Strona glowna -> Ogloszenia -> Poznaj Fidens -> Kontakt -> CTA
@@ -202,15 +225,40 @@ Ujednolicona na WSZYSTKICH stronach: glowna, /ogloszenia, /ogloszenia/[slug], /k
 /o-nas, /leasing, /regulamin, /polityka.
 
 ## Strona pojedynczego ogloszenia /ogloszenia/[slug] - uklad
-Kolejnosc (zaktualizowana):
+Kolejnosc:
 1. Okruszki (breadcrumb) - stylizowane: strzalka "rsaquo" zamiast ">", hover pomaranczowy
-   (CSS hover:text-[#F0A500], NIE onMouseEnter/onMouseLeave - to Server Component,
-   event handlery nie sa dozwolone w propsach)
+   (CSS hover:text-[#F0A500], NIE onMouseEnter/onMouseLeave - to Server Component)
 2. Tytul ogloszenia (h1) + badge ("Nowe"/"Promocja")
 3. Karuzela zdjec
 4. Dane pojazdu (tabela parametrow)
-5. Opis
+5. Opis (renderowany z Markdown - patrz "Formatowanie opisu ogloszen" wyzej)
 6. Kalkulator leasingu (w bocznym sidebarze, sticky)
+
+## Import z OtoMoto - szczegoly (lib/otomoto/scraper.ts)
+
+### Jak dziala
+Strona OtoMoto (Next.js) osadza dane w bloku __NEXT_DATA__. Scraper wyciaga dwa obiekty
+przez dopasowanie nawiasow klamrowych (funkcja extractJsonObject, marker + brace-matching,
+NIE regex na cala tresc):
+- **widget.props.advert** (marker: financingAdCarDetailsWidget lub financingSimulatorWidget)
+  -> podstawowe dane: id, title, rawPrice, make, model, year, mileage, fuelType
+- **fullAdvert** (marker: '"advert":{"id":"' - LAPIE PIERWSZE wystapienie w dokumencie,
+  czyli glowny obiekt advert, nie mniejsze wersje w widgetach) -> fullAdvert.details to
+  tablica {key, label, value, group} ZE WSZYSTKIMI polami technicznymi (fuel_type,
+  engine_capacity, engine_power, body_type, gearbox, transmission, country_origin, color...)
+  NIEZALEZNIE od tego czy ogloszenie ma zweryfikowane dane CEPIK. To glowne, niezawodne
+  zrodlo - budowane w detailsMap (Record<string,string> po d.key).
+- cepikWidget - dodatkowe zrodlo (fallback), CZESTO NIEDOSTEPNE (status!=0) bo wymaga
+  zweryfikowanych danych CEPIK. Kolor/skrzynia/moc/pojemnosc/kraj brane najpierw z
+  detailsMap, dopiero potem z cepikDetails jako fallback.
+
+### Niezawodnosc
+- fetch() ma teraz timeout 15s (AbortController) - jesli OtoMoto nie odpowie, rzuca
+  czytelny blad zamiast wisiec w nieskonczonosc
+- handleImportOtomoto w formularzu ma try/catch/finally - setImporting(false) ZAWSZE
+  sie wykona, nawet przy nieoczekiwanym bledzie (przycisk nigdy nie zawiesza sie na
+  "Importowanie..." bez konca)
+- Warianty (wersje wyposazenia) NIE sa jeszcze wyciagane automatycznie - zawsze warning
 
 ## Kalkulator leasingu - szczegoly
 
@@ -228,7 +276,7 @@ Score liczony ze srednich 3 parametrow (2 dla pozyczki - bez wykupu):
 - wykup_score = (wykup - wykupMin) / (wykupMax - wykupMin) (min wykup = najkorzystniej)
 - APR = APR_MIN + score * (APR_MAX - APR_MIN)
 
-### Wybor typu finansowania (NOWE)
+### Wybor typu finansowania
 - VAT-marza: zawsze pozyczka (bez wykupu) - bez wyboru
 - VAT-23: przelacznik "Leasing operacyjny" / "Pozyczka" nad kalkulatorem
   - Leasing operacyjny: hasWykup=true, cena liczona od netto (getNettoPrice)
@@ -248,7 +296,7 @@ Score liczony ze srednich 3 parametrow (2 dla pozyczki - bez wykupu):
 ### Link "Zapytaj o ten pojazd"
 Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyczka), wstepna, msc, wykup, rata
 
-### Rata "od X zl" na kartach ogloszen (ZROBIONE, potwierdzone w kodzie 28.08)
+### Rata "od X zl" na kartach ogloszen (ZROBIONE)
 Funkcja calculateShowcaseRate() w lib/leasing/calculator.ts, uzywana w app/page.tsx
 (ogloszenie tygodnia + najnowsze) i app/ogloszenia/page.tsx (cala lista).
 Wariant B (realistyczny): wplata 20%, okres 60 msc, wykup MAX dla okresu.
@@ -256,67 +304,47 @@ Wariant B (realistyczny): wplata 20%, okres 60 msc, wykup MAX dla okresu.
 ## Stan prac
 
 ### Zrobione
-- [x] Konto Supabase + projekt "Fidens"
-- [x] Schemat bazy (3 tabele + storage bucket + RLS)
-- [x] Klucze Supabase w .env.local i na Vercel
-- [x] Klienty Supabase (browser + server)
-- [x] Typy TypeScript dla bazy
-- [x] Statyczny katalog marek/modeli
-- [x] Wyszukiwarka autocomplete (desktop + mobile)
-- [x] Strona glowna z sekcjami: hero, ogloszenie tygodnia, najnowsze oferty, jak to dziala, opinie, stopka
-- [x] Strona /ogloszenia z obsluga query params + komunikat "Brak ofert" + CTA
-- [x] Logo (klikalne) w nawigacji i stopce
-- [x] Wyszukiwarka wycentrowana na desktop
-- [x] Responsywnosc: hamburger menu z drawerem, lupa rozwijajaca pole szukaj, sekcje 1/2/3 kolumny
-- [x] Strona pojedynczego ogloszenia /ogloszenia/[slug] z pelnymi danymi pojazdu
-- [x] Karuzela zdjec + lightbox (strzalki, klawisze, swipe na mobile, klik zamyka poza zdjeciem)
-- [x] Cover images na stronie glownej (ogloszenie tygodnia + 3 najnowsze) i liscie /ogloszenia
-- [x] Zdjecia w Storage dla 3 testowych ogloszen (BMW, Mercedes, Caterpillar)
-- [x] Kalkulator leasingu/pozyczki z wyborem typu finansowania dla VAT-23
-  - Rata jako hero (44px), cena drobno pod ratą
-  - Suwaki z dynamicznymi limitami wykupu, cursor pointer
-  - Przelacznik "Leasing operacyjny" / "Pozyczka" (tylko VAT-23)
-  - Link do /kontakt z parametrami w URL
-- [x] Formularz kontaktowy /kontakt (Supabase + rozpoczete DNS pod Resend)
-- [x] Strona /o-nas ("Dlaczego Fidens?")
-- [x] Strona /leasing ("Leasing dla firm")
-- [x] Strony /regulamin i /polityka (szkic z placeholderami - patrz sekcja wyzej)
-- [x] Panel admina /admin (login, CRUD ogloszen w /admin/ogloszenia + /nowe + /[id],
-  lista zapytan w /admin/zapytania)
-- [x] Import z OtoMoto (mechanizm istnieje, powiazany z otomoto_url/otomoto_id w bazie)
-- [x] Synchronizacja z OtoMoto - Vercel Cron (app/api/cron/otomoto-sync/route.ts),
-  harmonogram w vercel.json: codziennie o 3:00
-- [x] Reorganizacja Navbara: dodano "Ogloszenia", usunieto "Leasing" z gownego menu
-  (zostaje w stopce - cel SEO), ujednolicono desktop/mobile
+- [x] Konto Supabase + projekt "Fidens", schemat bazy, klucze, klienty, typy TS
+- [x] Statyczny katalog marek/modeli, wyszukiwarka autocomplete (desktop + mobile)
+- [x] Strona glowna, strona /ogloszenia z filtrami, logo klikalne, responsywnosc
+- [x] Strona pojedynczego ogloszenia z pelnymi danymi, karuzela + lightbox
+- [x] Cover images (strona glowna + lista), zdjecia w Storage dla 3 testowych ogloszen
+- [x] Kalkulator leasingu/pozyczki z wyborem typu finansowania dla VAT-23, cursor pointer
+- [x] Formularz kontaktowy /kontakt
+- [x] Strony /o-nas, /leasing, /regulamin, /polityka (te dwie ostatnie - szkic, patrz uwagi)
+- [x] Panel admina /admin (login, CRUD ogloszen, lista zapytan)
+- [x] Import z OtoMoto (dziala niezawodnie - timeout + try/catch + detailsMap zamiast
+  tylko cepikWidget - patrz sekcja szczegolowa wyzej)
+- [x] Synchronizacja z OtoMoto - Vercel Cron, codziennie o 3:00
+- [x] Reorganizacja Navbara: "Ogloszenia" w menu, "Leasing" tylko w stopce (SEO)
+- [x] Navbar sticky - przyklejony do gory podczas scrollowania
 - [x] Ujednolicone stopki (z pelnym zestawem linkow) na WSZYSTKICH stronach
-- [x] Naprawione kodowanie polskich znakow w app/kontakt/page.tsx i LeasingCalculator.tsx
+- [x] Naprawione kodowanie polskich znakow (app/kontakt, LeasingCalculator, app/kontakt/page.tsx)
 - [x] Tekst "zloz wniosek" -> "zloz zapytanie" na stronie glownej
-- [x] Strona ogloszenia: tytul przeniesiony nad karuzele, "Dane pojazdu" przed "Opisem"
-- [x] Ladniejsze okruszki (breadcrumb) na stronie ogloszenia
-- [x] Dynamiczna rata "od X zl" na kartach ogloszen (calculateShowcaseRate, wariant B)
+- [x] Strona ogloszenia: tytul nad karuzela, "Dane pojazdu" przed "Opisem", ladne okruszki
+- [x] Dynamiczna rata "od X zl" na kartach ogloszen
+- [x] Formatowanie opisu ogloszen (Markdown: naglowki, pogrubienie, listy, linia pozioma)
+  + przyciski Bold/Lista w panelu admina
 - [x] Wgrane na Vercel -> fidens.pl
 
 ### Do zrobienia (priorytety)
 
-1. **Mini-link "co to znaczy?" w kalkulatorze** (jedyna pozostala "drobna poprawka")
-   - W LeasingCalculator.tsx przy etykiecie typu finansowania (VAT-23) - maly, dyskretny
-     link tekstowy prowadzacy do /leasing, NIE osobny przycisk CTA (kalkulator ma zostac prosty)
+1. **Rozszerzenie kategorii pojazdow** - dodac "dostawcze" i "naczepy" do vehicle_type
+   (proste, wspolny model danych z istniejacymi osobowe/ciezarowe/maszyna)
 
-2. **Nowa kategoria "Inne"** (pawilony, fotowoltaika, pompy ciepla, magazyny energii)
-   - Podejscie portfolio (zdjecia z produkcji + opis), nie pelna struktura /ogloszenia
-     z filtrami - te produkty nie maja roku/przebiegu/paliwa
-   - Do zaprojektowania: struktura danych (elastyczne pola zamiast sztywnych kolumn),
-     wyglad karty, gdzie w Navbarze/menu
+2. **Nowa architektura: kategorie poza pojazdami** (do zaprojektowania w osobnej sesji)
+   - "Maszyny przemyslowe" (Gantech), "Pawilony", "Import" - kazda jako osobna
+     zakladka w Navbarze, podejscie portfolio (male, elastyczne, nie pelne filtry)
+   - Prawdopodobnie nowa tabela other_listings z elastycznymi specs (JSON)
+   - Szczegoly ustalen w sekcji "Decyzje produktowe" wyzej
 
-3. **Import z zagranicy - strona portfolio** (250-300k+ PLN)
-   - Podejscie portfolio: zdjecia + krotki opis "zajmujemy sie tym od A do Z",
-     bez szczegolow operacyjnych (clo/homologacja) - kazdy przypadek indywidualny
-   - Prostsze niz pierwotnie zakladano - NIE wymaga sesji planistycznej o formalnosciach
+3. **Regulamin i polityka prywatnosci** - uzupelnic dane spolki z o.o. po rejestracji,
+   konsultacja prawnicza PRZED publikacja na produkcji (patrz sekcja "Strony statyczne")
 
 4. **SEO i optymalizacja**
-   - Przejsc z <img> na <next/image> (karuzela, karta ogloszen, cover images) - wymaga next.config.ts z remotePatterns dla Supabase
-   - Kalibracja kalkulatora (Opcja C) - tabela marz od klientki, wtedy odchylenia od prawdziwego systemu banku znikna
-   - Favicon z logo Fidens (favicon.io/favicon-converter)
+   - Przejsc z <img> na <next/image> - next.config.ts z remotePatterns dla Supabase
+   - Kalibracja kalkulatora (Opcja C) - tabela marz od klientki
+   - Favicon z logo Fidens
    - Meta tagi (Open Graph + description per strona)
    - FAQ / Najczestsze pytania (rozwazane, nie ustalone)
    - Blog/Aktualnosci (rozwazane, nie ustalone)
@@ -334,41 +362,42 @@ Wariant B (realistyczny): wplata 20%, okres 60 msc, wykup MAX dla okresu.
   przez niewidoczne roznice w bialych znakach/kodowaniu - gdy tak sie stanie, przejsc na
   metode po numerach linii ([System.Collections.Generic.List[string]] + RemoveRange/InsertRange),
   ZAWSZE najpierw wypisac fragment (Get-Content + petla Write-Host) zeby potwierdzic dokladne
-  numery linii przed usunieciem/wstawieniem - liczenie "na oko" latwo pomylic o 1 linie
-  i zepsuc skladnie/tresc. PO KAZDEJ takiej edycji zweryfikowac cala okolice zmiany
-  (nie tylko sama zmieniona fraze), bo RemoveRange o niewlasciwej dlugosci moze po cichu
-  skasowac sasiedni naglowek/sekcje (patrz: incydent 28.08 - zniknal caly punkt "SEO i
-  optymalizacja" oraz naglowek "Konwencje pracy" przy okazji drobnej zmiany numeracji)
+  numery linii przed usunieciem/wstawieniem, i ZAWSZE zweryfikowac SZERSZY kontekst po
+  edycji (nie tylko zmieniony fragment) - RemoveRange o zlej dlugosci moze po cichu
+  skasowac sasiedni naglowek/dodac nadmiarowy zamykajacy tag
 - **Server Components (strony pobierajace dane bezposrednio z Supabase, bez "use client")
   NIE MOGA miec event handlerow (onClick, onMouseEnter itp.) w JSX** - blad "Event handlers
   cannot be passed to Client Component props". Hover/interaktywnosc na Server Components
   robic czystym CSS/Tailwind (hover:text-[...], hover:bg-[...]), nie JS
+- **position: sticky dziala jako kontekst pozycjonowania** dla potomkow z position:absolute,
+  tak samo jak position:relative - bezpiecznie zamienic relative na sticky bez psucia
+  wycentrowanych/absolutnie pozycjonowanych elementow w srodku
 
 ## Znane problemy/uwagi
 - **Hydration warning** od rozszerzenia Bitdefender (atrybuty bis_register, bis_skin_checked).
   To NIE jest blad kodu - tylko deweloperski warning w trybie dev. W produkcji niewidoczny.
 - **PowerShell + polskie znaki w komendach:** nie dziala (encoding sie rozjezdza).
-  Uzywamy komend BEZ polskich znakow (np. "Wplata wstepna"), potem w VS Code przez Ctrl+H
-  przywracamy ogonki. Zawartosc plikow z -Encoding utf8 dziala OK.
-- **W folderach z nawiasami kwadratowymi ([slug]):** uzywac -LiteralPath zamiast -Path/-FilePath
-  we WSZYSTKICH komendach (Get-Content, Select-String, Set-Content), nie tylko Out-File.
+  Uzywamy komend BEZ polskich znakow w FLAGACH/parametrach, ale tresc plikow (Out-File
+  -Encoding utf8) MOZE miec polskie znaki bezposrednio wpisane w komendzie - to dziala OK.
+- **W folderach z nawiasami kwadratowymi ([slug], [id]):** uzywac -LiteralPath zamiast
+  -Path/-FilePath we WSZYSTKICH komendach (Get-Content, Select-String, Set-Content).
 - **VS Code + literka M na zakladce:** to normalne "modified vs commit", nie "buforowany".
-  Widok Git Local Changes (Working Tree) pokazuje dokladnie roznice.
-- **Dev serwer nie chodzi po push -> stare wersje w cache:** ubijac procesy przez taskkill /IM node.exe /F
-  i czyscic .next przez Remove-Item -Recurse -Force .next
+- **Dev serwer nie pokazuje najnowszych zmian -> stare wersje w cache:** ZDARZALO SIE
+  WIELOKROTNIE w tej sesji. Procedura: taskkill /IM node.exe /F, potem
+  Remove-Item -Recurse -Force .next, potem npm run dev, potem twardy refresh w przegladarce
+  (Ctrl+Shift+R). Upewnic sie tez ze test jest na localhost:3000, NIE na fidens.pl (produkcja
+  nie ma jeszcze niewypchnietych zmian).
 - **Klasy Tailwinda w kwadratowych nawiasach (np. text-[10px]):** czasem sypia sie w Next 16.2.4.
   Uzywac standardowych klas Tailwinda (text-xs, text-sm) gdzie mozna.
 - **URL nie moze miec polskich znakow:** przy Ctrl+H uwaga zeby nie zmienic href="/ogloszenia"
   na href="/Ogloszenia" ani "/ogłoszenia". Klikac pojedynczo Replace, nie Replace All.
-  Widok Git Local Changes (Working Tree) w VS Code = szybki sprawdzian co poszlo nie tak.
 - **Stopka duplikowana per-strona:** stopka (footer) nie jest osobnym komponentem, jest
   wklejona recznie w kazdym page.tsx (a w przypadku /kontakt - w KontaktForm.tsx, ktory ma
   ja NAWET DWUKROTNIE dla dwoch stanow formularza). Przy zmianie linkow w stopce trzeba
   pamietac o aktualizacji wszedzie. Do rozwazenia w przyszlosci: wydzielenie do wspolnego
-  komponentu Footer.tsx - oszczedzi to duzo czasu przy przyszlych zmianach.
-- **Niektore pliki maja realnie zepsute kodowanie UTF-8 (nie tylko problem wyswietlania
-  w terminalu):** stwierdzone w app/kontakt/page.tsx i LeasingCalculator.tsx (objawy: znaki
-  typu "â€”", "Ĺadowanie", "poĹĽyczki" zamiast prawidlowych polskich liter). Naprawione
-  27-28.08. Jesli pojawi sie podobny problem w innym pliku - nadpisac cala zawartosc pliku
-  na nowo z poprawnym -Encoding utf8, nie probowac punktowych podmian (zawodza przy
-  zepsutym kodowaniu wejsciowym).
+  komponentu Footer.tsx.
+- **Niektore pliki mialy realnie zepsute kodowanie UTF-8** (nie tylko problem wyswietlania
+  w terminalu): stwierdzone w app/kontakt/page.tsx i LeasingCalculator.tsx. Naprawione.
+  Jesli pojawi sie podobny problem w innym pliku - nadpisac cala zawartosc pliku na nowo
+  z poprawnym -Encoding utf8, nie probowac punktowych podmian (zawodza przy zepsutym
+  kodowaniu wejsciowym).
