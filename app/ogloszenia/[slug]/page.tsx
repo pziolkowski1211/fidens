@@ -127,13 +127,13 @@ export default async function OgloszenieDetailPage({ params }: PageProps) {
     <main className="min-h-screen flex flex-col" style={{ backgroundColor: "#f8f9fb" }}>
       <Navbar />
 
-      <div className="px-4 sm:px-6 pt-5 pb-2" style={{ backgroundColor: "#ffffff", borderBottom: "1px solid #e8eaed" }}>
-        <div className="max-w-[1100px] mx-auto text-xs" style={{ color: "#888" }}>
-          <Link href="/" className="hover:underline">Strona główna</Link>
-          {" > "}
-          <Link href="/ogloszenia" className="hover:underline">Ogłoszenia</Link>
-          {" > "}
-          <span style={{ color: "#1B2A4A" }}>{listing.title}</span>
+      <div className="px-4 sm:px-6 pt-5 pb-3" style={{ backgroundColor: "#ffffff", borderBottom: "1px solid #e8eaed" }}>
+        <div className="max-w-[1100px] mx-auto flex items-center flex-wrap gap-2 text-sm">
+          <Link href="/" className="transition-colors hover:text-[#F0A500]" style={{ color: "#888" }}>Strona główna</Link>
+          <span style={{ color: "#ccc" }}>&rsaquo;</span>
+          <Link href="/ogloszenia" className="transition-colors hover:text-[#F0A500]" style={{ color: "#888" }}>Ogłoszenia</Link>
+          <span style={{ color: "#ccc" }}>&rsaquo;</span>
+          <span className="font-semibold" style={{ color: "#1B2A4A" }}>{listing.title}</span>
         </div>
       </div>
 
@@ -141,22 +141,15 @@ export default async function OgloszenieDetailPage({ params }: PageProps) {
         <div className="max-w-[1100px] mx-auto grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8">
 
           <div className="min-w-0">
-            <Carousel images={images} alt={listing.title} />
-
             <div className="flex items-start gap-3 mb-3 flex-wrap">
               <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: "#1B2A4A" }}>{listing.title}</h1>
               {listing.badge && (<span className="text-[11px] font-bold py-[3px] px-[10px] rounded-full mt-2" style={{ backgroundColor: listing.badge === "Promocja" ? "#fff3e0" : "#e8f4e8", color: listing.badge === "Promocja" ? "#e65100" : "#2a7a2a" }}>{listing.badge}</span>)}
             </div>
 
-            {listing.description && (
-              <div className="rounded-xl p-6 mb-6" style={{ backgroundColor: "#ffffff", border: "1px solid #e8eaed" }}>
-                <h2 className="text-lg font-bold mb-3" style={{ color: "#1B2A4A" }}>Opis</h2>
-                <p className="text-[15px] leading-relaxed whitespace-pre-line" style={{ color: "#555" }}>{listing.description}</p>
-              </div>
-            )}
+            <Carousel images={images} alt={listing.title} />
 
             {params_list.length > 0 && (
-              <div className="rounded-xl p-6" style={{ backgroundColor: "#ffffff", border: "1px solid #e8eaed" }}>
+              <div className="rounded-xl p-6 mb-6" style={{ backgroundColor: "#ffffff", border: "1px solid #e8eaed" }}>
                 <h2 className="text-lg font-bold mb-4" style={{ color: "#1B2A4A" }}>Dane pojazdu</h2>
                 <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
                   {params_list.map((p) => (
@@ -166,6 +159,13 @@ export default async function OgloszenieDetailPage({ params }: PageProps) {
                     </div>
                   ))}
                 </dl>
+              </div>
+            )}
+
+            {listing.description && (
+              <div className="rounded-xl p-6" style={{ backgroundColor: "#ffffff", border: "1px solid #e8eaed" }}>
+                <h2 className="text-lg font-bold mb-3" style={{ color: "#1B2A4A" }}>Opis</h2>
+                <p className="text-[15px] leading-relaxed whitespace-pre-line" style={{ color: "#555" }}>{listing.description}</p>
               </div>
             )}
           </div>
