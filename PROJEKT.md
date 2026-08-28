@@ -40,7 +40,7 @@ fidens/
     - Navbar.tsx (nawigacja desktop/mobile + hamburger)
     - SearchAutocomplete.tsx (wyszukiwarka z autocomplete)
     - Carousel.tsx (karuzela zdjec + lightbox z klawiszami i swipe)
-    - LeasingCalculator.tsx (kalkulator leasingu/pozyczki z suwakami)
+    - LeasingCalculator.tsx (kalkulator leasingu/pozyczki z suwakami + wybor typu dla VAT-23)
   - admin/
     - login/ (logowanie admina przez Supabase Auth)
     - ogloszenia/ (lista + CRUD)
@@ -53,15 +53,20 @@ fidens/
   - ogloszenia/
     - page.tsx (lista ogloszen z filtrami z URL + cover images)
     - [slug]/
-      - page.tsx (strona pojedynczego ogloszenia + karuzela + kalkulator)
+      - page.tsx (strona pojedynczego ogloszenia: tytul -> karuzela -> Dane pojazdu -> Opis -> kalkulator)
   - o-nas/
     - page.tsx (strona "Dlaczego Fidens?" - zaufanie, benefity, CTA)
   - leasing/
     - page.tsx (strona "Leasing dla firm" - edukacyjna, VAT-23 vs VAT-marza, proces)
+  - regulamin/
+    - page.tsx (regulamin serwisu - szkic z placeholderami danych spolki)
+  - polityka/
+    - page.tsx (polityka prywatnosci - szkic z placeholderami danych spolki)
   - kontakt/
-    - page.tsx (formularz kontaktowy)
+    - page.tsx (Suspense wrapper)
+    - KontaktForm.tsx (Navbar + formularz + stopka, wlasciwy komponent)
   - favicon.ico
-  - globals.css
+  - globals.css (m.in. cursor:pointer na suwakach input[type=range] i ich pseudo-elementach thumb)
   - layout.tsx
   - page.tsx (strona glowna z cover images w ogloszeniu tygodnia i najnowszych)
 - lib/
@@ -69,6 +74,8 @@ fidens/
     - client.ts (klient browser)
     - server.ts (klient server, cookies)
     - types.ts (typy TS dla bazy)
+  - leasing/
+    - calculator.ts (wspolny wzor raty - uzywany przez kalkulator interaktywny i karty ogloszen)
   - vehicles/
     - catalog.ts (statyczna lista marek/modeli)
 - public/
@@ -116,10 +123,13 @@ Tabele utworzone (RLS wlaczone):
 ## Decyzje produktowe (zatwierdzone z klientem)
 - **Galeria zdjec:** karuzela z lightbox (kliknij zdjecie zeby powiekszyc)
 - **Kalkulator leasingu:** frontend only, parametry wysylane w URL do /kontakt
-  - Automatycznie wybiera typ na podstawie vat_type: 'marza' = pozyczka leasingowa (bez wykupu), inaczej = leasing (z wykupem)
-  - Wzor: annuita z balonem, APR 5,2% (najkorzystniej) do 6,2% (najmniej korzystnie)
+  - Dla VAT-marza: zawsze pozyczka leasingowa (bez wykupu) - bez wyboru, tak jak wczesniej
+  - Dla VAT-23: KLIENT WYBIERA miedzy "Leasing operacyjny" (z wykupem, cena liczona od netto)
+    a "Pozyczka" (bez wykupu, cena liczona od brutto) - przelacznik nad kalkulatorem
+  - Wzor: annuita z balonem, APR 5,4% (najkorzystniej) do 7,3% (najmniej korzystnie)
   - Uklad "wariant A": rata jako hero (44px), cena drobno pod ratą
-  - PLANOWANE: mini-link "co to znaczy?" przy typie finansowania -> /leasing (patrz TODO)
+  - Cursor pointer na suwakach (thumb) i przyciskach wyboru typu finansowania
+  - PLANOWANE: mini-link "co to znaczy?" przy typie finansowania -> /leasing
 - **Wyszukiwarka:** autocomplete typu Google ze statycznej listy (~50 marek + modele).
   Klik w sugestie -> /ogloszenia?marka=X&model=Y. Brak wynikow -> CTA "Zapytaj o ten pojazd" z prefilled marka/modelem.
 - **Mobile nawigacja:** logo + lupa + hamburger. Drawer wysuwany z prawej.
@@ -141,6 +151,8 @@ Tabele utworzone (RLS wlaczone):
   - **Import z zagranicy** (250-300k+ PLN) - podejscie portfolio, NIE rozbudowana strona
     z detalami operacyjnymi (clo/homologacja). Kazdy przypadek indywidualny, omawiany z
     klientem osobno - strona ma tylko pokazac ze usluga istnieje + kilka zdjec.
+- **Podmiot prawny:** klient zdecydowal - dokumenty prawne (Regulamin/Polityka) robimy na
+  spolke z o.o. (jeszcze niezalozona/w trakcie), nie na obecna JDG.
 
 ## Strony statyczne
 
@@ -175,15 +187,30 @@ WAZNE PRZED PUBLIKACJA NA PRODUKCJI:
   je wdrozyc w przyszlosci - GDY to nastapi, TRZEBA zaktualizowac Polityke + dodac
   banner zgody na cookies PRZED zaladowaniem tych narzedzi (wymog RODO/ePrivacy)
 
+## Navbar - struktura (zaktualizowana)
+
 ### Desktop (top menu)
 Ogloszenia -> Poznaj Fidens -> Kontakt -> CTA "Zamow bezplatna kalkulacje"
 
 ### Mobile (drawer)
 Strona glowna -> Ogloszenia -> Poznaj Fidens -> Kontakt -> CTA
-(ujednolicone z desktop - wczesniej mobile mial "Wszystkie oferty" zamiast "Ogloszenia")
+(ujednolicone z desktop)
 
 ### Stopka (kopiowana per-strona, patrz "Znane problemy")
 Poznaj Fidens, Leasing, Kontakt, Regulamin, Polityka prywatnosci
+Ujednolicona na WSZYSTKICH stronach: glowna, /ogloszenia, /ogloszenia/[slug], /kontakt,
+/o-nas, /leasing, /regulamin, /polityka.
+
+## Strona pojedynczego ogloszenia /ogloszenia/[slug] - uklad
+Kolejnosc (zaktualizowana):
+1. Okruszki (breadcrumb) - stylizowane: strzalka "rsaquo" zamiast ">", hover pomaranczowy
+   (CSS hover:text-[#F0A500], NIE onMouseEnter/onMouseLeave - to Server Component,
+   event handlery nie sa dozwolone w propsach)
+2. Tytul ogloszenia (h1) + badge ("Nowe"/"Promocja")
+3. Karuzela zdjec
+4. Dane pojazdu (tabela parametrow)
+5. Opis
+6. Kalkulator leasingu (w bocznym sidebarze, sticky)
 
 ## Kalkulator leasingu - szczegoly
 
@@ -194,23 +221,30 @@ PV = kapital - wykup / (1+r)^n
 rata = PV * r / (1 - (1+r)^(-n))
 
 
-### APR zalezne od parametrow (5,2% - 6,2%)
+### APR zalezne od parametrow (5,4% - 7,3%)
 Score liczony ze srednich 3 parametrow (2 dla pozyczki - bez wykupu):
 - wplata_score = 1 - wplata/45 (max wplata = najkorzystniej)
 - okres_score = (okres-24)/48 (krotszy okres = najkorzystniej)
 - wykup_score = (wykup - wykupMin) / (wykupMax - wykupMin) (min wykup = najkorzystniej)
-- APR = 5,2 + score * 1,0
+- APR = APR_MIN + score * (APR_MAX - APR_MIN)
+
+### Wybor typu finansowania (NOWE)
+- VAT-marza: zawsze pozyczka (bez wykupu) - bez wyboru
+- VAT-23: przelacznik "Leasing operacyjny" / "Pozyczka" nad kalkulatorem
+  - Leasing operacyjny: hasWykup=true, cena liczona od netto (getNettoPrice)
+  - Pozyczka: hasWykup=false, cena liczona od brutto
+  - Domyslnie: "Leasing operacyjny" zaznaczony
 
 ### Limity suwakow
 - Wplata: 0-45%, default 20%
-- Okres: 24-72 msc (krok 12), default 48
+- Okres: 24-72 msc (krok 12), default 60 (wczesniej bylo 48, sprawdzic czy to nie kolejna
+  rozbieznosc dokumentacji - w kodzie useState(60))
 - Wykup: dynamiczny min/max zalezny od okresu:
   - 24 msc: 16-55%
   - 36 msc: 1-45%
   - 48 msc: 1-40%
   - 60 msc: 1-35%
   - 72 msc: 1-30%
-- Default wykupu: 10% (auto-podnoszony jesli minimum wyzsze)
 
 ### Link "Zapytaj o ten pojazd"
 Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyczka), wstepna, msc, wykup, rata
@@ -234,14 +268,15 @@ Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyc
 - [x] Karuzela zdjec + lightbox (strzalki, klawisze, swipe na mobile, klik zamyka poza zdjeciem)
 - [x] Cover images na stronie glownej (ogloszenie tygodnia + 3 najnowsze) i liscie /ogloszenia
 - [x] Zdjecia w Storage dla 3 testowych ogloszen (BMW, Mercedes, Caterpillar)
-- [x] Kalkulator leasingu/pozyczki (Opcja A - proste zalezne APR 5,2-6,2%)
+- [x] Kalkulator leasingu/pozyczki z wyborem typu finansowania dla VAT-23
   - Rata jako hero (44px), cena drobno pod ratą
-  - Suwaki z dynamicznymi limitami wykupu
-  - Automatyczny wybor typu (leasing/pozyczka) na podstawie vat_type
+  - Suwaki z dynamicznymi limitami wykupu, cursor pointer
+  - Przelacznik "Leasing operacyjny" / "Pozyczka" (tylko VAT-23)
   - Link do /kontakt z parametrami w URL
 - [x] Formularz kontaktowy /kontakt (Supabase + rozpoczete DNS pod Resend)
 - [x] Strona /o-nas ("Dlaczego Fidens?")
 - [x] Strona /leasing ("Leasing dla firm")
+- [x] Strony /regulamin i /polityka (szkic z placeholderami - patrz sekcja wyzej)
 - [x] Panel admina /admin (login, CRUD ogloszen w /admin/ogloszenia + /nowe + /[id],
   lista zapytan w /admin/zapytania)
 - [x] Import z OtoMoto (mechanizm istnieje, powiazany z otomoto_url/otomoto_id w bazie)
@@ -249,48 +284,42 @@ Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyc
   harmonogram w vercel.json: codziennie o 3:00
 - [x] Reorganizacja Navbara: dodano "Ogloszenia", usunieto "Leasing" z gownego menu
   (zostaje w stopce - cel SEO), ujednolicono desktop/mobile
+- [x] Ujednolicone stopki (z pelnym zestawem linkow) na WSZYSTKICH stronach
+- [x] Naprawione kodowanie polskich znakow w app/kontakt/page.tsx i LeasingCalculator.tsx
+- [x] Tekst "zloz wniosek" -> "zloz zapytanie" na stronie glownej
+- [x] Strona ogloszenia: tytul przeniesiony nad karuzele, "Dane pojazdu" przed "Opisem"
+- [x] Ladniejsze okruszki (breadcrumb) na stronie ogloszenia
 - [x] Wgrane na Vercel -> fidens.pl
 
 ### Do zrobienia (priorytety)
 
-1. **Drobne poprawki zebrane przy tworzeniu stron statycznych** <-- NASTEPNY KROK (szybkie)
-   - Kalkulator dla VAT-23: dodac mozliwosc wyboru dla klienta miedzy leasingiem operacyjnym
-     a pozyczka (obecnie kalkulator automatycznie wybiera leasing z wykupem dla VAT-23,
-     a powinien dawac wybor - klient moze chciec pozyczke tez przy VAT-23)
-   - Strona glowna, sekcja "Jak to dziala": zmienic tekst "zloz wniosek" na "zloz zapytanie"
-   - Naprawic kodowanie polskich znakow w stopce na app/page.tsx (widac krzaki:
-     "prywatnoĹ›ci" zamiast "prywatności", "zastrzeĹĽone" zamiast "zastrzeżone") - sprawdzic
-     czy to bledny zapis w pliku czy tylko wyswietlanie w terminalu
-   - Dodac link "Leasing" do stopki na pozostalych stronach (glowna, /ogloszenia, /kontakt,
-     [slug]) - obecnie stopka jest kopiowana recznie do kazdej strony, wiec trzeba
-     zaktualizowac wszedzie tam gdzie brakuje linku do /leasing
-   - Mini-link "co to znaczy?" w LeasingCalculator.tsx przy typie finansowania -> /leasing
+1. **Mini-link "co to znaczy?" w kalkulatorze** (jedyna pozostala "drobna poprawka")
+   - W LeasingCalculator.tsx przy etykiecie typu finansowania (VAT-23) - maly, dyskretny
+     link tekstowy prowadzacy do /leasing, NIE osobny przycisk CTA (kalkulator ma zostac prosty)
 
-2. **Regulamin i polityka prywatnosci** (/regulamin, /polityka)
-   - Osobna sesja - dokumenty prawne wymagaja spokojnej uwagi
-   - Docelowo do weryfikacji przez osobe z uprawnieniami prawniczymi
-
-3. **Nowa kategoria "Inne"** (pawilony, fotowoltaika, pompy ciepla, magazyny energii)
+2. **Nowa kategoria "Inne"** (pawilony, fotowoltaika, pompy ciepla, magazyny energii)
    - Podejscie portfolio (zdjecia z produkcji + opis), nie pelna struktura /ogloszenia
      z filtrami - te produkty nie maja roku/przebiegu/paliwa
    - Do zaprojektowania: struktura danych (elastyczne pola zamiast sztywnych kolumn),
      wyglad karty, gdzie w Navbarze/menu
 
-4. **Import z zagranicy - strona portfolio** (250-300k+ PLN)
+3. **Import z zagranicy - strona portfolio** (250-300k+ PLN)
    - Podejscie portfolio: zdjecia + krotki opis "zajmujemy sie tym od A do Z",
      bez szczegolow operacyjnych (clo/homologacja) - kazdy przypadek indywidualny
    - Prostsze niz pierwotnie zakladano - NIE wymaga sesji planistycznej o formalnosciach
 
-5. **"Od X zl" na kartach ogloszen** (obecnie pokazuje leasing_rate_pln z bazy)
+4. **"Od X zl" na kartach ogloszen** (obecnie pokazuje leasing_rate_pln z bazy)
    - Zamiast statycznej raty z bazy - liczyc dynamicznie "najatrakcyjniejsza" rate
    - Wariant B (realistyczny): wplata 20%, okres 60 msc, wykup MAX dla okresu (35% dla 60)
    - Wariant A (skrajny): max wplata 45%, max okres 72 msc, max wykup 30% - agresywne "od X"
    - Decyzja klienta: wariant B jesli chcemy uczciwie sprzedawac, A jesli agresywnie
    - Alternatywnie: pole showcase_rate w bazie, klientka wpisuje recznie per pojazd
+   - UWAGA: funkcja calculateShowcaseRate juz istnieje w lib/leasing/calculator.ts -
+     sprawdzic czy jest juz uzywana na kartach, czy to jeszcze "do zrobienia"
 
-6. **SEO i optymalizacja**
+5. **SEO i optymalizacja**
    - Przejsc z <img> na <next/image> (karuzela, karta ogloszen, cover images) - wymaga next.config.ts z remotePatterns dla Supabase
-   - Kalibracja kalkulatora (Opcja C) - tabela marz od klientki, wtedy odchylenia od prawdziwego systemu banku znikna (obecnie 4-5%)
+   - Kalibracja kalkulatora (Opcja C) - tabela marz od klientki, wtedy odchylenia od prawdziwego systemu banku znikna
    - Favicon z logo Fidens (favicon.io/favicon-converter)
    - Meta tagi (Open Graph + description per strona)
    - FAQ / Najczestsze pytania (rozwazane, nie ustalone)
@@ -305,6 +334,16 @@ Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyc
 - **PRZED KAZDYM PUSHEM:** npm run build lokalnie (Vercel wywala deployment na warningach TypeScript/ESLint)
 - **PRZED ZALOZENIEM CZEGOS O STANIE PROJEKTU:** sprawdzic w kodzie (Get-ChildItem/Get-Content),
   nie zgadywac na podstawie samej dokumentacji - PROJEKT.md moze byc nieaktualny
+- **Podmiana tekstu w duzych/skomplikowanych plikach ($content.Replace) czesto zawodzi**
+  przez niewidoczne roznice w bialych znakach/kodowaniu - gdy tak sie stanie, przejsc na
+  metode po numerach linii ([System.Collections.Generic.List[string]] + RemoveRange/InsertRange),
+  ZAWSZE najpierw wypisac fragment (Get-Content + petla Write-Host) zeby potwierdzic dokladne
+  numery linii przed usunieciem/wstawieniem - liczenie "na oko" latwo pomylic o 1 linie
+  (bialy znak, pusta linia) i zepsuc skladnie JSX (patrz: incydent z breadcrumb 27.08)
+- **Server Components (strony pobierajace dane bezposrednio z Supabase, bez "use client")
+  NIE MOGA miec event handlerow (onClick, onMouseEnter itp.) w JSX** - blad "Event handlers
+  cannot be passed to Client Component props". Hover/interaktywnosc na Server Components
+  robic czystym CSS/Tailwind (hover:text-[...], hover:bg-[...]), nie JS
 
 ## Znane problemy/uwagi
 - **Hydration warning** od rozszerzenia Bitdefender (atrybuty bis_register, bis_skin_checked).
@@ -312,7 +351,8 @@ Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyc
 - **PowerShell + polskie znaki w komendach:** nie dziala (encoding sie rozjezdza).
   Uzywamy komend BEZ polskich znakow (np. "Wplata wstepna"), potem w VS Code przez Ctrl+H
   przywracamy ogonki. Zawartosc plikow z -Encoding utf8 dziala OK.
-- **W folderach z nawiasami kwadratowymi ([slug]):** uzywac Set-Content -LiteralPath zamiast Out-File -FilePath.
+- **W folderach z nawiasami kwadratowymi ([slug]):** uzywac -LiteralPath zamiast -Path/-FilePath
+  we WSZYSTKICH komendach (Get-Content, Select-String, Set-Content), nie tylko Out-File.
 - **VS Code + literka M na zakladce:** to normalne "modified vs commit", nie "buforowany".
   Widok Git Local Changes (Working Tree) pokazuje dokladnie roznice.
 - **Dev serwer nie chodzi po push -> stare wersje w cache:** ubijac procesy przez taskkill /IM node.exe /F
@@ -323,6 +363,13 @@ Prowadzi do /kontakt z parametrami w URL: marka, model, slug, typ (leasing/pozyc
   na href="/Ogloszenia" ani "/ogłoszenia". Klikac pojedynczo Replace, nie Replace All.
   Widok Git Local Changes (Working Tree) w VS Code = szybki sprawdzian co poszlo nie tak.
 - **Stopka duplikowana per-strona:** stopka (footer) nie jest osobnym komponentem, jest
-  wklejona recznie w kazdym page.tsx. Przy zmianie linkow w stopce trzeba pamietac o
-  aktualizacji wszedzie (glowna, /ogloszenia, [slug], /kontakt, /o-nas, /leasing, /admin).
-  Do rozwazenia w przyszlosci: wydzielenie do wspolnego komponentu Footer.tsx.
+  wklejona recznie w kazdym page.tsx (a w przypadku /kontakt - w KontaktForm.tsx, ktory ma
+  ja NAWET DWUKROTNIE dla dwoch stanow formularza). Przy zmianie linkow w stopce trzeba
+  pamietac o aktualizacji wszedzie. Do rozwazenia w przyszlosci: wydzielenie do wspolnego
+  komponentu Footer.tsx - oszczedzi to duzo czasu przy przyszlych zmianach.
+- **Niektore pliki maja realnie zepsute kodowanie UTF-8 (nie tylko problem wyswietlania
+  w terminalu):** stwierdzone w app/kontakt/page.tsx i LeasingCalculator.tsx (objawy: znaki
+  typu "â€”", "Ĺadowanie", "poĹĽyczki" zamiast prawidlowych polskich liter). Naprawione
+  27-28.08. Jesli pojawi sie podobny problem w innym pliku - nadpisac cala zawartosc pliku
+  na nowo z poprawnym -Encoding utf8, nie probowac punktowych podmian (zawodza przy
+  zepsutym kodowaniu wejsciowym).
