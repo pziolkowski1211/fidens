@@ -1,4 +1,4 @@
-// lib/otomoto/scraper.ts
+﻿// lib/otomoto/scraper.ts
 // Import danych ogloszenia z OtoMoto na podstawie linku.
 // Strona OtoMoto (Next.js) osadza dane ogloszenia w kilku miejscach wewnatrz
 // bloku __NEXT_DATA__:
@@ -141,14 +141,26 @@ export function extractOtomotoImageUrls(html: string): string[] {
 export async function fetchOtomotoListing(url: string): Promise<OtomotoScrapedData> {
   const warnings: string[] = []
 
-  const res = await fetch(url, {
-    headers: {
-      "User-Agent":
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-      "Accept-Language": "pl-PL,pl;q=0.9",
-    },
-  })
-
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), 15000)
+  let res: Response
+  try {
+    res = await fetch(url, {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept-Language": "pl-PL,pl;q=0.9",
+      },
+      signal: controller.signal,
+    })
+  } catch (e) {
+    clearTimeout(timeoutId)
+    if (e instanceof Error && e.name === "AbortError") {
+      throw new Error("OtoMoto nie odpowiedzialo w ciagu 15 sekund - strona moze blokowac automatyczne zapytania. Sprobuj wypelnic dane recznie.")
+    }
+    throw new Error("Nie udalo sie polaczyc z OtoMoto - sprawdz link lub sprobuj ponownie.")
+  }
+  clearTimeout(timeoutId)
   if (!res.ok) {
     throw new Error(`OtoMoto zwrocilo blad HTTP ${res.status} - sprawdz czy link jest poprawny`)
   }
@@ -161,6 +173,22 @@ export async function fetchOtomotoListing(url: string): Promise<OtomotoScrapedDa
     (extractJsonObject(html, '"financingSimulatorWidget":{"status"') as any)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const advert = widget?.props?.advert as any
+
+  // Glowny obiekt "advert" na stronie (pierwsze wystapienie w __NEXT_DATA__) zawiera
+  // tablice "details" ze WSZYSTKIMI polami technicznymi (moc, pojemnosc, skrzynia,
+  // kolor, kraj pochodzenia) - NIEZALEZNIE od tego czy ogloszenie ma zweryfikowane
+  // dane CEPIK. To lepsze zrodlo niz cepikWidget, ktory czesto ma status!=0 (niedostepny).
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const fullAdvert = extractJsonObject(html, '"advert":{"id":"') as any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const detailsArray: any[] = Array.isArray(fullAdvert?.details) ? fullAdvert.details : []
+  const detailsMap: Record<string, string> = {}
+  for (const d of detailsArray) {
+    if (d && typeof d.key === "string" && typeof d.value === "string") {
+      detailsMap[d.key] = d.value
+    }
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const cepikWidget = extractJsonObject(html, '"cepikWidget":{"status"') as any
   const cepikDetails = cepikWidget?.props?.advert?.details ?? null
@@ -197,20 +225,21 @@ export async function fetchOtomotoListing(url: string): Promise<OtomotoScrapedDa
   const mileageKm = advert.mileage ? Number(advert.mileage) : null
   const fuel = mapFuel(advert.fuelType)
 
-  // Dane z cepikWidget (jesli dostepne) - kolor, skrzynia, moc, pojemnosc, kraj
-  const color = cepikDetails?.color ?? null
-  const transmission = mapTransmission(cepikDetails?.gearbox)
-  const powerHp = parseFirstNumber(cepikDetails?.engine_power)
-  const engineCc = parseFirstNumber(cepikDetails?.engine_capacity)
-  const countryOrigin = cepikDetails?.country_origin ?? null
+  // Dane techniczne: najpierw z detailsMap (glowny advert, zawsze dostepne),
+  // z fallbackiem na cepikDetails jesli detailsMap akurat nie ma danego pola.
+  const color = detailsMap.color ?? cepikDetails?.color ?? null
+  const transmission = mapTransmission(detailsMap.gearbox) ?? mapTransmission(cepikDetails?.gearbox)
+  const powerHp = parseFirstNumber(detailsMap.engine_power) ?? parseFirstNumber(cepikDetails?.engine_power)
+  const engineCc = parseFirstNumber(detailsMap.engine_capacity) ?? parseFirstNumber(cepikDetails?.engine_capacity)
+  const countryOrigin = detailsMap.country_origin ?? cepikDetails?.country_origin ?? null
 
   if (!brand) warnings.push("Nie znaleziono marki - uzupelnij recznie.")
   if (!model) warnings.push("Nie znaleziono modelu - uzupelnij recznie.")
   if (!pricePln) warnings.push("Nie znaleziono ceny - uzupelnij recznie.")
 
-  if (!cepikDetails) {
+  if (!color && !transmission && !powerHp && !engineCc && !countryOrigin) {
     warnings.push(
-      "To ogloszenie nie ma zweryfikowanych danych CEPIK, wiec kolor/skrzynia/moc/pojemnosc/kraj pochodzenia nie zostaly znalezione - uzupelnij je recznie."
+      "Nie udalo sie znalezc danych technicznych (kolor/skrzynia/moc/pojemnosc/kraj pochodzenia) - uzupelnij je recznie."
     )
   }
   warnings.push("Wariant (wersja wyposazenia) NIE jest jeszcze wyciagany automatycznie - uzupelnij recznie.")

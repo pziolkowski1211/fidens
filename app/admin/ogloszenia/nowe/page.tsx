@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -62,33 +62,38 @@ export default function NoweOgloszeniePage() {
     }
 
     setImporting(true);
-    const result = await importOtomotoListing(importUrl);
-    setImporting(false);
+    try {
+      const result = await importOtomotoListing(importUrl);
 
-    if (!result.success) {
-      setImportError(result.error);
-      return;
+      if (!result.success) {
+        setImportError(result.error);
+        return;
+      }
+
+      const data = result.data;
+
+      if (data.title) {
+        handleTitleChange(data.title);
+      }
+      if (data.brand) setBrand(data.brand);
+      if (data.model) setModel(data.model);
+      if (data.year) setYear(String(data.year));
+      if (data.pricePln) setPricePln(String(data.pricePln));
+      if (data.mileageKm) setMileageKm(String(data.mileageKm));
+      if (data.fuel) setFuel(data.fuel);
+      if (data.transmission) setTransmission(data.transmission);
+      if (data.color) setColor(data.color);
+      if (data.powerHp) setPowerHp(String(data.powerHp));
+      if (data.engineCc) setEngineCc(String(data.engineCc));
+      if (data.countryOrigin) setCountryOrigin(data.countryOrigin);
+      setOtomotoUrl(data.otomotoUrl);
+
+      setImportWarnings(data.warnings);
+    } catch (e) {
+      setImportError(e instanceof Error ? e.message : "Nieoczekiwany blad podczas importu");
+    } finally {
+      setImporting(false);
     }
-
-    const data = result.data;
-
-    if (data.title) {
-      handleTitleChange(data.title);
-    }
-    if (data.brand) setBrand(data.brand);
-    if (data.model) setModel(data.model);
-    if (data.year) setYear(String(data.year));
-    if (data.pricePln) setPricePln(String(data.pricePln));
-    if (data.mileageKm) setMileageKm(String(data.mileageKm));
-    if (data.fuel) setFuel(data.fuel);
-    if (data.transmission) setTransmission(data.transmission);
-    if (data.color) setColor(data.color);
-    if (data.powerHp) setPowerHp(String(data.powerHp));
-    if (data.engineCc) setEngineCc(String(data.engineCc));
-    if (data.countryOrigin) setCountryOrigin(data.countryOrigin);
-    setOtomotoUrl(data.otomotoUrl);
-
-    setImportWarnings(data.warnings);
   }
   function handleTitleChange(value: string) {
     setTitle(value);
