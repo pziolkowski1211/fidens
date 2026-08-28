@@ -81,6 +81,7 @@ export type ContactRequest = {
   leasing_initial_pct: number | null
   leasing_months: number | null
   leasing_residual_pct: number | null
+  marketing_consent: boolean
   is_read: boolean
   notes: string | null
 }

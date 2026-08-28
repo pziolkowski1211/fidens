@@ -119,6 +119,21 @@ export default function KontaktForm() {
               <textarea name="message" rows={4} className={inputClass} style={{ borderColor: "#e8eaed", outlineColor: "#F0A500" }} />
             </div>
 
+            <label
+              className="flex items-start gap-3 p-3 rounded-lg cursor-pointer"
+              style={{ backgroundColor: "#FFF8E8", border: "1px solid #F0A500" }}
+            >
+              <input
+                type="checkbox"
+                name="marketingConsent"
+                className="mt-0.5 w-5 h-5 cursor-pointer shrink-0"
+                style={{ accentColor: "#F0A500" }}
+              />
+              <span className="text-sm" style={{ color: "#1B2A4A" }}>
+                <strong>Chcę otrzymywać informacje o promocjach i nowych ofertach Fidens.</strong>
+              </span>
+            </label>
+
             {status === "error" && (
               <p className="text-sm" style={{ color: "#dc2626" }}>{errorMsg}</p>
             )}
@@ -157,4 +172,5 @@ export default function KontaktForm() {
     </main>
   )
 }
+
 

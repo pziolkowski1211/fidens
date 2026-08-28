@@ -16,6 +16,7 @@ export async function submitContactForm(formData: FormData) {
   const wstepna = formData.get("wstepna") as string
   const msc = formData.get("msc") as string
   const wykup = formData.get("wykup") as string
+  const marketingConsent = formData.get("marketingConsent") === "on"
 
   let listingId: string | null = null
 
@@ -41,6 +42,7 @@ export async function submitContactForm(formData: FormData) {
     leasing_initial_pct: wstepna ? Number(wstepna) : null,
     leasing_months: msc ? Number(msc) : null,
     leasing_residual_pct: wykup ? Number(wykup) : null,
+    marketing_consent: marketingConsent,
   })
 
   if (error) {
@@ -72,3 +74,4 @@ Wykup: ${wykup || "brak"}%`,
 
   return { success: true }
 }
+
