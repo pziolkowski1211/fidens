@@ -296,6 +296,32 @@ dopasowanie nawiasow klamrowych (funkcja extractJsonObject, marker + brace-match
 
 ### Niezawodnosc
 - fetch() ma timeout 15s (AbortController)
+
+### Struktura plikow (WAZNE - dwa osobne pliki, nie mieszac!)
+- app/admin/ogloszenia/otomoto-actions.ts - TYLKO importOtomotoListing (dane tekstowe:
+  marka/model/cena/rok/przebieg/paliwo/moc/pojemnosc/skrzynia/kolor/kraj). NIE importuje
+  sharp i NIE laczy sie z Supabase - lekki, szybki.
+- app/admin/ogloszenia/otomoto-photos-actions.ts - TYLKO importOtomotoPhotos (import zdjec,
+  przycinanie znaku wodnego). Importuje sharp - CIEZKI, wymaga natywnej biblioteki.
+- POWOD ROZDZIELENIA (incydent 29.08): oba byly w jednym pliku z sharp zaimportowanym na
+  gorze. Nawet klikniecie "Importuj dane" (ktore sharp w ogole nie uzywa) ladowalo caly
+  modul, w tym sharp - a na Vercel sharp nie mogl zaladowac natywnej biblioteki
+  (ERR_DLOPEN_FAILED: libvips-cpp.so... cannot open shared object file), co psulo NAWET
+  funkcje ktore sharp nie potrzebuja. Rozdzielenie na dwa pliki naprawilo import danych
+  natychmiast, bez potrzeby naprawiania samego sharp.
+- next.config.ts ma serverExternalPackages: ["sharp"] (mowi Turbopack zeby nie probowal
+  pakowac natywnego modulu sharp, tylko zostawic go jako zwykly require() Node.js) - to
+  NIE wystarczylo samo w sobie do naprawy bledu (blad nadal wystepowal przy imporcie zdjec
+  po tej zmianie), ale zostaje jako dobra praktyka.
+- WNIOSEK NA PRZYSZLOSC: pliki z ciezkimi/natywnymi zaleznosciami (sharp, i podobne) NIE
+  powinny byc w tym samym module co lekkie funkcje wywolywane czesciej/w innych kontekstach -
+  nawet nieuzywany import u gory pliku wplywa na cala reszte modulu.
+- app/admin/ogloszenia/nowe/layout.tsx i app/admin/ogloszenia/[id]/layout.tsx maja
+  export const maxDuration = 30 (Server Component wrapper, bo same page.tsx sa "use client"
+  i nie moga eksportowac route segment config) - wydluza limit czasu funkcji Vercel z
+  domyslnych 10s. To osobna, mniejsza poprawka - nie byla finalnym rozwiazaniem problemu
+  z importem danych (to byl sharp), ale warto ja zachowac na wypadek gdyby import
+  faktycznie kiedys trwal dlugo (np. wolna odpowiedz OtoMoto).
 - handleImportOtomoto ma try/catch/finally - setImporting(false) ZAWSZE sie wykona
 
 ## Kalkulator leasingu (pojazdy) - szczegoly
