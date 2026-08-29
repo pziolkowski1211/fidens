@@ -5,7 +5,7 @@ import imageCompression from "browser-image-compression";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 
-import { importOtomotoPhotos } from "@/app/admin/ogloszenia/otomoto-actions";
+import { importOtomotoPhotos } from "@/app/admin/ogloszenia/otomoto-photos-actions";
 
 type ListingImage = {
   id: string;
@@ -318,3 +318,4 @@ export default function ImageUploader({
     </div>
   );
 }
+
