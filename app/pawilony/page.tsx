@@ -2,9 +2,9 @@
 import Navbar from "../components/Navbar";
 
 export const metadata = {
-  title: "Pawilony na zamówienie z płyty warstwowej | Fidens.pl",
+  title: "Pawilony i kontenery na zamówienie z płyty warstwowej | Fidens.pl",
   description:
-    "Domki i pawilony modułowe z płyty warstwowej, projektowane indywidualnie pod potrzeby klienta. Finansowanie w leasingu lub pożyczce.",
+    "Szeroki wybór pawilonów i kontenerów, spersonalizowanych pod Twoje potrzeby. Domy modułowe, pawilony biurowe i gastronomiczne z finansowaniem w leasingu lub pożyczce.",
 };
 
 export default function PawilonyPage() {
@@ -15,7 +15,44 @@ export default function PawilonyPage() {
       wymiary: "10m × 3,5m",
       powierzchnia: "35 m²",
       cena: "158 000 zł brutto",
+      cenaPlaceholder: false,
       zdjecie: "/pawilony/domek-caloroczny-35m2-z-antresola/1.jpg",
+    },
+    {
+      slug: "dom-modulowy-40m2-10x4m",
+      nazwa: "Dom modułowy 40m²",
+      wymiary: "10m × 4m",
+      powierzchnia: "40 m²",
+      cena: "150 000 zł brutto",
+      cenaPlaceholder: true,
+      zdjecie: "/pawilony/dom-modulowy-40m2-10x4m/1.jpg",
+    },
+    {
+      slug: "pawilon-biurowy-24m2-8x3m",
+      nazwa: "Pawilon biurowy 24m²",
+      wymiary: "8m × 3m",
+      powierzchnia: "24 m²",
+      cena: "108 000 zł brutto",
+      cenaPlaceholder: true,
+      zdjecie: "/pawilony/pawilon-biurowy-24m2-8x3m/1.jpg",
+    },
+    {
+      slug: "pawilon-gastronomiczny-18m2-6x3m",
+      nazwa: "Pawilon gastronomiczny 18m²",
+      wymiary: "6m × 3m",
+      powierzchnia: "18 m²",
+      cena: "81 000 zł brutto",
+      cenaPlaceholder: true,
+      zdjecie: "/pawilony/pawilon-gastronomiczny-18m2-6x3m/1.jpg",
+    },
+    {
+      slug: "domek-modulowy-42m2-elewacja-palisandrowa",
+      nazwa: "Domek modułowy 42m² z elewacją palisandrową",
+      wymiary: "7m × 6m",
+      powierzchnia: "42 m²",
+      cena: "190 000 zł brutto",
+      cenaPlaceholder: true,
+      zdjecie: "/pawilony/domek-modulowy-42m2-elewacja-palisandrowa/1.jpg",
     },
   ];
 
@@ -25,12 +62,12 @@ export default function PawilonyPage() {
 
       <section className="max-w-3xl mx-auto px-4 py-16 text-center">
         <h1 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: "#1B2A4A" }}>
-          Pawilony na zamówienie
+          Pawilony i kontenery na zamówienie
         </h1>
         <p className="text-base md:text-lg text-gray-700">
-          Projektujemy i realizujemy pawilony oraz domki z płyty warstwowej, dopasowane do
-          Twoich potrzeb — jako dom całoroczny, domek rekreacyjny, biuro lub obiekt usługowy.
-          Poniżej przykładowe realizacje wraz z orientacyjną wyceną.
+          Szeroki wybór pawilonów i kontenerów modułowych, w pełni spersonalizowanych pod Twoje
+          potrzeby. Jaki projekt sobie wymarzysz — taki zrealizujemy i wycenimy. Poniżej przykładowe
+          realizacje wraz z orientacyjną wyceną.
         </p>
       </section>
 
@@ -56,13 +93,41 @@ export default function PawilonyPage() {
                 <div className="text-xs mb-1" style={{ color: "#888" }}>
                   Cena orientacyjna
                 </div>
-                <div className="text-lg font-bold" style={{ color: "#1B2A4A" }}>
+                <div
+                  className="text-lg font-bold"
+                  style={
+                    r.cenaPlaceholder
+                      ? { backgroundColor: "#FFF3B0", color: "#1B2A4A", display: "inline-block", padding: "0 4px", borderRadius: "3px" }
+                      : { color: "#1B2A4A" }
+                  }
+                >
                   od {r.cena}
                 </div>
               </div>
             </Link>
           ))}
+
+          <div
+            className="rounded-xl overflow-hidden bg-white flex flex-col items-center justify-center text-center p-6"
+            style={{ border: "2px dashed #F0A500" }}
+          >
+            <h2 className="text-lg font-bold mb-2" style={{ color: "#1B2A4A" }}>
+              Twój własny projekt
+            </h2>
+            <p className="text-sm text-gray-600 mb-4">
+              Nie widzisz tego, czego szukasz? Zaprojektujemy i wycenimy pawilon lub kontener
+              dokładnie pod Twoje potrzeby.
+            </p>
+            <Link
+              href="/kontakt"
+              className="inline-block px-6 py-3 rounded-lg font-semibold text-white no-underline hover:opacity-90 transition-opacity"
+              style={{ backgroundColor: "#F0A500", color: "#1B2A4A" }}
+            >
+              Zapytaj o wycenę
+            </Link>
+          </div>
         </div>
+
         <p className="text-sm text-gray-500 text-center mt-8">
           Każdy projekt wyceniamy indywidualnie i dopasowujemy do oczekiwań klienta. Podane
           ceny mają charakter orientacyjny.
