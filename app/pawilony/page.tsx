@@ -12,6 +12,7 @@ export default function PawilonyPage() {
     {
       slug: "domek-caloroczny-35m2-z-antresola",
       nazwa: "Domek całoroczny 35m² z antresolą",
+      kategoria: "Dom całoroczny",
       wymiary: "10m × 3,5m",
       powierzchnia: "35 m²",
       cena: "158 000 zł brutto",
@@ -21,6 +22,7 @@ export default function PawilonyPage() {
     {
       slug: "dom-modulowy-40m2-10x4m",
       nazwa: "Dom modułowy 40m²",
+      kategoria: "Dom modułowy",
       wymiary: "10m × 4m",
       powierzchnia: "40 m²",
       cena: "150 000 zł brutto",
@@ -30,6 +32,7 @@ export default function PawilonyPage() {
     {
       slug: "pawilon-biurowy-24m2-8x3m",
       nazwa: "Pawilon biurowy 24m²",
+      kategoria: "Pawilon biurowy",
       wymiary: "8m × 3m",
       powierzchnia: "24 m²",
       cena: "108 000 zł brutto",
@@ -39,6 +42,7 @@ export default function PawilonyPage() {
     {
       slug: "pawilon-gastronomiczny-18m2-6x3m",
       nazwa: "Pawilon gastronomiczny 18m²",
+      kategoria: "Pawilon gastronomiczny",
       wymiary: "6m × 3m",
       powierzchnia: "18 m²",
       cena: "81 000 zł brutto",
@@ -48,6 +52,7 @@ export default function PawilonyPage() {
     {
       slug: "domek-modulowy-42m2-elewacja-palisandrowa",
       nazwa: "Domek modułowy 42m² z elewacją palisandrową",
+      kategoria: "Domek modułowy",
       wymiary: "7m × 6m",
       powierzchnia: "42 m²",
       cena: "190 000 zł brutto",
@@ -77,28 +82,51 @@ export default function PawilonyPage() {
             <Link
               key={r.slug}
               href={`/pawilony/${r.slug}`}
-              className="rounded-xl overflow-hidden bg-white block hover:opacity-95 transition-opacity"
-              style={{ border: "1px solid #e8eaed" }}
+              className="group rounded-xl overflow-hidden bg-white block transition-all duration-300 hover:-translate-y-1"
+              style={{ border: "1px solid #e8eaed", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
             >
-              <div className="relative w-full aspect-[4/3] bg-gray-100">
-                <img src={r.zdjecie} alt={r.nazwa} className="w-full h-full object-cover" />
+              <div className="relative w-full aspect-[4/3] bg-gray-100 overflow-hidden">
+                <img
+                  src={r.zdjecie}
+                  alt={r.nazwa}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                <span
+                  className="absolute top-3 left-3 text-[11px] font-bold px-3 py-1 rounded-full"
+                  style={{ backgroundColor: "#1B2A4A", color: "#fff" }}
+                >
+                  {r.kategoria}
+                </span>
               </div>
               <div className="p-4">
                 <h2 className="text-lg font-bold mb-2" style={{ color: "#1B2A4A" }}>
                   {r.nazwa}
                 </h2>
-                <div className="text-sm text-gray-600 mb-3">
-                  {r.wymiary} &middot; {r.powierzchnia}
+                <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
+                  <span className="flex items-center gap-1.5">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#F0A500" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 3H3v18h18V3z"></path>
+                      <path d="M3 9h18"></path>
+                      <path d="M9 21V9"></path>
+                    </svg>
+                    {r.wymiary}
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#F0A500" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                    </svg>
+                    {r.powierzchnia}
+                  </span>
                 </div>
-                <div className="text-xs mb-1" style={{ color: "#888" }}>
+                <div className="text-xs mb-1.5" style={{ color: "#888" }}>
                   Cena orientacyjna
                 </div>
                 <div
-                  className="text-lg font-bold"
+                  className="inline-block text-base font-bold px-3 py-1.5 rounded-lg"
                   style={
                     r.cenaPlaceholder
-                      ? { backgroundColor: "#FFF3B0", color: "#1B2A4A", display: "inline-block", padding: "0 4px", borderRadius: "3px" }
-                      : { color: "#1B2A4A" }
+                      ? { backgroundColor: "#FFF3B0", color: "#1B2A4A" }
+                      : { backgroundColor: "#FFF8E8", color: "#1B2A4A" }
                   }
                 >
                   od {r.cena}
@@ -108,9 +136,17 @@ export default function PawilonyPage() {
           ))}
 
           <div
-            className="rounded-xl overflow-hidden bg-white flex flex-col items-center justify-center text-center p-6"
+            className="rounded-xl overflow-hidden bg-white flex flex-col items-center justify-center text-center p-6 transition-all duration-300 hover:-translate-y-1"
             style={{ border: "2px dashed #F0A500" }}
           >
+            <div
+              className="w-12 h-12 rounded-full flex items-center justify-center mb-3"
+              style={{ backgroundColor: "#FFF3B0" }}
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F0A500" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 5v14M5 12h14"></path>
+              </svg>
+            </div>
             <h2 className="text-lg font-bold mb-2" style={{ color: "#1B2A4A" }}>
               Twój własny projekt
             </h2>

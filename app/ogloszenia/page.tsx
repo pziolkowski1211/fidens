@@ -170,12 +170,12 @@ export default async function OgloszeniaPage({ searchParams }: PageProps) {
                 <Link
                   key={auto.id}
                   href={"/ogloszenia/" + auto.slug}
-                  className="rounded-xl overflow-hidden cursor-pointer hover:shadow-lg transition-shadow block"
+                  className="group rounded-xl overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-lg block"
                   style={{ backgroundColor: "#ffffff", border: "1px solid #e8eaed" }}
                 >
-                  <div className="relative h-44 sm:h-48 flex items-center justify-center overflow-hidden" style={{ backgroundColor: "#e8eaed" }}>
+                  <div className="relative h-44 sm:h-48 flex items-center justify-center overflow-hidden" style={{ backgroundColor:"#e8eaed" }}>
                     {auto.cover_url ? (
-                      <Image src={auto.cover_url} alt={auto.title} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover" />
+                      <Image src={auto.cover_url} alt={auto.title} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover transition-transform duration-500 group-hover:scale-110" />
                     ) : (
                       <span className="text-sm" style={{ color: "#aaa" }}>Brak zdjęcia</span>
                     )}
@@ -191,8 +191,25 @@ export default async function OgloszeniaPage({ searchParams }: PageProps) {
                       </div>
                     )}
                     <div className="text-base font-bold mb-1" style={{ color: "#1B2A4A" }}>{auto.title}</div>
-                    <div className="text-[13px] mb-3" style={{ color: "#888" }}>
-                      {[auto.year, auto.mileage_km ? formatNumber(auto.mileage_km) + " km" : null].filter(Boolean).join(" \u00B7 ")}
+                    <div className="flex items-center gap-3 text-[13px] mb-3" style={{ color: "#888" }}>
+                      {auto.year && (
+                        <span className="flex items-center gap-1">
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#F0A500" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+                            <path d="M16 2v4M8 2v4M3 10h18"></path>
+                          </svg>
+                          {auto.year}
+                        </span>
+                      )}
+                      {auto.mileage_km ? (
+                        <span className="flex items-center gap-1">
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#F0A500" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M12 12l4-4"></path>
+                          </svg>
+                          {formatNumber(auto.mileage_km)} km
+                        </span>
+                      ) : null}
                     </div>
                     {auto.rate && (
                       <div className="text-[22px] font-bold" style={{ color: "#1B2A4A" }}>
