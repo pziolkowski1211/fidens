@@ -1,4 +1,4 @@
-﻿"use server"
+"use server"
 import { createClient } from "@/lib/supabase/server"
 import { Resend } from "resend"
 
@@ -49,6 +49,22 @@ export async function submitContactForm(formData: FormData) {
     return { success: false, error: error.message }
   }
 
+  if (marketingConsent && email) {
+    try {
+      const nameParts = name.trim().split(/\s+/)
+      const firstName = nameParts[0] || ""
+      const lastName = nameParts.slice(1).join(" ") || ""
+      await resend.contacts.create({
+        email,
+        firstName,
+        lastName,
+        unsubscribed: false,
+        audienceId: "36608761-95f3-431e-bb2c-000684e745b4",
+      })
+    } catch (contactError) {
+      console.error("Blad dodawania kontaktu do segmentu Resend:", contactError)
+    }
+  }
   try {
     await resend.emails.send({
       from: "Fidens <kontakt@fidens.pl>",

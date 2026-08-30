@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
@@ -17,6 +17,7 @@ type ContactRequest = {
   leasing_residual_pct: number | null;
   is_read: boolean;
   notes: string | null;
+  marketing_consent: boolean;
 };
 
 export default function AdminZapytaniaPage() {
@@ -110,7 +111,17 @@ export default function AdminZapytaniaPage() {
           >
             <div className="mb-2 flex items-start justify-between gap-2">
               <div>
-                <p className="font-medium text-gray-900">{req.name}</p>
+                <div className="flex items-center gap-2">
+                  <p className="font-medium text-gray-900">{req.name}</p>
+                  {req.marketing_consent && (
+                    <span
+                      className="rounded-full px-2 py-0.5 text-[10px] font-semibold text-white"
+                      style={{ backgroundColor: "#16a34a" }}
+                    >
+                      Zgoda marketingowa
+                    </span>
+                  )}
+                </div>
                 <p className="text-xs text-gray-500">
                   {formatDate(req.created_at)}
                 </p>
