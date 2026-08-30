@@ -50,13 +50,15 @@ export default function Navbar() {
           />
         </Link>
 
-        {/* DESKTOP: Wyszukiwarka wycentrowana */}
-        <div className="hidden lg:block absolute left-1/2 -translate-x-1/2">
-          <SearchAutocomplete variant="desktop" />
+        {/* DESKTOP: Wyszukiwarka - elastyczna, bierze tylko dostepne miejsce (nie nachodzi na menu) */}
+        <div className="hidden lg:flex flex-1 justify-center px-4">
+          <div className="w-full max-w-md">
+            <SearchAutocomplete variant="desktop" />
+          </div>
         </div>
 
         {/* DESKTOP: Menu prawa strona */}
-        <div className="hidden lg:flex ml-auto items-center gap-8">
+        <div className="hidden lg:flex items-center gap-6 shrink-0">
           <Link href="/ogloszenia" style={{ color: "rgba(255,255,255,0.8)", fontSize: "14px" }}>Ogłoszenia</Link>
           <Link href="/pawilony" style={{ color: "rgba(255,255,255,0.8)", fontSize: "14px" }}>Pawilony</Link>
           <Link href="/o-nas" style={{ color: "rgba(255,255,255,0.8)", fontSize: "14px" }}>Poznaj Fidens</Link>
