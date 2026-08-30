@@ -202,6 +202,31 @@ TODO: badge w /admin/zapytania, sekcja w Polityce Prywatnosci.
 ### Podmiot prawny
 Regulamin/Polityka na spolke z o.o. (jeszcze niezalozona), nie na obecna JDG.
 
+### Zgoda marketingowa - integracja z Resend (30.08, ZROBIONE)
+Kontakty z marketing_consent=true sa TERAZ automatycznie dodawane do dedykowanego
+segmentu w Resend, zeby Piotr mogl wysylac zbiorowe maile (np. zyczenia) przez
+Resend Broadcasts bez budowania wlasnego systemu mailingowego.
+
+- Segment Resend: "Fidens - Zgoda marketingowa", ID: 36608761-95f3-431e-bb2c-000684e745b4
+- Kod: app/kontakt/actions.ts, blok "if (marketingConsent && email)" PRZED wysylka
+  maila powiadomienia - wywoluje resend.contacts.create({ email, firstName, lastName,
+  unsubscribed: false, audienceId: "..." }). Imie/nazwisko dzielone z pola "name" po
+  pierwszej spacji (dla placeholderow {{{FIRST_NAME}}} w przyszlych broadcastach)
+- Blad zlapany przez try/catch, loguje do konsoli serwera, NIE blokuje zapisu
+  glownego zapytania do bazy ani maila powiadomienia jesli Resend zawiedzie
+- WAZNE: RESEND_API_KEY zostal wymieniony na klucz z uprawnieniem "Full access"
+  (poprzedni mial tylko "Sending access" i nie mogl zarzadzac kontaktami/segmentami -
+  blad 401 "restricted_api_key" w logach). Zaktualizowany w .env.local ORAZ w
+  Vercel Environment Variables (Production) - PRZY ROTACJI KLUCZA pamietac o OBU
+  miejscach + redeploy na Vercelu
+- Panel /admin/zapytania: zielony badge "Zgoda marketingowa" obok imienia, widoczny
+  tylko gdy marketing_consent === true (typ ContactRequest zaktualizowany o to pole)
+- Wysylka properly do WSZYSTKICH: Resend Broadcasts nie ma opcji "wszyscy kontakci",
+  wymaga segmentu - dlatego segment "Fidens - Zgoda marketingowa" jest wlasnie tym
+  celem (nie mylic z istniejacym segmentem "General" o nieznanym Piotrowi przeznaczeniu)
+- TODO: sekcja o zgodzie marketingowej w /polityka (opis ze dane trafiaja tez do
+  systemu mailingowego Resend)
+
 ### NOWE kategorie produktowe (ustalone biznesowo, JESZCZE NIE zakodowane)
 - Rozszerzyc vehicle_type o "dostawcze" i "naczepy"
 - "Maszyny przemyslowe" (Gantech) - osobna zakladka, mala skala
@@ -283,6 +308,7 @@ wplata/okres/(wykup jesli hasWykup). Rata "od X zl" na kartach: calculateShowcas
   /ogloszenia, strona glowna (Ogloszenie tygodnia + Najnowsze oferty)
 - [x] **Testy regresyjne Playwright - kompletny setup + WSZYSTKIE testy przechodza**
   (72 testy, 67 aktywnych + 5 skip celowych, 0 failed). Szczegoly w sekcji nizej.
+- [x] **Integracja zgody marketingowej z Resend** - automatyczny zapis kontaktow do segmentu, badge w panelu admina (30.08)
 - [x] Wgrane na Vercel -> fidens.pl
 
 ### Do zrobienia (priorytety)
@@ -314,6 +340,11 @@ wplata/okres/(wykup jesli hasWykup). Rata "od X zl" na kartach: calculateShowcas
 - Komendy w PowerShell z Out-File -Encoding utf8, test na localhost:3000 przed pushem
 - git add . && git commit -m "opis" && git push -> Vercel auto-rebuild
 - **PRZED KAZDYM PUSHEM:** npm run build lokalnie
+- **PO POTWIERDZENIU ZE COS DZIALA LOKALNIE:** od razu zrobic git add+commit+push,
+  ZANIM zacznie sie testowanie na produkcji - inaczej latwo przetestowac fidens.pl
+  na starym kodzie i pomyslec ze naprawa nie zadziala (incydent 30.08: zmiany w
+  kontakt/actions.ts i admin/zapytania/page.tsx dzialaly lokalnie ale nie byly
+  wypchniete, testy na fidens.pl mylnie sugerowaly ze integracja z Resend nie dziala)
 - **PRZED ZALOZENIEM CZEGOS O STANIE PROJEKTU:** sprawdzic w kodzie, nie zgadywac
 - **Zmiany schematu bazy Supabase RECZNIE przez SQL Editor**, PO KAZDEJ takiej zmianie
   zaktualizowac lib/supabase/types.ts (inaczej blad "Type X is not assignable to type never")
