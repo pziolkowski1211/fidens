@@ -1,4 +1,4 @@
-﻿# Fidens.pl - Projekt strony
+# Fidens.pl - Projekt strony
 
 ## Cel projektu
 Strona dla brokera/dealera leasingowego (auta osobowe, ciezarowe, maszyny budowlane, pawilony).
@@ -46,6 +46,9 @@ fidens/
     - PawilonCalculator.tsx (ODDZIELNY kalkulator dla PAWILONOW - bez wykupu, leasing
       operacyjny tylko 48/60 msc)
     - ImageUploader.tsx (upload/reorder/cover/delete zdjec w panelu admina + import z OtoMoto)
+    - ConfirmDialog.tsx (modal potwierdzenia - uzywany przy usuwaniu ogloszen; przycisk
+      potwierdzenia ma domyslny tekst "Usun" (confirmLabel), NIE mylic z przyciskiem
+      wyzwalajacym ktory bywa nazwany inaczej np. "Usun ogloszenie")
   - admin/
     - layout.tsx (naglowek z linkami Ogloszenia/Zapytania + Wyloguj)
     - login/ (logowanie admina przez Supabase Auth)
@@ -70,7 +73,8 @@ fidens/
       Karty: znaczek kategorii na zdjeciu, ikonki wymiary/powierzchnia, plakietka ceny,
       hover zoom+uniesienie)
     - domek-caloroczny-35m2-z-antresola/ (REALNE dane: cena 158 000 zl, 6 zdjec)
-    - dom-modulowy-40m2-10x4m/ (PLACEHOLDER cena/opis/wyposazenie, 6 zdjec)
+    - dom-modulowy-40m2-10x4m/ (PLACEHOLDER cena/opis/wyposazenie, 6 zdjec - UWAGA: pliki
+      zdjec sa obecnie uszkodzone/puste, patrz sekcja "Testy regresyjne")
     - pawilon-biurowy-24m2-8x3m/ (PLACEHOLDER cena/opis/wyposazenie, 9 zdjec)
     - pawilon-gastronomiczny-18m2-6x3m/ (PLACEHOLDER cena/opis/wyposazenie, 4 zdjecia)
     - domek-modulowy-42m2-elewacja-palisandrowa/ (PLACEHOLDER cena/opis/wyposazenie, 5 zdjec)
@@ -106,7 +110,14 @@ fidens/
 - public/
   - jasne.png, ciemne.png
   - pawilony/ (5 podfolderow ze zdjeciami statycznymi, NIE Supabase Storage)
-- .env.local, vercel.json, next.config.ts (ma serverExternalPackages: ["sharp"])
+- tests/
+  - helpers.ts (funkcja loginAsAdmin())
+  - navbar.spec.ts, homepage.spec.ts, ogloszenia-list.spec.ts, ogloszenie-detail.spec.ts,
+    kontakt.spec.ts, admin-login.spec.ts, admin-crud.spec.ts, pawilony.spec.ts,
+    static-pages.spec.ts
+  - playwright.config.ts (w katalogu glownym, nie w tests/)
+- .env.local, .env.test (oba POZA GITEM), vercel.json, playwright.config.ts,
+  next.config.ts (ma serverExternalPackages: ["sharp"])
 - PROJEKT.md, AGENTS.md, CLAUDE.md
 
 ## Schemat bazy Supabase
@@ -154,7 +165,7 @@ klient chcial prostote, rzadko zmienia). Kazda realizacja to osobny statyczny ro
 
 **5 realizacji (stan na dzisiaj):**
 1. Domek caloroczny 35m2 z antresola (10x3,5m) - REALNE dane, cena 158 000 zl brutto, 6 zdjec
-2. Dom modulowy 40m2 (10x4m) - PLACEHOLDER, 6 zdjec
+2. Dom modulowy 40m2 (10x4m) - PLACEHOLDER, 6 zdjec (zdjecia obecnie uszkodzone, patrz TODO)
 3. Pawilon biurowy 24m2 (8x3m) - PLACEHOLDER, 9 zdjec
 4. Pawilon gastronomiczny 18m2 (6x3m) - PLACEHOLDER, 4 zdjecia
 5. Domek modulowy 42m2 z elewacja palisandrowa (7x6m) - PLACEHOLDER, 5 zdjec
@@ -166,7 +177,7 @@ zastosowania. Kazdy placeholder oznaczony zoltym tlem (#FFF3B0) i tekstem
 "[DO UZUPELNIENIA...]" - latwo znalezc przez wyszukanie "DO UZUPEŁNIENIA" lub "placeholder"
 w folderze app/pawilony.
 
-**Design kart na li\u015bcie /pawilony (i powielony na /ogloszenia + strona glowna):**
+**Design kart na liscie /pawilony (i powielony na /ogloszenia + strona glowna):**
 - Znaczek kategorii (granatowa plakietka) w lewym gornym rogu zdjecia
 - Ikonki (linijka/kwadrat) przy wymiary/powierzchnia zamiast suchego tekstu
 - Cena jako wyrozniona "plakietka" z tlem (zolte dla placeholder, jasnozolte dla realnej)
@@ -252,13 +263,16 @@ wplata/okres/(wykup jesli hasWykup). Rata "od X zl" na kartach: calculateShowcas
   kafelek "Twoj wlasny projekt", design kart ze znaczkiem/ikonkami/plakietka ceny
 - [x] **Hover efekty na kartach ogloszen** (zoom zdjecia + uniesienie karty) - /pawilony,
   /ogloszenia, strona glowna (Ogloszenie tygodnia + Najnowsze oferty)
+- [x] **Testy regresyjne Playwright - kompletny setup + WSZYSTKIE testy przechodza**
+  (72 testy, 67 aktywnych + 5 skip celowych, 0 failed). Szczegoly w sekcji nizej.
 - [x] Wgrane na Vercel -> fidens.pl
 
 ### Do zrobienia (priorytety)
 
 1. **PRZED PROMOWANIEM /pawilony:** uzupelnic zolte placeholdery (cena/opis/wyposazenie/
    zastosowania) dla 4 nowych realizacji (dom modulowy 40m2, pawilon biurowy 24m2,
-   pawilon gastronomiczny 18m2, domek modulowy 42m2)
+   pawilon gastronomiczny 18m2, domek modulowy 42m2) ORAZ podmienic uszkodzone zdjecia
+   dla dom-modulowy-40m2-10x4m (obecne pliki .jpg zwracaja blad "isn't a valid image")
 
 2. **Dokonczenie zgody marketingowej** - badge w /admin/zapytania, sekcja w Polityce
 
@@ -268,10 +282,15 @@ wplata/okres/(wykup jesli hasWykup). Rata "od X zl" na kartach: calculateShowcas
 
 5. **Regulamin i polityka prywatnosci** - dane spolki z o.o., konsultacja prawnicza
 
-6. **SEO i optymalizacja** - next/image wszedzie, kalibracja kalkulatora, favicon,
-   meta tagi, FAQ/Blog (nieustalone)
+6. **SEO i optymalizacja** - next/image wszedzie (w tym dodanie loading="eager" dla
+   zdjec karuzeli powyzej fold, zeby uciszyc ostrzezenie LCP w konsoli), kalibracja
+   kalkulatora, favicon, meta tagi, FAQ/Blog (nieustalone)
 
 7. **Docelowo: mailing/newsletter** do osob z marketing_consent=true przez Resend
+
+8. **Playwright w konwencji "przed pushem"** - rozwazyc czy npx playwright test ma byc
+   obowiazkowym krokiem przed kazdym push, czy uruchamiane osobno co jakis czas
+   (trwa ok. 1-1.5 min, dluzej niz sam npm run build)
 
 ## Konwencje pracy
 - Komendy w PowerShell z Out-File -Encoding utf8, test na localhost:3000 przed pushem
@@ -284,6 +303,11 @@ wplata/okres/(wykup jesli hasWykup). Rata "od X zl" na kartach: calculateShowcas
   znakach - przejsc na metode po numerach linii, ZAWSZE wypisac fragment przed edycja,
   ZAWSZE zweryfikowac SZERSZY kontekst po edycji (latwo przypadkiem usunac/zostawic
   osierocona linie otwierajaca/zamykajaca np. {tablica.map(() => ( ... )) })
+- **[regex]::Escape() + reczne "odwracanie" escapowania na calym $content jest NIEBEZPIECZNE**
+  (incydent 30.08: probem uzycia -replace '\\(.)','$1' na calym pliku zamiast tylko na nowym
+  fragmencie usunal pojedyncze backslashe WSZEDZIE w dokumencie, w tym w sciezkach
+  C:\Users\pziol\fidens) - przy wiekszych podmianach zawsze pelny rewrite pliku metoda
+  WriteAllText z heredoc, NIGDY regex operujacy na calej tresci pliku
 - **Server Components NIE MOGA miec event handlerow** w JSX - czysty CSS/Tailwind zamiast
 - **position: sticky dziala jako kontekst pozycjonowania** jak position:relative
 - **cursor-pointer NIE jest domyslny na <button>** w tym projekcie - dopisywac explicite
@@ -295,7 +319,8 @@ wplata/okres/(wykup jesli hasWykup). Rata "od X zl" na kartach: calculateShowcas
 ## Znane problemy/uwagi
 - Hydration warning od Bitdefendera (bis_register, bis_skin_checked) - NIE jest bledem kodu
 - PowerShell + polskie znaki: nie dziala we FLAGACH, ale tresc plikow (-Encoding utf8) OK
-- Foldery z nawiasami ([slug], [id]): uzywac -LiteralPath wszedzie
+- Foldery z nawiasami ([slug], [id]): uzywac -LiteralPath wszedzie (zwykly Get-Content
+  interpretuje [id] jako wzorzec wildcard i rzuca blad "parameter cannot be found")
 - Dev serwer/build z bledami cache: taskkill /IM node.exe /F, Remove-Item -Recurse -Force .next,
   npm run dev, twardy refresh (Ctrl+Shift+R)
 - Klasy Tailwinda w nawiasach kwadratowych czasem sypia sie w Next 16.2.4
@@ -303,3 +328,105 @@ wplata/okres/(wykup jesli hasWykup). Rata "od X zl" na kartach: calculateShowcas
 - Stopka duplikowana per-strona (nie komponent) - do rozwazenia: wspolny Footer.tsx
 - Niektore pliki mialy zepsute kodowanie UTF-8 (naprawione) - jesli znowu, nadpisac cala
   zawartosc na nowo, nie punktowe podmiany
+- **Zdjecia dom-modulowy-40m2-10x4m uszkodzone** (blad "isn't a valid image" w konsoli) -
+  do podmiany razem z uzupelnieniem realnych danych tej realizacji
+
+## Testy regresyjne (Playwright) - stan na dzisiaj (30.08)
+
+### WSZYSTKIE TESTY PRZECHODZA
+72 testy razem, 2 projekty (chromium-desktop + mobile-chrome): 67 aktywnych (passed),
+5 skip celowych (testy oznaczone jako desktop-only lub mobile-only poprawnie pomijaja
+sie na drugim projekcie), 0 failed.
+
+### Setup (zrobiony)
+- @playwright/test zainstalowany (npm install -D), przegladarki pobrane (npx playwright install)
+- playwright.config.ts (w katalogu glownym) - testDir ./tests, projekty: chromium-desktop
+  + mobile-chrome (Pixel 5), auto-start npm run dev jesli nie dziala
+  (reuseExistingServer: true)
+- .env.test (POZA GITEM) - ADMIN_EMAIL, ADMIN_PASSWORD, BASE_URL. Wczytywane w
+  playwright.config.ts przez process.loadEnvFile(".env.test")
+- tests/helpers.ts - funkcja loginAsAdmin() do wielokrotnego uzytku
+
+### Pliki testowe (10 plikow, pokrycie calej strony modul po module)
+navbar.spec.ts, homepage.spec.ts, ogloszenia-list.spec.ts, ogloszenie-detail.spec.ts,
+kontakt.spec.ts, admin-login.spec.ts, admin-crud.spec.ts, pawilony.spec.ts, static-pages.spec.ts
+
+### Uruchamianie
+npx playwright test  (jedna komenda, odpala wszystko na desktop + mobile, generuje raport
+HTML na localhost:9323, trwa ok. 1-1.5 min)
+
+### WAZNE decyzje dot. danych testowych (ustalone z klientem)
+- Test admin-crud.spec.ts tworzy testowe ogloszenie ("PLAYWRIGHT TEST ...") i SAM je kasuje
+  w tym samym tescie
+- Test kontakt.spec.ts faktycznie WYSYLA formularz -> PRAWDZIWY MAIL przez Resend za kazdym
+  uruchomieniem (klient zaakceptowal to swiadomie) + loguje sie do admina i kasuje testowe
+  zapytanie z /admin/zapytania po tescie (samo wyslanie maila nie da sie cofnac, ale wpis
+  w bazie contact_requests jest sprzatany)
+
+### Pierwsze uruchomienie (29.08) - wynik: 45 passed / 27 failed
+Wiekszosc porazek (24 z 27) to bledy W SAMYCH TESTACH, nie na stronie - selektory
+lapiace 2 elementy naraz, brak rozdzielenia desktop/mobile, wyszukiwarka na mobile
+ukryta pod lupa. Szczegoly napraw ponizej.
+
+### ZNALEZIONY REALNY BUG (nie blad testu!) - NAPRAWIONY (29.08)
+Wyszukiwarka w Navbarze byla wycentrowana przez position:absolute (left-1/2 -translate-x-1/2),
+co IGNOROWALO ile miejsca zajmuje menu obok. Po dodaniu "Pawilony" do menu, przy typowej
+szerokosci ekranu laptopa (~1280px) wyszukiwarka FIZYCZNIE NACHODZILA na linki "Ogloszenia"
+i "Pawilony" - realny problem UX, ktory playwright wylapal jako "element intercepts pointer
+events" przy probie kliknieca. NAPRAWIONE: zamieniono absolute positioning na flex layout
+(search w div z flex-1 + wrapper max-w-md).
+
+### Sesja naprawcza selektorow (30.08) - wynik koncowy: 0 failed
+**navbar.spec.ts:**
+- Scope do page.locator("nav").first() we wszystkich testach desktopowych - omija
+  duplikat linku "Poznaj Fidens" w stopce strony glownej
+- test.skip(testInfo.project.name !== "chromium-desktop"/"mobile-chrome", ...) na
+  testach oznaczonych jako desktop-/mobile-only
+- Test menu mobilnego scope'owany przez getByRole("dialog", { name: "Menu" }) - drawer
+  ma jawnie role="dialog" + aria-label="Menu", jednoznacznie odroznia linki w drawerze
+  od reszty strony
+
+**ogloszenie-detail.spec.ts i pawilony.spec.ts:**
+- Breadcrumb "Ogloszenia"/"Pawilony" na stronach szczegolowych duplikowal identyczny
+  link w Navbarze -> scope przez page.locator("div.text-sm", { hasText: "Strona glowna" })
+- pawilony.spec.ts: getByText("24")/("72") bez exact:true ryzykownie dopasowywal
+  podciagi wiekszych liczb (np. "2400") -> dodano { exact: true }
+
+**ogloszenia-list.spec.ts:**
+- Pole wyszukiwania na mobile nie istnieje w DOM dopoki nie klikniesz ikony lupy
+  (aria-label="Wyszukiwarka") -> dodano warunkowy klik dla testInfo.project.name
+  === "mobile-chrome"
+- Po otwarciu w DOM sa DWA inputy z tym samym placeholderem (desktopowy ukryty przez
+  hidden lg:flex, ale nadal obecny w drzewie) -> selektor zawezony przez
+  input[placeholder="..."]:visible
+
+**admin-login.spec.ts + admin-crud.spec.ts + kontakt.spec.ts (12 falszywych bledow
+na raz) - REALNY BUG W DANYCH TESTOWYCH, nie w kodzie:**
+.env.test mial bledny ADMIN_EMAIL (literowka "twoj-" sklejona z prawdziwym adresem
+z szablonu przy tworzeniu pliku, np. "twoj-imie.nazwisko@gmail.com" zamiast czystego
+adresu) - Supabase Auth odrzucal login, strona logowania pokazywala "Nieprawidlowy
+email lub haslo", loginAsAdmin() w helpers.ts wpadal w timeout na waitForURL.
+Dotyczylo to WSZYSTKICH testow zaleznych od loginAsAdmin (bo kontakt.spec.ts tez
+loguje sie do admina, zeby posprzatac testowe zapytanie). Naprawione recznym
+poprawieniem maila w VS Code, zweryfikowano brak BOM po zapisie (odczyt pierwszych
+3 bajtow pliku).
+
+**admin-crud.spec.ts - dodatkowe poprawki po naprawie logowania:**
+- Test nie wypelnial wymaganego pola "Cena (PLN) *" (atrybut required w formularzu) ->
+  natywna walidacja HTML5 blokowala wyslanie formularza, submit nigdy sie nie odpalal ->
+  dodano fillByLabel("Cena", "150000")
+- Klik w tytul ogloszenia na liscie nie dzialal (tytul to zwykly tekst w <td>, nie link;
+  link do edycji to osobna kolumna "Edytuj") -> zamieniono na klik w
+  row.getByRole("link", { name: "Edytuj" }) gdzie row = page.locator("tr", { hasText })
+- Przycisk potwierdzenia usuniecia w ConfirmDialog.tsx ma tekst dokladnie "Usun"
+  (confirmLabel domyslny), NIE "Usun ogloszenie" jak przycisk wyzwalajacy. ConfirmDialog
+  renderuje sie w JSX PRZED przyciskiem wyzwalajacym, wiec w DOM .last() z regexem
+  /usun|potwierdz|tak/i lapal z powrotem przycisk pod nakladka (overlay intercepts
+  pointer events) -> zamieniono na getByRole("button", { name: "Usun", exact: true })
+
+### Do zrobienia (kolejna sesja)
+- Uzupelnic realne zdjecia dla dom-modulowy-40m2-10x4m (obecne pliki .jpg sa
+  uszkodzone/puste - blad "isn't a valid image" w konsoli podczas testow, i tak
+  trzeba to zrobic przed promowaniem /pawilony)
+- Rozwazyc dodanie npx playwright test jako krok w konwencji "przed pushem"
+  (albo uruchamiac osobno, co jakis czas - nie kazdorazowo, bo trwa ok. 1-1.5 min)

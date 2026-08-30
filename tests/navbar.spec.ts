@@ -1,30 +1,35 @@
-﻿import { test, expect } from "@playwright/test";
+import { test, expect } from "@playwright/test";
 
 test.describe("Navbar", () => {
-  test("desktop - widoczne wszystkie linki i CTA", async ({ page }) => {
+  test("desktop - widoczne wszystkie linki i CTA", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium-desktop", "tylko desktop");
     await page.goto("/");
-    await expect(page.getByRole("link", { name: "Ogłoszenia", exact: true })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Pawilony", exact: true })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Poznaj Fidens", exact: true })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Kontakt", exact: true }).first()).toBeVisible();
-    await expect(page.getByRole("link", { name: "Zamów bezpłatną kalkulację" })).toBeVisible();
+    const nav = page.locator("nav").first();
+    await expect(nav.getByRole("link", { name: "Ogłoszenia", exact: true })).toBeVisible();
+    await expect(nav.getByRole("link", { name: "Pawilony", exact: true })).toBeVisible();
+    await expect(nav.getByRole("link", { name: "Poznaj Fidens", exact: true })).toBeVisible();
+    await expect(nav.getByRole("link", { name: "Kontakt", exact: true })).toBeVisible();
+    await expect(nav.getByRole("link", { name: "Zamów bezpłatną kalkulację" })).toBeVisible();
   });
 
-  test("desktop - kliknięcie w Ogłoszenia przenosi do /ogloszenia", async ({ page }) => {
+  test("desktop - kliknięcie w Ogłoszenia przenosi do /ogloszenia", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium-desktop", "tylko desktop");
     await page.goto("/");
-    await page.getByRole("link", { name: "Ogłoszenia", exact: true }).click();
+    await page.locator("nav").first().getByRole("link", { name: "Ogłoszenia", exact: true }).click();
     await expect(page).toHaveURL(/\/ogloszenia/);
   });
 
-  test("desktop - kliknięcie w Pawilony przenosi do /pawilony", async ({ page }) => {
+  test("desktop - kliknięcie w Pawilony przenosi do /pawilony", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium-desktop", "tylko desktop");
     await page.goto("/");
-    await page.getByRole("link", { name: "Pawilony", exact: true }).click();
+    await page.locator("nav").first().getByRole("link", { name: "Pawilony", exact: true }).click();
     await expect(page).toHaveURL(/\/pawilony/);
   });
 
-  test("desktop - logo przenosi na stronę główną", async ({ page }) => {
+  test("desktop - logo przenosi na stronę główną", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium-desktop", "tylko desktop");
     await page.goto("/ogloszenia");
-    await page.getByRole("link").filter({ has: page.locator("img[alt*='FIDENS' i], img[alt*='Fidens' i]") }).first().click();
+    await page.locator("nav").first().getByRole("link").filter({ has: page.locator("img[alt*='Fidens' i]") }).first().click();
     await expect(page).toHaveURL("/");
   });
 
@@ -36,13 +41,15 @@ test.describe("Navbar", () => {
     await expect(navbar).toBeInViewport();
   });
 
-  test("mobile - menu hamburger pokazuje wszystkie linki", async ({ page }) => {
+  test("mobile - menu hamburger pokazuje wszystkie linki", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "mobile-chrome", "tylko mobile");
     await page.goto("/");
-    await page.getByRole("button", { name: /menu/i }).click();
-    await expect(page.getByRole("link", { name: "Strona główna", exact: true })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Ogłoszenia", exact: true })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Pawilony", exact: true })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Poznaj Fidens", exact: true })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Kontakt", exact: true })).toBeVisible();
+    await page.getByRole("button", { name: "Menu", exact: true }).click();
+    const menu = page.getByRole("dialog", { name: "Menu" });
+    await expect(menu.getByRole("link", { name: "Strona główna", exact: true })).toBeVisible();
+    await expect(menu.getByRole("link", { name: "Ogłoszenia", exact: true })).toBeVisible();
+    await expect(menu.getByRole("link", { name: "Pawilony", exact: true })).toBeVisible();
+    await expect(menu.getByRole("link", { name: "Poznaj Fidens", exact: true })).toBeVisible();
+    await expect(menu.getByRole("link", { name: "Kontakt", exact: true })).toBeVisible();
   });
 });

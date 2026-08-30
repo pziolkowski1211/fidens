@@ -1,4 +1,4 @@
-﻿import { test, expect } from "@playwright/test";
+import { test, expect } from "@playwright/test";
 
 test.describe("/pawilony - lista", () => {
   test("strona się ładuje z nagłówkiem i 5 realizacjami + kafelek własnego projektu", async ({ page }) => {
@@ -28,8 +28,9 @@ test.describe("/pawilony - lista", () => {
 test.describe("/pawilony/[slug] - strona szczegółowa + PawilonCalculator", () => {
   test("realizacja z realną ceną - okruszki, karuzela, dane obiektu, wyposażenie", async ({ page }) => {
     await page.goto("/pawilony/domek-caloroczny-35m2-z-antresola");
-    await expect(page.getByText("Strona główna")).toBeVisible();
-    await expect(page.getByText("Pawilony", { exact: true })).toBeVisible();
+    const breadcrumb = page.locator("div.text-sm", { hasText: "Strona główna" });
+    await expect(breadcrumb.getByText("Strona główna")).toBeVisible();
+    await expect(breadcrumb.getByRole("link", { name: "Pawilony", exact: true })).toBeVisible();
     await expect(page.locator("h1")).toContainText("Domek całoroczny");
     await expect(page.getByRole("heading", { name: "Dane obiektu" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Wyposażenie" })).toBeVisible();
@@ -45,8 +46,8 @@ test.describe("/pawilony/[slug] - strona szczegółowa + PawilonCalculator", () 
   test("kalkulator: Pożyczka pokazuje suwak okresu 24-72 msc", async ({ page }) => {
     await page.goto("/pawilony/domek-caloroczny-35m2-z-antresola");
     await page.getByRole("button", { name: "Pożyczka" }).click();
-    await expect(page.getByText("24")).toBeVisible();
-    await expect(page.getByText("72")).toBeVisible();
+    await expect(page.getByText("24", { exact: true })).toBeVisible();
+    await expect(page.getByText("72", { exact: true })).toBeVisible();
   });
 
   test("przycisk CTA mówi Zapytaj o ten obiekt (nie pojazd)", async ({ page }) => {

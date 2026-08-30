@@ -1,4 +1,4 @@
-﻿import { test, expect } from "@playwright/test";
+import { test, expect } from "@playwright/test";
 
 test.describe("/ogloszenia - lista", () => {
   test("strona się ładuje i pokazuje nagłówek", async ({ page }) => {
@@ -8,7 +8,7 @@ test.describe("/ogloszenia - lista", () => {
 
   test("pokazuje karty ogłoszeń albo komunikat braku ofert", async ({ page }) => {
     await page.goto("/ogloszenia");
-    const cards = page.locator('a[href^="/ogloszenia/"]');
+    const cards = page.locator(`a[href^="/ogloszenia/"]`);
     const brakOfert = page.getByText(/Brak ofert/i);
     const cardsCount = await cards.count();
     if (cardsCount === 0) {
@@ -23,9 +23,12 @@ test.describe("/ogloszenia - lista", () => {
     await expect(page).toHaveURL(/marka=bmw/);
   });
 
-  test("wyszukiwarka pokazuje sugestie po wpisaniu tekstu", async ({ page }) => {
+  test("wyszukiwarka pokazuje sugestie po wpisaniu tekstu", async ({ page }, testInfo) => {
     await page.goto("/ogloszenia");
-    const search = page.getByPlaceholder(/Szukaj marki lub modelu/i);
+    if (testInfo.project.name === "mobile-chrome") {
+      await page.getByRole("button", { name: "Wyszukiwarka" }).click();
+    }
+    const search = page.locator(`input[placeholder="Szukaj marki lub modelu..."]:visible`);
     await search.fill("bmw");
     await page.waitForTimeout(500);
   });
@@ -36,7 +39,7 @@ test.describe("/ogloszenia - lista", () => {
       if (msg.type() === "error") errors.push(msg.text());
     });
     await page.goto("/ogloszenia");
-    const firstCard = page.locator('a[href^="/ogloszenia/"]').first();
+    const firstCard = page.locator(`a[href^="/ogloszenia/"]`).first();
     if (await firstCard.count() > 0) {
       await firstCard.hover();
       await page.waitForTimeout(300);

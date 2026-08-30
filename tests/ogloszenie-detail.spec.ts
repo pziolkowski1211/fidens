@@ -1,9 +1,9 @@
-﻿import { test, expect } from "@playwright/test";
+import { test, expect } from "@playwright/test";
 
 test.describe("/ogloszenia/[slug] - strona szczegółowa + kalkulator", () => {
   async function goToFirstListing(page: import("@playwright/test").Page) {
     await page.goto("/ogloszenia");
-    const firstCard = page.locator('a[href^="/ogloszenia/"]').first();
+    const firstCard = page.locator(`a[href^="/ogloszenia/"]`).first();
     const count = await firstCard.count();
     if (count === 0) return null;
     const href = await firstCard.getAttribute("href");
@@ -14,8 +14,9 @@ test.describe("/ogloszenia/[slug] - strona szczegółowa + kalkulator", () => {
   test("okruszki, tytuł i karuzela są widoczne", async ({ page }) => {
     const href = await goToFirstListing(page);
     test.skip(!href, "Brak ogłoszeń do przetestowania");
-    await expect(page.getByText("Strona główna")).toBeVisible();
-    await expect(page.getByText("Ogłoszenia", { exact: true })).toBeVisible();
+    const breadcrumb = page.locator("div.text-sm", { hasText: "Strona główna" });
+    await expect(breadcrumb.getByText("Strona główna")).toBeVisible();
+    await expect(breadcrumb.getByRole("link", { name: "Ogłoszenia", exact: true })).toBeVisible();
     await expect(page.locator("h1")).toBeVisible();
   });
 
