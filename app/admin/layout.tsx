@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -26,7 +26,7 @@ export default function AdminLayout({
   }
 
   const links = [
-    { href: "/admin/ogloszenia", label: "Ogloszenia" },
+    { href: "/admin/ogloszenia", label: "Ogłoszenia" },
     { href: "/admin/zapytania", label: "Zapytania" },
   ];
 

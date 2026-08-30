@@ -50,7 +50,8 @@ fidens/
       potwierdzenia ma domyslny tekst "Usun" (confirmLabel), NIE mylic z przyciskiem
       wyzwalajacym ktory bywa nazwany inaczej np. "Usun ogloszenie")
   - admin/
-    - layout.tsx (naglowek z linkami Ogloszenia/Zapytania + Wyloguj)
+    - layout.tsx (naglowek z linkami Ogloszenia/Zapytania + Wyloguj - POPRAWIONA 30.08:
+      brakowalo polskiego znaku "l z kreska" w slowie "Ogloszenia" w tablicy links[])
     - login/ (logowanie admina przez Supabase Auth)
     - ogloszenia/ (lista + CRUD)
       - otomoto-actions.ts (TYLKO importOtomotoListing - dane tekstowe, LEKKI, bez sharp)
@@ -238,6 +239,23 @@ cepikWidget jako fallback (czesto niedostepny).
   page.tsx sa "use client" i nie moga eksportowac route segment config)
 - WNIOSEK: ciezkie/natywne zaleznosci (sharp) NIE powinny byc w tym samym module co lekkie
   funkcje wywolywane w innych kontekstach - nawet nieuzywany import wplywa na caly modul
+
+### Blad sharp w Server Action importu ZDJEC (30.08) - NAPRAWIONY
+Po naprawie z 29.08 (rozdzielenie plikow) import DANYCH tekstowych dzialal, ale import
+ZDJEC (otomoto-photos-actions.ts, ktory bezposrednio importuje "sharp") nigdy nie zostal
+przetestowany na produkcji i failowal identycznym bledem ERR_DLOPEN_FAILED:
+libvips-cpp.so - mimo serverExternalPackages: ["sharp"] w next.config.ts.
+Redeploy bez cache NIE pomogl - to nie byl problem cache'u.
+
+PRZYCZYNA: znany, potwierdzony bug w sharp 0.35.x uzywanym w Server Actions pod
+Turbopackiem (domyslny bundler w Next.js 16, rowniez dla next build, nie tylko dev) na
+Vercelu. Zgloszenie: github.com/lovell/sharp/issues/4567. Build przechodzi bez bledu,
+funkcja failuje dopiero PRZY WYKONANIU.
+
+NAPRAWA: downgrade sharp z ^0.35.4 do 0.34.5 (dokladnie ta wersja, ktorej i tak juz
+uzywa wewnetrznie sam Next.js dla next/image - widac to w package-lock.json).
+npm install sharp@0.34.5 --save-exact
+Zero zmian w kodzie, dziala od razu po downgrade + rebuild.
 
 ## Kalkulator leasingu (pojazdy) - wzor
 Klasyczna annuita z balonem: kapital = cena - wplata; PV = kapital - wykup/(1+r)^n;
