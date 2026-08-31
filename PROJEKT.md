@@ -91,8 +91,9 @@ fidens/
   - kontakt/
     - page.tsx (Suspense wrapper)
     - KontaktForm.tsx (Navbar + formularz + stopka, checkbox marketing_consent widoczny
-      zolty box, NIE pre-checked)
-    - actions.ts (Server Action submitContactForm - zapisuje do Supabase + Resend)
+      zolty box, NIE pre-checked, ukryte pole honeypot "website" - patrz nizej)
+    - actions.ts (Server Action submitContactForm - zapisuje do Supabase + Resend,
+      sprawdza honeypot jako pierwszy krok)
   - favicon.ico
   - globals.css (cursor:pointer na suwakach input[type=range])
   - layout.tsx
@@ -145,6 +146,13 @@ w public/pawilony/, NIE w tym bucketcie.
 ### RLS policies
 Public: SELECT na active listings + images, INSERT na contact_requests.
 Authenticated (admin): pelny dostep.
+
+ZWERYFIKOWANE 31.08 (audyt bezpieczenstwa): rowsecurity=true na wszystkich 3 tabelach.
+Test w oknie incognito na /rest/v1/contact_requests?select=*&apikey=ANON_KEY zwraca
+pusta tablice [] - anon NIE ma dostepu do danych klientow. Polityki "Admin full access"
+maja warunek auth.role() = authenticated (mimo ze w kolumnie roles widnieje {public},
+faktyczny dostep jest ograniczony przez warunek USING). Wszystko poprawnie skonfigurowane,
+brak wycieku danych.
 
 ## Decyzje produktowe (zatwierdzone z klientem)
 
@@ -201,6 +209,39 @@ TODO: badge w /admin/zapytania, sekcja w Polityce Prywatnosci.
 
 ### Podmiot prawny
 Regulamin/Polityka na spolke z o.o. (jeszcze niezalozona), nie na obecna JDG.
+
+### Audyt bezpieczenstwa (31.08) - co zrobione, co odlozone
+Otrzymany raport audytu kodu (53 pliki) wskazal szereg problemow. Piotr zdecydowal
+ktore naprawiac teraz, a ktore przy przejsciu na "live z reklama":
+
+ODLOZONE na pozniej (swiadoma decyzja Piotra, 31.08):
+- Fikcyjne opinie klientow na stronie glownej (app/page.tsx) - do usuniecia/zastapienia
+  prawdziwymi
+- Dane administratora/spolki w regulaminie i polityce prywatnosci - placeholdery
+  zostana przed przejsciem live
+- Zdjecia 4 z 5 pawilonow (brakujace pliki) - zostana dodane pozniej
+- Konflikt sharp: audyt zaleca sharp@^0.35.4 (4 podatnosci HIGH w <0.35.0), ale
+  30.08 SWIADOMIE zeszlismy na 0.34.5 z powodu bledu Turbopack/Vercel (patrz sekcja
+  "Import z OtoMoto"). DO ZBADANIA pozniej: czy nowsza wersja 0.35.x lub 0.36+
+  naprawila oba problemy naraz (sprawdzic changelog sharp przed nastepna probq)
+- Pelna walidacja serwerowa formularza (dlugosci pol, format email/NIP), rate-limit
+  po IP, double opt-in dla Resend (obecnie resend.contacts.create dziala od razu
+  przy zaznaczeniu checkboxa - ryzyko ze ktos wpisze cudzy email)
+- SSRF w walidacji URL OtoMoto (url.includes("otomoto.pl") zamiast parsowania URL)
+- Reszta listy z audytu: patrz RAPORT-AUDYT-FIDENS.md (przeslany 31.08) sekcja 7
+
+ZROBIONE teraz (31.08):
+- Weryfikacja RLS w Supabase - rowsecurity=true na wszystkich tabelach, test w
+  incognito potwierdza brak publicznego dostepu do danych klientow (szczegoly w
+  sekcji "RLS policies" wyzej)
+- Honeypot w formularzu kontaktowym - ukryte pole "website" (poza ekranem, aria-hidden,
+  tabIndex=-1), jesli wypelnione (bot) - submitContactForm cicho zwraca sukces bez
+  zapisu do bazy/Resend/maila. Pierwsza linia obrony przed prostymi botami spamowymi
+
+ZNALEZIONY PRZY OKAZJI (nie z audytu) - ODLOZONY: podwojne kliknieicie "Wyslij
+zapytanie" przed pojawieniem sie stanu "sending" moze wyslac formularz dwa razy
+(brak natychmiastowej blokady przycisku). Do naprawy pozniej - disabled powinien
+ustawic sie synchronicznie w onClick, nie czekac na re-render po async submit
 
 ### Zgoda marketingowa - integracja z Resend (30.08, ZROBIONE)
 Kontakty z marketing_consent=true sa TERAZ automatycznie dodawane do dedykowanego

@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 import { useState } from "react"
 import { useSearchParams } from "next/navigation"
 import Navbar from "../components/Navbar"
@@ -90,6 +90,10 @@ export default function KontaktForm() {
           )}
 
           <form action={handleSubmit} className="space-y-4">
+            <div style={{ position: "absolute", left: "-9999px", width: "1px", height: "1px", overflow: "hidden" }} aria-hidden="true">
+              <label htmlFor="website">Strona WWW</label>
+              <input type="text" id="website" name="website" tabIndex={-1} autoComplete="off" />
+            </div>
             <input type="hidden" name="slug" value={slug} />
             <input type="hidden" name="wstepna" value={wstepna} />
             <input type="hidden" name="msc" value={msc} />
