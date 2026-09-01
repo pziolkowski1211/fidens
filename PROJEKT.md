@@ -23,6 +23,10 @@ Plik .env.local (NIE w gitu) zawiera:
 - NEXT_PUBLIC_SUPABASE_URL - https://mglgfsaimktblkzjkmfg.supabase.co
 - NEXT_PUBLIC_SUPABASE_ANON_KEY - sb_publishable_LgsGRj9uVhBigrIXMPY5Rw_89VdFLlN
 - RESEND_API_KEY - uzywany w app/kontakt/actions.ts
+- SUPABASE_SERVICE_ROLE_KEY - klucz z pelnym dostepem pomijajacym RLS, uzywany
+  WYLACZNIE server-side (lib/supabase/service.ts -> createServiceClient()).
+  Odkryty 01.09, dodany na Vercel 26.08 (prawdopodobnie do cron joba OtoMoto),
+  wczesniej NIEUDOKUMENTOWANY - NIGDY nie importowac w komponentach klienckich.
 
 Te same klucze sa dodane na Vercel (Environment Variables -> Production/Preview/Development).
 
@@ -102,7 +106,12 @@ fidens/
 - lib/
   - supabase/
     - client.ts, server.ts
+    - service.ts (createServiceClient() - klient z SUPABASE_SERVICE_ROLE_KEY, pomija RLS,
+      TYLKO server-side, np. cron OtoMoto)
     - types.ts (typy TS dla bazy - AKTUALIZOWAC przy KAZDEJ zmianie schematu w Supabase!)
+  - kontakt/
+    - validate.ts (walidacja serwerowa formularza kontaktowego - imie, telefon PL,
+      email, suma kontrolna NIP, dlugosc wiadomosci; zwraca ktore pole zawiodlo)
   - leasing/
     - calculator.ts (wspolny wzor raty - LeasingCalculator, PawilonCalculator, karty ogloszen)
   - otomoto/
@@ -137,7 +146,8 @@ id, listing_id (FK), storage_path, url, position, is_cover
 
 ### contact_requests
 id, listing_id (FK, nullable), name, phone, email, leasing_initial_pct, leasing_months,
-leasing_residual_pct, marketing_consent (boolean, DODANE), is_read, notes
+leasing_residual_pct, marketing_consent (boolean, DODANE), is_read, notes,
+ip_address (text, DODANE 01.09 - rate-limit po IP, max 3 zgloszenia / 10 min)
 
 ### Storage bucket
 listing-images - publiczny odczyt, upload tylko admin. UWAGA: zdjecia PAWILONOW sa statyczne
@@ -220,15 +230,54 @@ ODLOZONE na pozniej (swiadoma decyzja Piotra, 31.08):
 - Dane administratora/spolki w regulaminie i polityce prywatnosci - placeholdery
   zostana przed przejsciem live
 - Zdjecia 4 z 5 pawilonow (brakujace pliki) - zostana dodane pozniej
-- Konflikt sharp: audyt zaleca sharp@^0.35.4 (4 podatnosci HIGH w <0.35.0), ale
-  30.08 SWIADOMIE zeszlismy na 0.34.5 z powodu bledu Turbopack/Vercel (patrz sekcja
-  "Import z OtoMoto"). DO ZBADANIA pozniej: czy nowsza wersja 0.35.x lub 0.36+
-  naprawila oba problemy naraz (sprawdzic changelog sharp przed nastepna probq)
-- Pelna walidacja serwerowa formularza (dlugosci pol, format email/NIP), rate-limit
-  po IP, double opt-in dla Resend (obecnie resend.contacts.create dziala od razu
-  przy zaznaczeniu checkboxa - ryzyko ze ktos wpisze cudzy email)
 - SSRF w walidacji URL OtoMoto (url.includes("otomoto.pl") zamiast parsowania URL)
 - Reszta listy z audytu: patrz RAPORT-AUDYT-FIDENS.md (przeslany 31.08) sekcja 7
+
+ZROBIONE 01.09 (sesja naprawcza po audycie):
+- Sharp: potwierdzono ze blad ERR_DLOPEN_FAILED w sharp 0.35.x na Vercel/Turbopack
+  NADAL jest otwarty i niezalatany (github.com/lovell/sharp/issues/4567, brak
+  odpowiedzi maintainera). Podatnosci HIGH (GHSA-f88m-g3jw-g9cj) nie maja patcha
+  na galezi 0.34.x - jedyny oficjalny fix to upgrade do 0.35.0+. ROZWIAZANIE:
+  zostajemy na sharp@0.34.5 (dziala stabilnie), dodano sharp.block({ operation:
+  ["VipsForeignLoadNsgif", "VipsForeignLoadTiff", "VipsForeignLoadVips"] }) w
+  otomoto-photos-actions.ts - blokuje dekodery formatow (GIF/TIFF/VIPS) ktorych
+  i tak nie uzywamy (obrabiamy tylko JPEG z OtoMoto), co eliminuje wektor ataku
+  bez zmiany wersji i bez ryzyka zlamania importu zdjec. NIE probowac ponownie
+  upgrade'u sharp bez sprawdzenia najpierw statusu issue #4567.
+- Walidacja serwerowa formularza kontaktowego: nowy plik lib/kontakt/validate.ts
+  (walidacja imienia, telefonu PL, email, sumy kontrolnej NIP, dlugosci wiadomosci
+  max 2000 znakow). Zwraca tez ktore pole zawiodlo (field), formularz podswietla
+  je na czerwono.
+- Rate-limit po IP: nowa kolumna contact_requests.ip_address (+ indeks
+  ip_address+created_at), max 3 zgloszenia / 10 minut z jednego IP. IP odczytywane
+  z naglowka x-forwarded-for (dziala na Vercel).
+- Double opt-in dla Resend: ZAIMPLEMENTOWANY, a nastepnie SWIADOMIE WYCOFANY tego
+  samego dnia (decyzja biznesowa Piotra) - token+mail potwierdzajacy tworzyl zbyt
+  duze tarcie (klient musial klikac zgode dwa razy - raz checkbox, raz link w mailu).
+  ZAMIAST TEGO: zostaje pojedyncza zgoda (checkbox -> od razu resend.contacts.create),
+  a wypisanie sie z listy obslugiwane przez wbudowany w Resend Broadcasts link
+  "unsubscribed" (automatycznie ustawia unsubscribed=true po kliknieciu przez
+  odbiorce, nie wymaga wlasnego kodu). NIE wracac do pomyslu double opt-in bez
+  ponownej rozmowy z Piotrem - to swiadoma, przemyslana decyzja, nie zapomniany TODO.
+- Odkryto NIEUDOKUMENTOWANY plik lib/supabase/service.ts (createServiceClient(),
+  klient z pelnym dostepem pomijajacym RLS) i zmienna SUPABASE_SERVICE_ROLE_KEY w
+  Vercel (dodane 26.08, prawdopodobnie do cron joba OtoMoto) - NIE bylo o tym
+  wzmianki w PROJEKT.md. Doszly do glosu przy probie double opt-in. Klucz sluzy
+  wylacznie do kodu server-side bez sesji uzytkownika, NIGDY nie importowac w
+  komponentach klienckich.
+- UX formularza kontaktowego: 3 poprawki naraz -
+  1) Pola formularza NIE czysciy sie juz po bledzie walidacji (przejscie z
+     niekontrolowanych inputow na useState per pole)
+  2) Pole z bledem podswietla sie na czerwono (borderStyle() w KontaktForm.tsx
+     na podstawie field zwroconego z walidacji)
+  3) NAPRAWIONY subtelny bug Reacta 19: <form action={...}> automatycznie
+     resetuje formularz na poziomie przegladarki po kazdym submicie (nawet przy
+     bledzie), co czasem "gubilo" stan checkboxa mimo ze byl kontrolowany -
+     React nie odswiezal go z powrotem bo prop "checked" nie zmienil sie miedzy
+     renderami mimo ze DOM zostal zresetowany pod spodem. Naprawa: zamieniono
+     <form action={handleSubmit}> na <form onSubmit={onFormSubmit}> z recznym
+     budowaniem FormData (new FormData(e.currentTarget)) - to omija automatyczny
+     reset Reacta calkowicie.
 
 ZROBIONE teraz (31.08):
 - Weryfikacja RLS w Supabase - rowsecurity=true na wszystkich tabelach, test w
@@ -360,7 +409,9 @@ wplata/okres/(wykup jesli hasWykup). Rata "od X zl" na kartach: calculateShowcas
    pawilon gastronomiczny 18m2, domek modulowy 42m2) ORAZ podmienic uszkodzone zdjecia
    dla dom-modulowy-40m2-10x4m (obecne pliki .jpg zwracaja blad "isn't a valid image")
 
-2. **Dokonczenie zgody marketingowej** - badge w /admin/zapytania, sekcja w Polityce
+2. **Dokonczenie zgody marketingowej** - badge w /admin/zapytania JUZ ZROBIONY (30.08),
+   zostaje TYLKO sekcja w Polityce Prywatnosci. Zgoda jest POJEDYNCZA (nie double
+   opt-in - swiadoma decyzja 01.09, patrz sekcja "Audyt bezpieczenstwa")
 
 3. **Rozszerzenie kategorii pojazdow** - dostawcze, naczepy w vehicle_type
 
