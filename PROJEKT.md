@@ -238,10 +238,11 @@ ZROBIONE teraz (31.08):
   tabIndex=-1), jesli wypelnione (bot) - submitContactForm cicho zwraca sukces bez
   zapisu do bazy/Resend/maila. Pierwsza linia obrony przed prostymi botami spamowymi
 
-ZNALEZIONY PRZY OKAZJI (nie z audytu) - ODLOZONY: podwojne kliknieicie "Wyslij
-zapytanie" przed pojawieniem sie stanu "sending" moze wyslac formularz dwa razy
-(brak natychmiastowej blokady przycisku). Do naprawy pozniej - disabled powinien
-ustawic sie synchronicznie w onClick, nie czekac na re-render po async submit
+NAPRAWIONY (01.09): podwojne kilkniecie "Wyslij zapytanie" moglo wyslac formularz
+dwa razy (brak natychmiastowej blokady przycisku). Naprawa: isSubmittingRef (useRef)
+w KontaktForm.tsx - synchroniczna blokada w handleSubmit ustawiana natychmiast,
+niezaleznie od re-renderu (setStatus jest asynchroniczny, wiec disabled na przycisku
+samo w sobie nie wystarczalo). Wdrozone i wypchniete na produkcje.
 
 ### Zgoda marketingowa - integracja z Resend (30.08, ZROBIONE)
 Kontakty z marketing_consent=true sa TERAZ automatycznie dodawane do dedykowanego
