@@ -404,10 +404,18 @@ wplata/okres/(wykup jesli hasWykup). Rata "od X zl" na kartach: calculateShowcas
 
 ### Do zrobienia (priorytety)
 
-1. **PRZED PROMOWANIEM /pawilony:** uzupelnic zolte placeholdery (cena/opis/wyposazenie/
-   zastosowania) dla 4 nowych realizacji (dom modulowy 40m2, pawilon biurowy 24m2,
-   pawilon gastronomiczny 18m2, domek modulowy 42m2) ORAZ podmienic uszkodzone zdjecia
-   dla dom-modulowy-40m2-10x4m (obecne pliki .jpg zwracaja blad "isn't a valid image")
+1. **PRZED PROMOWANIEM /pawilony:** uzupelnic placeholdery dla pozostalych 3 realizacji
+   (dom modulowy 40m2, pawilon gastronomiczny 18m2, domek modulowy 42m2) ORAZ podmienic
+   uszkodzone zdjecia dla dom-modulowy-40m2-10x4m.
+   ZROBIONE 01.09: "Pawilon biurowy 24m2" PRZEMIANOWANY na "Pawilon modulowy 24m2"
+   (URL/slug bez zmian: /pawilony/pawilon-biurowy-24m2-8x3m). Cena realna 83 000 zl
+   brutto (byla 108 000 placeholder). Wyposazenie i "Sprawdza sie jako" jako krotkie
+   listy wypunktowane (nie dlugie opisy) + adnotacja "pelna specyfikacja dostepna po
+   kontakcie". 7 realnych zdjec dodanych do public/pawilony/pawilon-biurowy-24m2-8x3m/
+   (byly .jpeg, zmienione na .jpg zeby pasowaly do kodu). WAZNE: folder byl CALKOWICIE
+   PUSTY przed ta sesja (nie tylko "uszkodzony" jak sadzilismy wczesniej) - warto
+   sprawdzic foldery pozostalych 3 realizacji tym samym sposobem (Test-Path +
+   (Get-ChildItem ... -Force).Count) zanim zalozymy ze tylko brakuje im tresci tekstowej.
 
 2. **Dokonczenie zgody marketingowej** - badge w /admin/zapytania JUZ ZROBIONY (30.08),
    zostaje TYLKO sekcja w Polityce Prywatnosci. Zgoda jest POJEDYNCZA (nie double
