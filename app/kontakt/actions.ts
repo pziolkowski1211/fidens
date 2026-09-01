@@ -3,13 +3,11 @@ import { createClient } from "@/lib/supabase/server"
 import { Resend } from "resend"
 import { validateContactForm } from "@/lib/kontakt/validate"
 import { headers } from "next/headers"
-import { randomUUID } from "crypto"
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
 const RATE_LIMIT_MAX_REQUESTS = 3
 const RATE_LIMIT_WINDOW_MINUTES = 10
-const SITE_URL = "https://fidens.pl"
 
 async function getClientIp(): Promise<string | null> {
   const headersList = await headers()
@@ -75,8 +73,6 @@ export async function submitContactForm(formData: FormData) {
     }
   }
 
-  const marketingToken = marketingConsent && email ? randomUUID() : null
-
   const { error } = await supabase.from("contact_requests").insert({
     name,
     phone,
@@ -89,34 +85,28 @@ export async function submitContactForm(formData: FormData) {
     leasing_residual_pct: wykup ? Number(wykup) : null,
     marketing_consent: marketingConsent,
     ip_address: ipAddress,
-    marketing_confirm_token: marketingToken,
-    marketing_confirmed: false,
   })
 
   if (error) {
     return { success: false, error: error.message }
   }
 
-  if (marketingToken && email) {
+  if (marketingConsent && email) {
     try {
-      const confirmUrl = `${SITE_URL}/potwierdz-zgode?token=${marketingToken}`
-      await resend.emails.send({
-        from: "Fidens <kontakt@fidens.pl>",
-        to: email,
-        subject: "Potwierdz zgode na otrzymywanie ofert Fidens",
-        text: `Dziekujemy za zainteresowanie oferta Fidens.
-
-Aby otrzymywac od nas informacje o promocjach i nowych ofertach, potwierdz prosze swoj adres email klikajac w ponizszy link:
-
-${confirmUrl}
-
-Jesli to nie Ty wypelniles/as formularz na fidens.pl, zignoruj te wiadomosc - Twoj adres nie zostanie dodany do listy mailingowej.`,
+      const nameParts = name.trim().split(/\s+/)
+      const firstName = nameParts[0] || ""
+      const lastName = nameParts.slice(1).join(" ") || ""
+      await resend.contacts.create({
+        email,
+        firstName,
+        lastName,
+        unsubscribed: false,
+        audienceId: "36608761-95f3-431e-bb2c-000684e745b4",
       })
-    } catch (confirmEmailError) {
-      console.error("Blad wysylki maila potwierdzajacego zgode:", confirmEmailError)
+    } catch (contactError) {
+      console.error("Blad dodawania kontaktu do segmentu Resend:", contactError)
     }
   }
-
   try {
     await resend.emails.send({
       from: "Fidens <kontakt@fidens.pl>",

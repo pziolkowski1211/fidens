@@ -85,8 +85,6 @@ export type ContactRequest = {
   is_read: boolean
   notes: string | null
   ip_address: string | null
-  marketing_confirm_token: string | null
-  marketing_confirmed: boolean
 }
 
 export type ContactRequestInsert = Omit<ContactRequest, 'id' | 'created_at' | 'is_read' | 'notes'>
