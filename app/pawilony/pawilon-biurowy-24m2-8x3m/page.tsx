@@ -1,17 +1,17 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import Navbar from "../../components/Navbar";
 import Carousel from "../../components/Carousel";
 import PawilonCalculator from "../../components/PawilonCalculator";
 
 export const metadata = {
-  title: "Pawilon biurowy 24m² (8x3m) | Pawilony Fidens.pl",
+  title: "Pawilon modułowy 24m² (8x3m) | Pawilony Fidens.pl",
   description:
-    "Pawilon biurowy 24m², wymiary 8x3m. Realizacja z płyty warstwowej — sprawdź szczegóły i orientacyjną ratę w leasingu.",
+    "Pawilon modułowy 24m², wymiary 8x3m. Realizacja z płyty warstwowej — sprawdź szczegóły i orientacyjną ratę w leasingu.",
 };
 
 const SLUG = "pawilon-biurowy-24m2-8x3m";
-const NAZWA = "Pawilon biurowy 24m²";
-const CENA = 108000;
+const NAZWA = "Pawilon modułowy 24m²";
+const CENA = 83000;
 
 const zdjecia = [
   { url: `/pawilony/${SLUG}/1.jpg`, position: 0 },
@@ -21,17 +21,7 @@ const zdjecia = [
   { url: `/pawilony/${SLUG}/5.jpg`, position: 4 },
   { url: `/pawilony/${SLUG}/6.jpg`, position: 5 },
   { url: `/pawilony/${SLUG}/7.jpg`, position: 6 },
-  { url: `/pawilony/${SLUG}/8.jpg`, position: 7 },
-  { url: `/pawilony/${SLUG}/9.jpg`, position: 8 },
 ];
-
-function Placeholder({ children }: { children: React.ReactNode }) {
-  return (
-    <span style={{ backgroundColor: "#FFF3B0", padding: "0 4px", borderRadius: "3px", fontWeight: 600 }}>
-      {children}
-    </span>
-  );
-}
 
 export default function PawilonPage() {
   return (
@@ -71,16 +61,31 @@ export default function PawilonPage() {
 
             <div className="rounded-xl p-6 mb-6" style={{ backgroundColor: "#ffffff", border: "1px solid #e8eaed" }}>
               <h2 className="text-lg font-bold mb-3" style={{ color: "#1B2A4A" }}>Wyposażenie</h2>
-              <p className="text-[15px]" style={{ color: "#555" }}>
-                <Placeholder>[DO UZUPEŁNIENIA - lista wyposażenia]</Placeholder>
+              <ul className="list-disc pl-5 space-y-1 text-[15px]" style={{ color: "#555" }}>
+                <li>Ściany i dach z płyty warstwowej</li>
+                <li>Ocieplona podłoga (płyta OSB + wykładzina PCV)</li>
+                <li>Drzwi przeszklone lub stalowe z dwoma zamkami</li>
+                <li>Kompletna instalacja elektryczna</li>
+                <li>Funkcjonalny aneks kuchenny</li>
+                <li>W pełni wyposażona łazienka</li>
+                <li>Nowoczesne lamele drewnopodobne (kilka kolorów do wyboru)</li>
+              </ul>
+              <p className="text-sm mt-4" style={{ color: "#aaa" }}>
+                Pełna specyfikacja techniczna (dokładne wymiary okien, wysokość, opcje
+                dodatkowe jak klimatyzacja, antresola czy zmiana grubości ścian) dostępna
+                po kontakcie z naszym doradcą.
               </p>
             </div>
 
             <div className="rounded-xl p-6" style={{ backgroundColor: "#ffffff", border: "1px solid #e8eaed" }}>
               <h2 className="text-lg font-bold mb-3" style={{ color: "#1B2A4A" }}>Sprawdza się jako</h2>
-              <p className="text-[15px]" style={{ color: "#555" }}>
-                <Placeholder>[DO UZUPEŁNIENIA - zastosowania]</Placeholder>
-              </p>
+              <ul className="list-disc pl-5 space-y-1 text-[15px]" style={{ color: "#555" }}>
+                <li>Biuro</li>
+                <li>Lokal usługowy</li>
+                <li>Całoroczny domek mieszkalny</li>
+                <li>Domek rekreacyjny / wypoczynkowy</li>
+                <li>Obiekt na wynajem</li>
+              </ul>
               <p className="text-sm mt-4" style={{ color: "#aaa" }}>
                 Każdy projekt wyceniamy indywidualnie i dopasowujemy do oczekiwań klienta. Podana
                 cena ma charakter orientacyjny.
@@ -89,9 +94,6 @@ export default function PawilonPage() {
           </div>
 
           <aside className="lg:sticky lg:top-20 lg:self-start">
-            <p className="text-xs mb-2 p-2 rounded" style={{ backgroundColor: "#FFF3B0", color: "#1B2A4A" }}>
-              <strong>[UWAGA: cena poniżej to placeholder — {CENA.toLocaleString("pl-PL")} zł — podmień na realną wartość przed promowaniem strony]</strong>
-            </p>
             <div className="rounded-xl p-6" style={{ backgroundColor: "#ffffff", border: "1px solid #e8eaed" }}>
               <PawilonCalculator price={CENA} slug={SLUG} brand="Pawilon" model={NAZWA} />
             </div>

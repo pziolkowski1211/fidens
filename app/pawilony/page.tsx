@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import Navbar from "../components/Navbar";
 
 export const metadata = {
@@ -31,8 +31,8 @@ export default function PawilonyPage() {
     },
     {
       slug: "pawilon-biurowy-24m2-8x3m",
-      nazwa: "Pawilon biurowy 24m²",
-      kategoria: "Pawilon biurowy",
+      nazwa: "Pawilon modułowy 24m²",
+      kategoria: "Pawilon modułowy",
       wymiary: "8m × 3m",
       powierzchnia: "24 m²",
       cena: "108 000 zł brutto",
