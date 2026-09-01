@@ -1,4 +1,4 @@
-﻿// lib/supabase/types.ts
+// lib/supabase/types.ts
 export type VehicleType = 'osobowe' | 'ciezarowe' | 'maszyna'
 export type FuelType = 'benzyna' | 'diesel' | 'elektryczny' | 'hybryda' | 'lpg' | 'inny'
 export type TransmissionType = 'manualna' | 'automatyczna' | 'inne'
@@ -84,6 +84,7 @@ export type ContactRequest = {
   marketing_consent: boolean
   is_read: boolean
   notes: string | null
+  ip_address: string | null
 }
 
 export type ContactRequestInsert = Omit<ContactRequest, 'id' | 'created_at' | 'is_read' | 'notes'>

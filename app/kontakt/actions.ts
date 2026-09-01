@@ -2,8 +2,21 @@
 import { createClient } from "@/lib/supabase/server"
 import { Resend } from "resend"
 import { validateContactForm } from "@/lib/kontakt/validate"
+import { headers } from "next/headers"
 
 const resend = new Resend(process.env.RESEND_API_KEY)
+
+const RATE_LIMIT_MAX_REQUESTS = 3
+const RATE_LIMIT_WINDOW_MINUTES = 10
+
+async function getClientIp(): Promise<string | null> {
+  const headersList = await headers()
+  const forwardedFor = headersList.get("x-forwarded-for")
+  if (forwardedFor) {
+    return forwardedFor.split(",")[0].trim()
+  }
+  return headersList.get("x-real-ip")
+}
 
 export async function submitContactForm(formData: FormData) {
   const honeypot = formData.get("website") as string
@@ -26,6 +39,24 @@ export async function submitContactForm(formData: FormData) {
   const validation = validateContactForm({ name, phone, email, nip, message })
   if (!validation.valid) {
     return { success: false, error: validation.error }
+  }
+
+  const ipAddress = await getClientIp()
+
+  if (ipAddress) {
+    const windowStart = new Date(Date.now() - RATE_LIMIT_WINDOW_MINUTES * 60 * 1000).toISOString()
+    const { count } = await supabase
+      .from("contact_requests")
+      .select("id", { count: "exact", head: true })
+      .eq("ip_address", ipAddress)
+      .gte("created_at", windowStart)
+
+    if (count !== null && count >= RATE_LIMIT_MAX_REQUESTS) {
+      return {
+        success: false,
+        error: "Zbyt wiele zapytan w krotkim czasie. Sprobuj ponownie za kilka minut.",
+      }
+    }
   }
 
   let listingId: string | null = null
@@ -53,6 +84,7 @@ export async function submitContactForm(formData: FormData) {
     leasing_months: msc ? Number(msc) : null,
     leasing_residual_pct: wykup ? Number(wykup) : null,
     marketing_consent: marketingConsent,
+    ip_address: ipAddress,
   })
 
   if (error) {
