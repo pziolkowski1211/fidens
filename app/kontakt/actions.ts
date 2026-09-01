@@ -38,7 +38,7 @@ export async function submitContactForm(formData: FormData) {
 
   const validation = validateContactForm({ name, phone, email, nip, message })
   if (!validation.valid) {
-    return { success: false, error: validation.error }
+    return { success: false, error: validation.error, field: validation.field }
   }
 
   const ipAddress = await getClientIp()

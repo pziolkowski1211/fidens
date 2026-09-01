@@ -4,11 +4,21 @@ import { useSearchParams } from "next/navigation"
 import Navbar from "../components/Navbar"
 import { submitContactForm } from "./actions"
 
+type FormField = "name" | "phone" | "email" | "nip" | "message"
+
 export default function KontaktForm() {
   const searchParams = useSearchParams()
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle")
   const [errorMsg, setErrorMsg] = useState("")
+  const [errorField, setErrorField] = useState<FormField | null>(null)
   const isSubmittingRef = useRef(false)
+
+  const [name, setName] = useState("")
+  const [phone, setPhone] = useState("")
+  const [email, setEmail] = useState("")
+  const [nip, setNip] = useState("")
+  const [message, setMessage] = useState("")
+  const [marketingConsent, setMarketingConsent] = useState(false)
 
   const marka = searchParams.get("marka")
   const model = searchParams.get("model")
@@ -19,10 +29,17 @@ export default function KontaktForm() {
   const msc = searchParams.get("msc") || ""
   const wykup = searchParams.get("wykup") || ""
 
+  async function onFormSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const formData = new FormData(e.currentTarget)
+    await handleSubmit(formData)
+  }
+
   async function handleSubmit(formData: FormData) {
     if (isSubmittingRef.current) return
     isSubmittingRef.current = true
     setStatus("sending")
+    setErrorField(null)
     try {
       const result = await submitContactForm(formData)
       if (result.success) {
@@ -30,6 +47,7 @@ export default function KontaktForm() {
       } else {
         setStatus("error")
         setErrorMsg(result.error || "Coś poszło nie tak")
+        setErrorField((result.field as FormField) || null)
       }
     } finally {
       isSubmittingRef.current = false
@@ -38,6 +56,12 @@ export default function KontaktForm() {
 
   const inputClass = "w-full rounded-lg border px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2"
   const labelClass = "block text-sm font-semibold mb-1.5"
+
+  function borderStyle(field: FormField) {
+    return errorField === field
+      ? { borderColor: "#dc2626", outlineColor: "#dc2626" }
+      : { borderColor: "#e8eaed", outlineColor: "#F0A500" }
+  }
 
   if (status === "sent") {
     return (
@@ -96,7 +120,7 @@ export default function KontaktForm() {
             </div>
           )}
 
-          <form action={handleSubmit} className="space-y-4">
+          <form onSubmit={onFormSubmit} className="space-y-4">
             <div style={{ position: "absolute", left: "-9999px", width: "1px", height: "1px", overflow: "hidden" }} aria-hidden="true">
               <label htmlFor="website">Strona WWW</label>
               <input type="text" id="website" name="website" tabIndex={-1} autoComplete="off" />
@@ -108,26 +132,27 @@ export default function KontaktForm() {
 
             <div>
               <label className={labelClass} style={{ color: "#1B2A4A" }}>Imię i nazwisko *</label>
-              <input type="text" name="name" required className={inputClass} style={{ borderColor: "#e8eaed", outlineColor: "#F0A500" }} />
+              <input type="text" name="name" required value={name} onChange={(e) => setName(e.target.value)} className={inputClass} style={borderStyle("name")} />
             </div>
 
             <div>
               <label className={labelClass} style={{ color: "#1B2A4A" }}>Telefon *</label>
-              <input type="tel" name="phone" required className={inputClass} style={{ borderColor: "#e8eaed", outlineColor: "#F0A500" }} />
+              <input type="tel" name="phone" required value={phone} onChange={(e) => setPhone(e.target.value)} className={inputClass} style={borderStyle("phone")} />
             </div>
 
             <div>
               <label className={labelClass} style={{ color: "#1B2A4A" }}>Email *</label>
-              <input type="email" name="email" required className={inputClass} style={{ borderColor: "#e8eaed", outlineColor: "#F0A500" }} />            </div>
+              <input type="email" name="email" required value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} style={borderStyle("email")} />
+            </div>
 
             <div>
               <label className={labelClass} style={{ color: "#1B2A4A" }}>NIP (opcjonalnie)</label>
-              <input type="text" name="nip" className={inputClass} style={{ borderColor: "#e8eaed", outlineColor: "#F0A500" }} />
+              <input type="text" name="nip" value={nip} onChange={(e) => setNip(e.target.value)} className={inputClass} style={borderStyle("nip")} />
             </div>
 
             <div>
               <label className={labelClass} style={{ color: "#1B2A4A" }}>Wiadomość (opcjonalnie)</label>
-              <textarea name="message" rows={4} className={inputClass} style={{ borderColor: "#e8eaed", outlineColor: "#F0A500" }} />
+              <textarea name="message" rows={4} value={message} onChange={(e) => setMessage(e.target.value)} className={inputClass} style={borderStyle("message")} />
             </div>
 
             <label
@@ -137,6 +162,8 @@ export default function KontaktForm() {
               <input
                 type="checkbox"
                 name="marketingConsent"
+                checked={marketingConsent}
+                onChange={(e) => setMarketingConsent(e.target.checked)}
                 className="mt-0.5 w-5 h-5 cursor-pointer shrink-0"
                 style={{ accentColor: "#F0A500" }}
               />
@@ -183,5 +210,3 @@ export default function KontaktForm() {
     </main>
   )
 }
-
-

@@ -1,8 +1,10 @@
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
+export type ContactFormField = "name" | "phone" | "email" | "nip" | "message"
+
 export type ContactFormValidationResult =
   | { valid: true }
-  | { valid: false; error: string }
+  | { valid: false; error: string; field: ContactFormField }
 
 // Suma kontrolna NIP wg wzoru z ustawy - wagi 6,5,7,2,3,4,5,6,7, reszta z dzielenia przez 11
 export function isValidNIP(nipRaw: string): boolean {
@@ -36,19 +38,19 @@ export function validateContactForm(data: {
   const message = data.message?.trim() ?? ""
 
   if (name.length < 2 || name.length > 100) {
-    return { valid: false, error: "Imie i nazwisko musi miec od 2 do 100 znakow" }
+    return { valid: false, error: "Imie i nazwisko musi miec od 2 do 100 znakow", field: "name" }
   }
   if (!isValidPolishPhone(phone)) {
-    return { valid: false, error: "Podaj poprawny numer telefonu (9 cyfr, opcjonalnie z prefiksem +48)" }
+    return { valid: false, error: "Podaj poprawny numer telefonu (9 cyfr, opcjonalnie z prefiksem +48)", field: "phone" }
   }
   if (email.length > 254 || !EMAIL_REGEX.test(email)) {
-    return { valid: false, error: "Podaj poprawny adres email" }
+    return { valid: false, error: "Podaj poprawny adres email", field: "email" }
   }
   if (nip && !isValidNIP(nip)) {
-    return { valid: false, error: "Podany NIP jest nieprawidlowy" }
+    return { valid: false, error: "Podany NIP jest nieprawidlowy", field: "nip" }
   }
   if (message.length > 2000) {
-    return { valid: false, error: "Wiadomosc jest za dluga (maksymalnie 2000 znakow)" }
+    return { valid: false, error: "Wiadomosc jest za dluga (maksymalnie 2000 znakow)", field: "message" }
   }
   return { valid: true }
 }
