@@ -1,12 +1,13 @@
-﻿"use server"
+"use server"
 import { fetchOtomotoListing, OtomotoScrapedData } from "@/lib/otomoto/scraper"
+import { isValidOtomotoUrl } from "@/lib/otomoto/validate-url"
 
 export type ImportOtomotoResult =
   | { success: true; data: OtomotoScrapedData }
   | { success: false; error: string }
 
 export async function importOtomotoListing(url: string): Promise<ImportOtomotoResult> {
-  if (!url || !url.includes("otomoto.pl")) {
+  if (!url || !isValidOtomotoUrl(url)) {
     return { success: false, error: "To nie wyglada na poprawny link do OtoMoto" }
   }
   try {

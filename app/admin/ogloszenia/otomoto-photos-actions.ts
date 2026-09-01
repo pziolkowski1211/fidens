@@ -2,6 +2,7 @@
 import { extractOtomotoImageUrls } from "@/lib/otomoto/scraper"
 import { createClient } from "@/lib/supabase/server"
 import sharp from "sharp"
+import { isValidOtomotoUrl } from "@/lib/otomoto/validate-url"
 
 // Mitygacja GHSA-f88m-g3jw-g9cj (podatnosci libvips w sharp <0.35.0): blokujemy dekodery
 // formatow ktorych i tak nie uzywamy (GIF/TIFF/VIPS), zeby nie musiec migrowac na sharp 0.35.x,
@@ -20,7 +21,7 @@ export async function importOtomotoPhotos(
   slug: string,
   otomotoUrl: string
 ): Promise<ImportOtomotoPhotosResult> {
-  if (!otomotoUrl || !otomotoUrl.includes("otomoto.pl")) {
+  if (!otomotoUrl || !isValidOtomotoUrl(otomotoUrl)) {
     return { success: false, error: "Brak poprawnego linku OtoMoto dla tego ogloszenia" }
   }
   let html: string
