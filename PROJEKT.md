@@ -472,6 +472,15 @@ wplata/okres/(wykup jesli hasWykup). Rata "od X zl" na kartach: calculateShowcas
   zawartosc na nowo, nie punktowe podmiany
 - **Zdjecia dom-modulowy-40m2-10x4m uszkodzone** (blad "isn't a valid image" w konsoli) -
   do podmiany razem z uzupelnieniem realnych danych tej realizacji
+- **INCYDENT 01.09:** przy recznej edycji .env.local w Notatniku (dodawanie
+  SUPABASE_SERVICE_ROLE_KEY) przypadkiem nadpisano wartosc NEXT_PUBLIC_SUPABASE_ANON_KEY
+  kluczem sb_secret_... zamiast sb_publishable_..., co spowodowalo blad w przegladarce
+  "Forbidden use of secret API key in browser" przy zapisie ogloszenia w panelu admina.
+  Naprawione poprawnym wklejeniem klucza publishable z Supabase (Settings -> API Keys).
+  LEKCJA: przy edycji .env.local w Notatniku ZAWSZE sprawdzic KTORA linia sie edytuje
+  (klucze sb_publishable_ i sb_secret_ latwo pomylic, oba dlugie i losowe) - dobra
+  praktyka: uzyc Ctrl+F w Notatniku zeby najpierw namierzyc dokladna linie zamiast
+  edytowac "na oko" po przewinieciu.
 
 ## Testy regresyjne (Playwright) - stan na dzisiaj (30.08)
 
