@@ -1,7 +1,12 @@
-﻿"use server"
+"use server"
 import { extractOtomotoImageUrls } from "@/lib/otomoto/scraper"
 import { createClient } from "@/lib/supabase/server"
 import sharp from "sharp"
+
+// Mitygacja GHSA-f88m-g3jw-g9cj (podatnosci libvips w sharp <0.35.0): blokujemy dekodery
+// formatow ktorych i tak nie uzywamy (GIF/TIFF/VIPS), zeby nie musiec migrowac na sharp 0.35.x,
+// ktory ma potwierdzony blad ERR_DLOPEN_FAILED na Vercel/Turbopack (patrz PROJEKT.md)
+sharp.block({ operation: ["VipsForeignLoadNsgif", "VipsForeignLoadTiff", "VipsForeignLoadVips"] })
 
 export type ImportOtomotoPhotosResult =
   | { success: true; imported: number; failed: number }
