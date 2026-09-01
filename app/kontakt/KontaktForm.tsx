@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { useSearchParams } from "next/navigation"
 import Navbar from "../components/Navbar"
 import { submitContactForm } from "./actions"
@@ -8,6 +8,7 @@ export default function KontaktForm() {
   const searchParams = useSearchParams()
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle")
   const [errorMsg, setErrorMsg] = useState("")
+  const isSubmittingRef = useRef(false)
 
   const marka = searchParams.get("marka")
   const model = searchParams.get("model")
@@ -19,13 +20,19 @@ export default function KontaktForm() {
   const wykup = searchParams.get("wykup") || ""
 
   async function handleSubmit(formData: FormData) {
+    if (isSubmittingRef.current) return
+    isSubmittingRef.current = true
     setStatus("sending")
-    const result = await submitContactForm(formData)
-    if (result.success) {
-      setStatus("sent")
-    } else {
-      setStatus("error")
-      setErrorMsg(result.error || "Coś poszło nie tak")
+    try {
+      const result = await submitContactForm(formData)
+      if (result.success) {
+        setStatus("sent")
+      } else {
+        setStatus("error")
+        setErrorMsg(result.error || "Coś poszło nie tak")
+      }
+    } finally {
+      isSubmittingRef.current = false
     }
   }
 
