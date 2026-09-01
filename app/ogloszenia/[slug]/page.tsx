@@ -1,4 +1,4 @@
-﻿import { notFound } from "next/navigation"
+import { notFound } from "next/navigation"
 import Link from "next/link"
 import { cache } from "react"
 import type { ReactNode } from "react"
@@ -201,9 +201,37 @@ export default async function OgloszenieDetailPage({ params }: PageProps) {
 
   const isMarza = listing.vat_type === "marza"
 
+  const coverImage = images.find((i) => i.is_cover)?.url || images[0]?.url
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Vehicle",
+    name: listing.title,
+    brand: listing.brand || undefined,
+    model: listing.model || undefined,
+    vehicleModelDate: listing.year || undefined,
+    fuelType: listing.fuel || undefined,
+    vehicleTransmission: listing.transmission || undefined,
+    color: listing.color || undefined,
+    image: coverImage || undefined,
+    mileageFromOdometer: listing.mileage_km
+      ? { "@type": "QuantitativeValue", value: listing.mileage_km, unitCode: "KMT" }
+      : undefined,
+    offers: listing.price_pln
+      ? {
+          "@type": "Offer",
+          price: listing.price_pln,
+          priceCurrency: "PLN",
+          availability: "https://schema.org/InStock",
+          url: `https://fidens.pl/ogloszenia/${listing.slug}`,
+        }
+      : undefined,
+  }
+
   return (
     <main className="min-h-screen flex flex-col" style={{ backgroundColor: "#f8f9fb" }}>
       <Navbar />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       <div className="px-4 sm:px-6 pt-5 pb-3" style={{ backgroundColor: "#ffffff", borderBottom: "1px solid #e8eaed" }}>
         <div className="max-w-[1100px] mx-auto flex items-center flex-wrap gap-2 text-sm">
@@ -281,5 +309,4 @@ export default async function OgloszenieDetailPage({ params }: PageProps) {
 function capitalizeFirst(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1)
 }
-
 
