@@ -419,9 +419,14 @@ wplata/okres/(wykup jesli hasWykup). Rata "od X zl" na kartach: calculateShowcas
 
 5. **Regulamin i polityka prywatnosci** - dane spolki z o.o., konsultacja prawnicza
 
-6. **SEO i optymalizacja** - next/image wszedzie (w tym dodanie loading="eager" dla
-   zdjec karuzeli powyzej fold, zeby uciszyc ostrzezenie LCP w konsoli), kalibracja
-   kalkulatora, favicon, meta tagi, FAQ/Blog (nieustalone)
+6. **SEO i optymalizacja** - ZROBIONE 01.09: eager loading zdjec karuzeli (bylo juz
+   zaimplementowane przez prop priority={current === 0} w Carousel.tsx - lepszy
+   odpowiednik loading="eager" dla next/image), app/robots.ts (blokuje /admin i /api),
+   app/sitemap.ts (dynamiczny - wszystkie strony statyczne + pawilony + aktywne
+   ogloszenia z bazy), JSON-LD (schema.org Vehicle) na stronie ogloszenia z cena/
+   marka/przebieg/paliwo - zweryfikowane na produkcji, wszystko dziala poprawnie.
+   ZOSTAJE: kalibracja kalkulatora, favicon (jest juz zrobiony wczesniej), meta tagi
+   (juz sa w generateMetadata), FAQ/Blog (nieustalone, niski priorytet)
 
 7. **Docelowo: mailing/newsletter** do osob z marketing_consent=true przez Resend
 
