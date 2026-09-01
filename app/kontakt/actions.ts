@@ -1,6 +1,7 @@
 "use server"
 import { createClient } from "@/lib/supabase/server"
 import { Resend } from "resend"
+import { validateContactForm } from "@/lib/kontakt/validate"
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -21,6 +22,11 @@ export async function submitContactForm(formData: FormData) {
   const msc = formData.get("msc") as string
   const wykup = formData.get("wykup") as string
   const marketingConsent = formData.get("marketingConsent") === "on"
+
+  const validation = validateContactForm({ name, phone, email, nip, message })
+  if (!validation.valid) {
+    return { success: false, error: validation.error }
+  }
 
   let listingId: string | null = null
 
@@ -94,4 +100,3 @@ Wykup: ${wykup || "brak"}%`,
 
   return { success: true }
 }
-
