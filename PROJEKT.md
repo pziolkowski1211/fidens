@@ -485,6 +485,16 @@ wplata/okres/(wykup jesli hasWykup). Rata "od X zl" na kartach: calculateShowcas
   zawartosc na nowo, nie punktowe podmiany
 - **Zdjecia dom-modulowy-40m2-10x4m uszkodzone** (blad "isn't a valid image" w konsoli) -
   do podmiany razem z uzupelnieniem realnych danych tej realizacji
+- **NAPRAWIONY (01.09):** dane pojazdu (z "Zapytaj o ten pojazd") zostawaly widoczne
+  w bannerze na /kontakt nawet po przejsciu na czysty /kontakt (np. przez przycisk
+  "Zamow bezplatna kalkulacje" w Navbarze). PRZYCZYNA: te linki uzywaly Next.js
+  <Link>, ktory robi "miekka" nawigacje (client-side) - Next.js Router Cache czasem
+  nie odswieza poprawnie stanu strony gdy zmieniaja sie tylko query params na tej
+  samej sciezce. NAPRAWA: zamieniono <Link href="/kontakt"> na zwykle <a href="/kontakt">
+  we wszystkich 4 miejscach w Navbar.tsx (desktop CTA, desktop link "Kontakt", mobile
+  drawer link, mobile drawer CTA) - wymusza pelne przeladowanie strony, gwarantujac
+  swiezy stan. WZORZEC: linki ktore CELOWO maja zerowac kontekst (jak ten) powinny
+  uzywac <a>, nie <Link> - podobnie jak juz bylo zrobione w PawilonCalculator.tsx.
 - **INCYDENT 01.09:** przy recznej edycji .env.local w Notatniku (dodawanie
   SUPABASE_SERVICE_ROLE_KEY) przypadkiem nadpisano wartosc NEXT_PUBLIC_SUPABASE_ANON_KEY
   kluczem sb_secret_... zamiast sb_publishable_..., co spowodowalo blad w przegladarce
