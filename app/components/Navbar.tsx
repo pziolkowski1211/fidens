@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState, useEffect } from "react"
 import Image from "next/image"
@@ -62,13 +62,13 @@ export default function Navbar() {
           <Link href="/ogloszenia" style={{ color: "rgba(255,255,255,0.8)", fontSize: "14px" }}>Ogłoszenia</Link>
           <Link href="/pawilony" style={{ color: "rgba(255,255,255,0.8)", fontSize: "14px" }}>Pawilony</Link>
           <Link href="/o-nas" style={{ color: "rgba(255,255,255,0.8)", fontSize: "14px" }}>Poznaj Fidens</Link>
-          <Link href="/kontakt" style={{ color: "rgba(255,255,255,0.8)", fontSize: "14px" }}>Kontakt</Link>
-          <Link
+          <a href="/kontakt" style={{ color: "rgba(255,255,255,0.8)", fontSize: "14px" }}>Kontakt</a>
+          <a
             href="/kontakt"
             style={{ backgroundColor: "#F0A500", color: "#1B2A4A", padding: "8px 20px", borderRadius: "6px", fontWeight: "600", fontSize: "14px" }}
           >
             Zamów bezpłatną kalkulację
-          </Link>
+          </a>
         </div>
 
         {/* MOBILE: Lupa + Hamburger po prawej */}
@@ -175,25 +175,25 @@ export default function Navbar() {
               >
                 Poznaj Fidens
               </Link>
-              <Link
+              <a
                 href="/kontakt"
                 onClick={() => setIsMenuOpen(false)}
                 className="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 text-base transition-colors"
               >
                 Kontakt
-              </Link>
+              </a>
             </nav>
 
             {/* CTA na dole */}
             <div className="p-5 border-t border-white/10">
-              <Link
+              <a
                 href="/kontakt"
                 onClick={() => setIsMenuOpen(false)}
                 className="block w-full text-center font-bold rounded-lg py-3.5 text-sm transition-opacity hover:opacity-90"
                 style={{ backgroundColor: "#F0A500", color: "#1B2A4A" }}
               >
                 Zamów bezpłatną kalkulację
-              </Link>
+              </a>
             </div>
           </div>
         </>
@@ -219,7 +219,6 @@ export default function Navbar() {
     </>
   )
 }
-
 
 
 
