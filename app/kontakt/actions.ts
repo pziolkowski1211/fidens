@@ -36,7 +36,8 @@ export async function submitContactForm(formData: FormData) {
   const wykup = formData.get("wykup") as string
   const marketingConsent = formData.get("marketingConsent") === "on"
 
-  const validation = validateContactForm({ name, phone, email, nip, message })
+  const nipRequired = Boolean(slug)
+  const validation = validateContactForm({ name, phone, email, nip, message, nipRequired })
   if (!validation.valid) {
     return { success: false, error: validation.error, field: validation.field }
   }

@@ -25,6 +25,7 @@ export default function KontaktForm() {
   const typ = searchParams.get("typ")
   const rata = searchParams.get("rata")
   const slug = searchParams.get("slug") || ""
+  const nipRequired = Boolean(slug)
   const wstepna = searchParams.get("wstepna") || ""
   const msc = searchParams.get("msc") || ""
   const wykup = searchParams.get("wykup") || ""
@@ -146,8 +147,8 @@ export default function KontaktForm() {
             </div>
 
             <div>
-              <label className={labelClass} style={{ color: "#1B2A4A" }}>NIP (opcjonalnie)</label>
-              <input type="text" name="nip" value={nip} onChange={(e) => setNip(e.target.value)} className={inputClass} style={borderStyle("nip")} />
+              <label className={labelClass} style={{ color: "#1B2A4A" }}>NIP{nipRequired ? " *" : " (opcjonalnie)"}</label>
+              <input type="text" name="nip" required={nipRequired} value={nip} onChange={(e) => setNip(e.target.value)} className={inputClass} style={borderStyle("nip")} />
             </div>
 
             <div>
