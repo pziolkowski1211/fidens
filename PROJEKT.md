@@ -245,9 +245,18 @@ ZROBIONE 01.09 (sesja naprawcza po audycie):
   bez zmiany wersji i bez ryzyka zlamania importu zdjec. NIE probowac ponownie
   upgrade'u sharp bez sprawdzenia najpierw statusu issue #4567.
 - Walidacja serwerowa formularza kontaktowego: nowy plik lib/kontakt/validate.ts
-  (walidacja imienia, telefonu PL, email, sumy kontrolnej NIP, dlugosci wiadomosci
-  max 2000 znakow). Zwraca tez ktore pole zawiodlo (field), formularz podswietla
-  je na czerwono.
+  (walidacja imienia, telefonu PL, email, formatu NIP, dlugosci wiadomosci max 2000
+  znakow). Zwraca tez ktore pole zawiodlo (field), formularz podswietla je na czerwono.
+  ZMIANA 01.09 (decyzja biznesowa Piotra): USUNIETA suma kontrolna NIP (sprawdzala
+  matematyczna poprawnosc, blokowala realne leady przy drobnych pomylkach - Piotr
+  wolal zdobyc leada niz miec 100% poprawny NIP). Teraz tylko format (dokladnie 10
+  cyfr). NIP jest WYMAGANY (nie opcjonalny) gdy formularz przyszedl z konkretnego
+  ogloszenia (nipRequired = Boolean(slug) - liczone z hidden pola "slug" w formularzu),
+  a OPCJONALNY w formularzu ogolnym (np. z przycisku "Zamow bezplatna kalkulacje" w
+  Navbarze, bez kontekstu konkretnego pojazdu). Logika w 3 miejscach: lib/kontakt/
+  validate.ts (walidacja), app/kontakt/actions.ts (oblicza nipRequired z slug),
+  app/kontakt/KontaktForm.tsx (etykieta "NIP *" vs "NIP (opcjonalnie)" + atrybut
+  required na inpucie, zaleznie od nipRequired).
 - Rate-limit po IP: nowa kolumna contact_requests.ip_address (+ indeks
   ip_address+created_at), max 3 zgloszenia / 10 minut z jednego IP. IP odczytywane
   z naglowka x-forwarded-for (dziala na Vercel).
