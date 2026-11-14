@@ -25,8 +25,8 @@ export default function PawilonyPage() {
       kategoria: "Dom modułowy",
       wymiary: "10m × 4m",
       powierzchnia: "40 m²",
-      cena: "150 000 zł brutto",
-      cenaPlaceholder: true,
+      cena: "147 000 z brutto",
+      cenaPlaceholder: false,
       zdjecie: "/pawilony/dom-modulowy-40m2-10x4m/1.jpg",
     },
     {
@@ -35,8 +35,8 @@ export default function PawilonyPage() {
       kategoria: "Pawilon modułowy",
       wymiary: "8m × 3m",
       powierzchnia: "24 m²",
-      cena: "108 000 zł brutto",
-      cenaPlaceholder: true,
+      cena: "83 000 zł brutto",
+      cenaPlaceholder: false,
       zdjecie: "/pawilony/pawilon-biurowy-24m2-8x3m/1.jpg",
     },
     {

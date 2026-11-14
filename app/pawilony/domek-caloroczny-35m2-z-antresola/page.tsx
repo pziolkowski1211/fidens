@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import Navbar from "../../components/Navbar";
 import Carousel from "../../components/Carousel";
 import PawilonCalculator from "../../components/PawilonCalculator";
@@ -29,7 +29,7 @@ const wyposazenie = [
   "Dwie komfortowe sypialnie",
   "Klimatyzacja",
   "Taras",
-  "Nowoczesna elewacja",
+  "Ściany i dach z płyty warstwowej",
 ];
 
 const zastosowania = [
@@ -71,6 +71,10 @@ export default function PawilonPage() {
                 <div className="flex justify-between border-b pb-2" style={{ borderColor: "#f0f0f0" }}>
                   <dt className="text-sm" style={{ color: "#888" }}>Powierzchnia</dt>
                   <dd className="text-sm font-semibold" style={{ color: "#1B2A4A" }}>35 m&sup2;</dd>
+                </div>
+                <div className="flex justify-between border-b pb-2" style={{ borderColor: "#f0f0f0" }}>
+                  <dt className="text-sm" style={{ color: "#888" }}>Materiał</dt>
+                  <dd className="text-sm font-semibold" style={{ color: "#1B2A4A" }}>płyta wielowarstwowa</dd>
                 </div>
               </dl>
             </div>
@@ -124,6 +128,4 @@ export default function PawilonPage() {
     </main>
   );
 }
-
-
 

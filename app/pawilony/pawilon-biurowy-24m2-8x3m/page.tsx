@@ -56,6 +56,10 @@ export default function PawilonPage() {
                   <dt className="text-sm" style={{ color: "#888" }}>Powierzchnia</dt>
                   <dd className="text-sm font-semibold" style={{ color: "#1B2A4A" }}>24 m&sup2;</dd>
                 </div>
+                <div className="flex justify-between border-b pb-2" style={{ borderColor: "#f0f0f0" }}>
+                  <dt className="text-sm" style={{ color: "#888" }}>Materiał</dt>
+                  <dd className="text-sm font-semibold" style={{ color: "#1B2A4A" }}>płyta wielowarstwowa</dd>
+                </div>
               </dl>
             </div>
 
