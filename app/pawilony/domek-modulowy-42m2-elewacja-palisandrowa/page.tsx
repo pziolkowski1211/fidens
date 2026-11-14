@@ -1,17 +1,17 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import Navbar from "../../components/Navbar";
 import Carousel from "../../components/Carousel";
 import PawilonCalculator from "../../components/PawilonCalculator";
 
 export const metadata = {
-  title: "Domek modułowy 42m² z elewacją palisandrową (7x6m) | Pawilony Fidens.pl",
+  title: "Domek modułowy 42m² (7x6m) | Pawilony Fidens.pl",
   description:
-    "Domek modułowy 42m² z elewacją palisandrową, wymiary 7x6m. Realizacja z płyty warstwowej — sprawdź szczegóły i orientacyjną ratę w leasingu.",
+    "Domek modułowy 42m², wymiary 7x6m. Z dużą antresolą, dwiema sypialniami i salonem z aneksem kuchennym — sprawdź szczegóły i orientacyjną ratę w leasingu.",
 };
 
 const SLUG = "domek-modulowy-42m2-elewacja-palisandrowa";
-const NAZWA = "Domek modułowy 42m² z elewacją palisandrową";
-const CENA = 190000;
+const NAZWA = "Domek modułowy 42m²";
+const CENA = 173000;
 
 const zdjecia = [
   { url: `/pawilony/${SLUG}/1.jpg`, position: 0 },
@@ -20,14 +20,6 @@ const zdjecia = [
   { url: `/pawilony/${SLUG}/4.jpg`, position: 3 },
   { url: `/pawilony/${SLUG}/5.jpg`, position: 4 },
 ];
-
-function Placeholder({ children }: { children: React.ReactNode }) {
-  return (
-    <span style={{ backgroundColor: "#FFF3B0", padding: "0 4px", borderRadius: "3px", fontWeight: 600 }}>
-      {children}
-    </span>
-  );
-}
 
 export default function PawilonPage() {
   return (
@@ -62,21 +54,36 @@ export default function PawilonPage() {
                   <dt className="text-sm" style={{ color: "#888" }}>Powierzchnia</dt>
                   <dd className="text-sm font-semibold" style={{ color: "#1B2A4A" }}>42 m&sup2;</dd>
                 </div>
+                <div className="flex justify-between border-b pb-2" style={{ borderColor: "#f0f0f0" }}>
+                  <dt className="text-sm" style={{ color: "#888" }}>Materiał</dt>
+                  <dd className="text-sm font-semibold" style={{ color: "#1B2A4A" }}>płyta wielowarstwowa</dd>
+                </div>
               </dl>
             </div>
 
             <div className="rounded-xl p-6 mb-6" style={{ backgroundColor: "#ffffff", border: "1px solid #e8eaed" }}>
               <h2 className="text-lg font-bold mb-3" style={{ color: "#1B2A4A" }}>Wyposażenie</h2>
-              <p className="text-[15px]" style={{ color: "#555" }}>
-                <Placeholder>[DO UZUPEŁNIENIA - lista wyposażenia]</Placeholder>
+              <ul className="list-disc pl-5 space-y-1 text-[15px]" style={{ color: "#555" }}>
+                <li>2 oddzielne sypialnie</li>
+                <li>Przestronny salon z gotowym aneksem kuchennym</li>
+                <li>W pełni wyposażona łazienka</li>
+                <li>Duża antresola – aż 20 m²</li>
+                <li>Klimatyzacja z funkcją grzania</li>
+                <li>Dekoracyjne wykończenie elewacji</li>
+              </ul>
+              <p className="text-sm mt-4" style={{ color: "#aaa" }}>
+                Pełna specyfikacja techniczna dostępna po kontakcie z naszym doradcą.
               </p>
             </div>
 
             <div className="rounded-xl p-6" style={{ backgroundColor: "#ffffff", border: "1px solid #e8eaed" }}>
               <h2 className="text-lg font-bold mb-3" style={{ color: "#1B2A4A" }}>Sprawdza się jako</h2>
-              <p className="text-[15px]" style={{ color: "#555" }}>
-                <Placeholder>[DO UZUPEŁNIENIA - zastosowania]</Placeholder>
-              </p>
+              <ul className="list-disc pl-5 space-y-1 text-[15px]" style={{ color: "#555" }}>
+                <li>Dom całoroczny</li>
+                <li>Domek rekreacyjny</li>
+                <li>Biuro lub obiekt usługowy</li>
+                <li>Inwestycja pod wynajem</li>
+              </ul>
               <p className="text-sm mt-4" style={{ color: "#aaa" }}>
                 Każdy projekt wyceniamy indywidualnie i dopasowujemy do oczekiwań klienta. Podana
                 cena ma charakter orientacyjny.
@@ -85,9 +92,6 @@ export default function PawilonPage() {
           </div>
 
           <aside className="lg:sticky lg:top-20 lg:self-start">
-            <p className="text-xs mb-2 p-2 rounded" style={{ backgroundColor: "#FFF3B0", color: "#1B2A4A" }}>
-              <strong>[UWAGA: cena poniżej to placeholder — {CENA.toLocaleString("pl-PL")} zł — podmień na realną wartość przed promowaniem strony]</strong>
-            </p>
             <div className="rounded-xl p-6" style={{ backgroundColor: "#ffffff", border: "1px solid #e8eaed" }}>
               <PawilonCalculator price={CENA} slug={SLUG} brand="Pawilon" model={NAZWA} />
             </div>

@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import Navbar from "../../components/Navbar";
 import Carousel from "../../components/Carousel";
 import PawilonCalculator from "../../components/PawilonCalculator";
@@ -6,12 +6,12 @@ import PawilonCalculator from "../../components/PawilonCalculator";
 export const metadata = {
   title: "Pawilon gastronomiczny 18m² (6x3m) | Pawilony Fidens.pl",
   description:
-    "Pawilon gastronomiczny 18m², wymiary 6x3m. Realizacja z płyty warstwowej — sprawdź szczegóły i orientacyjną ratę w leasingu.",
+    "Pawilon gastronomiczny 18m², wymiary 6x3m. Realizacja z płyty warstwowej PIR — sprawdź szczegóły i orientacyjną ratę w leasingu.",
 };
 
 const SLUG = "pawilon-gastronomiczny-18m2-6x3m";
 const NAZWA = "Pawilon gastronomiczny 18m²";
-const CENA = 81000;
+const CENA = 42000;
 
 const zdjecia = [
   { url: `/pawilony/${SLUG}/1.jpg`, position: 0 },
@@ -19,14 +19,6 @@ const zdjecia = [
   { url: `/pawilony/${SLUG}/3.jpg`, position: 2 },
   { url: `/pawilony/${SLUG}/4.jpg`, position: 3 },
 ];
-
-function Placeholder({ children }: { children: React.ReactNode }) {
-  return (
-    <span style={{ backgroundColor: "#FFF3B0", padding: "0 4px", borderRadius: "3px", fontWeight: 600 }}>
-      {children}
-    </span>
-  );
-}
 
 export default function PawilonPage() {
   return (
@@ -61,21 +53,42 @@ export default function PawilonPage() {
                   <dt className="text-sm" style={{ color: "#888" }}>Powierzchnia</dt>
                   <dd className="text-sm font-semibold" style={{ color: "#1B2A4A" }}>18 m&sup2;</dd>
                 </div>
+                <div className="flex justify-between border-b pb-2" style={{ borderColor: "#f0f0f0" }}>
+                  <dt className="text-sm" style={{ color: "#888" }}>Materiał</dt>
+                  <dd className="text-sm font-semibold" style={{ color: "#1B2A4A" }}>płyta wielowarstwowa</dd>
+                </div>
               </dl>
             </div>
 
             <div className="rounded-xl p-6 mb-6" style={{ backgroundColor: "#ffffff", border: "1px solid #e8eaed" }}>
               <h2 className="text-lg font-bold mb-3" style={{ color: "#1B2A4A" }}>Wyposażenie</h2>
-              <p className="text-[15px]" style={{ color: "#555" }}>
-                <Placeholder>[DO UZUPEŁNIENIA - lista wyposażenia]</Placeholder>
+              <ul className="list-disc pl-5 space-y-1 text-[15px]" style={{ color: "#555" }}>
+                <li>Dach jednospadowy</li>
+                <li>Ściany i dach z płyty warstwowej PIR 100 mm</li>
+                <li>Ocieplona podłoga (płyta warstwowa 100 mm + OSB + wykładzina PCV odporna na ścieranie)</li>
+                <li>Okno podawcze</li>
+                <li>Drzwi stalowe z dwoma zamkami</li>
+                <li>Rolety zewnętrzne zabezpieczające</li>
+                <li>Kompleksowa instalacja elektryczna</li>
+                <li>Wykończenie dekoracyjne według wybranego projektu</li>
+                <li>Elewacja gotowa do oklejenia grafiką lub logo</li>
+              </ul>
+              <p className="text-sm mt-4" style={{ color: "#aaa" }}>
+                Pełna specyfikacja techniczna dostępna po kontakcie z naszym doradcą.
               </p>
             </div>
 
             <div className="rounded-xl p-6" style={{ backgroundColor: "#ffffff", border: "1px solid #e8eaed" }}>
               <h2 className="text-lg font-bold mb-3" style={{ color: "#1B2A4A" }}>Sprawdza się jako</h2>
-              <p className="text-[15px]" style={{ color: "#555" }}>
-                <Placeholder>[DO UZUPEŁNIENIA - zastosowania]</Placeholder>
-              </p>
+              <ul className="list-disc pl-5 space-y-1 text-[15px]" style={{ color: "#555" }}>
+                <li>Biuro</li>
+                <li>Punkt handlowy</li>
+                <li>Salon kosmetyczny lub fryzjerski</li>
+                <li>Gabinet</li>
+                <li>Punkt usługowy</li>
+                <li>Domek rekreacyjny</li>
+                <li>Zaplecze dla firmy</li>
+              </ul>
               <p className="text-sm mt-4" style={{ color: "#aaa" }}>
                 Każdy projekt wyceniamy indywidualnie i dopasowujemy do oczekiwań klienta. Podana
                 cena ma charakter orientacyjny.
@@ -84,9 +97,6 @@ export default function PawilonPage() {
           </div>
 
           <aside className="lg:sticky lg:top-20 lg:self-start">
-            <p className="text-xs mb-2 p-2 rounded" style={{ backgroundColor: "#FFF3B0", color: "#1B2A4A" }}>
-              <strong>[UWAGA: cena poniżej to placeholder — {CENA.toLocaleString("pl-PL")} zł — podmień na realną wartość przed promowaniem strony]</strong>
-            </p>
             <div className="rounded-xl p-6" style={{ backgroundColor: "#ffffff", border: "1px solid #e8eaed" }}>
               <PawilonCalculator price={CENA} slug={SLUG} brand="Pawilon" model={NAZWA} />
             </div>

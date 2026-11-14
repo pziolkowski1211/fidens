@@ -25,7 +25,7 @@ export default function PawilonyPage() {
       kategoria: "Dom modułowy",
       wymiary: "10m × 4m",
       powierzchnia: "40 m²",
-      cena: "147 000 z brutto",
+      cena: "147 000 zł brutto",
       cenaPlaceholder: false,
       zdjecie: "/pawilony/dom-modulowy-40m2-10x4m/1.jpg",
     },
@@ -45,19 +45,20 @@ export default function PawilonyPage() {
       kategoria: "Pawilon gastronomiczny",
       wymiary: "6m × 3m",
       powierzchnia: "18 m²",
-      cena: "81 000 zł brutto",
-      cenaPlaceholder: true,
+      cena: "42 000 zł brutto",
+      cenaPlaceholder: false,
       zdjecie: "/pawilony/pawilon-gastronomiczny-18m2-6x3m/1.jpg",
     },
     {
       slug: "domek-modulowy-42m2-elewacja-palisandrowa",
-      nazwa: "Domek modułowy 42m² z elewacją palisandrową",
+      nazwa: "Domek modułowy 42m²",
       kategoria: "Domek modułowy",
       wymiary: "7m × 6m",
       powierzchnia: "42 m²",
-      cena: "190 000 zł brutto",
-      cenaPlaceholder: true,
+      cena: "173 000 zł brutto",
+      cenaPlaceholder: false,
       zdjecie: "/pawilony/domek-modulowy-42m2-elewacja-palisandrowa/1.jpg",
+      pozycja: "20% 50%",
     },
   ];
 
@@ -82,7 +83,7 @@ export default function PawilonyPage() {
             <Link
               key={r.slug}
               href={`/pawilony/${r.slug}`}
-              className="group rounded-xl overflow-hidden bg-white block transition-all duration-300 hover:-translate-y-1"
+              className="group rounded-xl overflow-hidden bg-white flex flex-col transition-all duration-300 hover:-translate-y-1"
               style={{ border: "1px solid #e8eaed", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
             >
               <div className="relative w-full aspect-[4/3] bg-gray-100 overflow-hidden">
@@ -90,6 +91,7 @@ export default function PawilonyPage() {
                   src={r.zdjecie}
                   alt={r.nazwa}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  style={{ objectPosition: r.pozycja ?? "center" }}
                 />
                 <span
                   className="absolute top-3 left-3 text-[11px] font-bold px-3 py-1 rounded-full"
@@ -98,7 +100,7 @@ export default function PawilonyPage() {
                   {r.kategoria}
                 </span>
               </div>
-              <div className="p-4">
+              <div className="p-4 flex flex-col flex-1">
                 <h2 className="text-lg font-bold mb-2" style={{ color: "#1B2A4A" }}>
                   {r.nazwa}
                 </h2>
@@ -118,11 +120,11 @@ export default function PawilonyPage() {
                     {r.powierzchnia}
                   </span>
                 </div>
-                <div className="text-xs mb-1.5" style={{ color: "#888" }}>
+                <div className="text-xs mb-1.5 mt-auto" style={{ color: "#888" }}>
                   Cena orientacyjna
                 </div>
                 <div
-                  className="inline-block text-base font-bold px-3 py-1.5 rounded-lg"
+                  className="self-start inline-block text-base font-bold px-3 py-1.5 rounded-lg"
                   style={
                     r.cenaPlaceholder
                       ? { backgroundColor: "#FFF3B0", color: "#1B2A4A" }
