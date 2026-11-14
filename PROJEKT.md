@@ -184,10 +184,10 @@ klient chcial prostote, rzadko zmienia). Kazda realizacja to osobny statyczny ro
 
 **5 realizacji (stan na dzisiaj):**
 1. Domek caloroczny 35m2 z antresola (10x3,5m) - REALNE dane, cena 158 000 zl brutto, 6 zdjec
-2. Dom modulowy 40m2 (10x4m) - PLACEHOLDER, 6 zdjec (zdjecia obecnie uszkodzone, patrz TODO)
-3. Pawilon biurowy 24m2 (8x3m) - PLACEHOLDER, 9 zdjec
-4. Pawilon gastronomiczny 18m2 (6x3m) - PLACEHOLDER, 4 zdjecia
-5. Domek modulowy 42m2 z elewacja palisandrowa (7x6m) - PLACEHOLDER, 5 zdjec
+2. Dom modulowy 40m2 (10x4m) - GOTOWE, 147 000 zl brutto, 5 zdjec
+3. Pawilon modulowy 24m2 (8x3m) - GOTOWE, 83 000 zl brutto, 7 zdjec (dawniej "biurowy")
+4. Pawilon gastronomiczny 18m2 (6x3m) - GOTOWE, 42 000 zl brutto, 4 zdjecia
+5. Domek modulowy 42m2 (7x6m) - GOTOWE, 173 000 zl brutto, 5 zdjec (bez "elewacja palisandrowa" w nazwie)
 
 **WAZNE - strona /pawilony NIE JEST jeszcze promowana/znana klientom** (potwierdzone przez
 klienta), dlatego placeholdery cen sa akceptowalne tymczasowo - ale PRZED promowaniem strony
@@ -413,19 +413,19 @@ wplata/okres/(wykup jesli hasWykup). Rata "od X zl" na kartach: calculateShowcas
 
 ### Do zrobienia (priorytety)
 
-1. **PRZED PROMOWANIEM /pawilony:** uzupelnic placeholdery dla pozostalych 3 realizacji
-   (dom modulowy 40m2, pawilon gastronomiczny 18m2, domek modulowy 42m2) ORAZ podmienic
-   uszkodzone zdjecia dla dom-modulowy-40m2-10x4m.
-   ZROBIONE 01.09: "Pawilon biurowy 24m2" PRZEMIANOWANY na "Pawilon modulowy 24m2"
-   (URL/slug bez zmian: /pawilony/pawilon-biurowy-24m2-8x3m). Cena realna 83 000 zl
-   brutto (byla 108 000 placeholder). Wyposazenie i "Sprawdza sie jako" jako krotkie
-   listy wypunktowane (nie dlugie opisy) + adnotacja "pelna specyfikacja dostepna po
-   kontakcie". 7 realnych zdjec dodanych do public/pawilony/pawilon-biurowy-24m2-8x3m/
-   (byly .jpeg, zmienione na .jpg zeby pasowaly do kodu). WAZNE: folder byl CALKOWICIE
-   PUSTY przed ta sesja (nie tylko "uszkodzony" jak sadzilismy wczesniej) - warto
-   sprawdzic foldery pozostalych 3 realizacji tym samym sposobem (Test-Path +
-   (Get-ChildItem ... -Force).Count) zanim zalozymy ze tylko brakuje im tresci tekstowej.
-
+1. **/pawilony - GOTOWE (14.11):** wszystkie 5 realizacji ma realne dane, zdjecia i ceny,
+   zadnych zoltych placeholderow. Zakladka gotowa do promowania. Ceny brutto: domek
+   35m2 158 000, dom 40m2 147 000, pawilon modulowy 24m2 83 000, pawilon gastronomiczny
+   18m2 42 000, domek modulowy 42m2 173 000 zl. Kazda strona ma krotkie listy
+   "Wyposazenie" i "Sprawdza sie jako" + adnotacje "pelna specyfikacja po kontakcie".
+   W "Dane obiektu" jest wiersz "Material: plyta wielowarstwowa". Domek 42m2: z nazwy
+   zniknela "elewacja palisandrowa" (slug w URL bez zmian). Pawilon "biurowy" 24m2 to
+   teraz "Pawilon modulowy" (slug bez zmian). Karty na liscie /pawilony maja rowne ceny
+   (flex flex-col + mt-auto) i opcjonalne pole "pozycja" (object-position miniatury,
+   uzyte dla domku 42m2: "20% 50%").
+   Foldery public/pawilony/* BYLY PUSTE przed ta praca (nie "uszkodzone"). Zdjecia
+   PNG/JPEG konwertowane do JPG przez sharp (max 1920 px, jakosc 82) - skrypt
+   node z $env:TEMP, numeracja 1.jpg..N.jpg, liczba zdjec w karuzeli = liczba plikow.
 2. **Dokonczenie zgody marketingowej** - badge w /admin/zapytania JUZ ZROBIONY (30.08),
    zostaje TYLKO sekcja w Polityce Prywatnosci. Zgoda jest POJEDYNCZA (nie double
    opt-in - swiadoma decyzja 01.09, patrz sekcja "Audyt bezpieczenstwa")
@@ -480,6 +480,14 @@ wplata/okres/(wykup jesli hasWykup). Rata "od X zl" na kartach: calculateShowcas
   duration-300 hover:-translate-y-1 hover:shadow-lg" na linku/karcie, a na obrazku
   wewnatrz "transition-transform duration-500 group-hover:scale-110"
 
+- **Skrypty wstawiajace POJEDYNCZE linie z polskimi literami potrafia zgubic znaki** (incydent 14.11: "ł" wypadlo z
+  "Material", "plyta" i z ceny "zl" na liscie - bledy trafily na produkcje). ZASADA: nowe strony pisac CALYM plikiem
+  (here-string + WriteAllText), a po zapisie sprawdzac litery przez [char]0x142 (ł), 0x119 (ę), 0x17C (ż),
+  0x144 (ń) + Contains(), zamiast wpisywac polskie litery w komendzie. Przy wzorcach szukajacych zgubionych liter
+  uzywac \bpyta\b (inaczej lapie "Zapytaj").
+- **Zdjecia do galerii**: konwersja PNG/JPEG -> JPG przez sharp z node (require z node_modules projektu), bo
+  oryginalne PNG mialy 2-3 MB. Kod karuzeli oczekuje .jpg, numeracja 1..N.
+
 ## Znane problemy/uwagi
 - Hydration warning od Bitdefendera (bis_register, bis_skin_checked) - NIE jest bledem kodu
 - PowerShell + polskie znaki: nie dziala we FLAGACH, ale tresc plikow (-Encoding utf8) OK
@@ -492,8 +500,7 @@ wplata/okres/(wykup jesli hasWykup). Rata "od X zl" na kartach: calculateShowcas
 - Stopka duplikowana per-strona (nie komponent) - do rozwazenia: wspolny Footer.tsx
 - Niektore pliki mialy zepsute kodowanie UTF-8 (naprawione) - jesli znowu, nadpisac cala
   zawartosc na nowo, nie punktowe podmiany
-- **Zdjecia dom-modulowy-40m2-10x4m uszkodzone** (blad "isn't a valid image" w konsoli) -
-  do podmiany razem z uzupelnieniem realnych danych tej realizacji
+- Zdjecia pawilonow: ROZWIAZANE 14.11 (patrz "Do zrobienia" pkt 1) - foldery byly puste, nie uszkodzone.
 - **NAPRAWIONY (01.09):** dane pojazdu (z "Zapytaj o ten pojazd") zostawaly widoczne
   w bannerze na /kontakt nawet po przejsciu na czysty /kontakt (np. przez przycisk
   "Zamow bezplatna kalkulacje" w Navbarze). PRZYCZYNA: te linki uzywaly Next.js
