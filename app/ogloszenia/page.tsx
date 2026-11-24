@@ -1,4 +1,4 @@
-﻿import Link from "next/link"
+import Link from "next/link"
 import Image from "next/image"
 import type { Metadata } from "next"
 import Navbar from "../components/Navbar"
@@ -170,7 +170,7 @@ export default async function OgloszeniaPage({ searchParams }: PageProps) {
                 <Link
                   key={auto.id}
                   href={"/ogloszenia/" + auto.slug}
-                  className="group rounded-xl overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-lg block"
+                  className="group rounded-xl overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-lg flex flex-col"
                   style={{ backgroundColor: "#ffffff", border: "1px solid #e8eaed" }}
                 >
                   <div className="relative h-44 sm:h-48 flex items-center justify-center overflow-hidden" style={{ backgroundColor:"#e8eaed" }}>
@@ -180,7 +180,7 @@ export default async function OgloszeniaPage({ searchParams }: PageProps) {
                       <span className="text-sm" style={{ color: "#aaa" }}>Brak zdjęcia</span>
                     )}
                   </div>
-                  <div className="p-4">
+                  <div className="p-4 flex flex-col flex-1">
                     {auto.badge && (
                       <div className="text-[10px] py-0.5 px-2 rounded-[3px] inline-block mb-2"
                         style={{
@@ -212,7 +212,7 @@ export default async function OgloszeniaPage({ searchParams }: PageProps) {
                       ) : null}
                     </div>
                     {auto.rate && (
-                      <div className="text-[22px] font-bold" style={{ color: "#1B2A4A" }}>
+                      <div className="text-[22px] font-bold mt-auto" style={{ color: "#1B2A4A" }}>
                         od {formatNumber(Math.round(auto.rate))} zł <span className="text-[13px] font-normal" style={{ color: "#888" }}>/msc{!auto.is_marza && " netto"}</span>
                       </div>
                     )}
