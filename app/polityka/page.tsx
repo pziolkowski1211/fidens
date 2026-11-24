@@ -1,4 +1,4 @@
-﻿import Navbar from "../components/Navbar";
+import Navbar from "../components/Navbar";
 
 export const metadata = {
   title: "Polityka prywatnosci | Fidens.pl",
@@ -49,7 +49,7 @@ export default function PolitykaPage() {
           <h2 className="text-xl font-bold mt-8 mb-3" style={{ color: "#1B2A4A" }}>§3 Cel i podstawa prawna przetwarzania</h2>
           <p>Dane przetwarzane są w celu:</p>
           <ul className="list-disc pl-5 space-y-1">
-            <li>udzielenia odpowiedzi na Zapytanie i przedstawienia informacji o możliwościach finansowania — podstawa prawna: art. 6 ust. 1 lit. b RODO (działania podejmowane przed zawarciem umowy, na żądanie osoby, której dane dotyczą),</li>
+            <li>udzielenia odpowiedzi na Zapytanie i przedstawienia informacji o możliwościach finansowania — podstawa prawna: art. 6 ust. 1 lit.b RODO (działania podejmowane przed zawarciem umowy, na żądanie osoby, której dane dotyczą),</li>
             <li>kontaktu zwrotnego oraz obsługi zgłoszenia — podstawa prawna: art. 6 ust. 1 lit. f RODO (prawnie uzasadniony interes administratora).</li>
           </ul>
 
@@ -81,10 +81,35 @@ export default function PolitykaPage() {
             z obowiązującymi przepisami.
           </p>
 
-          <h2 className="text-xl font-bold mt-8 mb-3" style={{ color: "#1B2A4A" }}>§8 Bezpieczeństwo danych</h2>
+          <h2 className="text-xl font-bold mt-8 mb-3" style={{ color: "#1B2A4A" }}>§8 Zgoda marketingowa</h2>
+          <p>
+            Niezależnie od obsługi Zapytania, Użytkownik może odrębnie wyrazić zgodę na otrzymywanie od Fidens
+            informacji marketingowych (np. o ofertach leasingowych, promocjach i nowościach w Serwisie) drogą
+            elektroniczną (e-mail) lub telefoniczną.
+          </p>
+          <p>
+            Podstawą prawną przetwarzania danych w tym celu jest zgoda Użytkownika (art. 6 ust. 1 lit. a RODO w
+            związku z art. 10 ustawy o świadczeniu usług drogą elektroniczną oraz art. 172 ustawy Prawo
+            telekomunikacyjne).
+          </p>
+          <p>
+            Wyrażenie zgody marketingowej jest całkowicie dobrowolne i niezależne od możliwości skorzystania z
+            pozostałych usług Serwisu — jej brak nie wpływa na możliwość złożenia Zapytania o finansowanie.
+          </p>
+          <p>
+            Zgodę można wycofać w dowolnym momencie, bez wpływu na zgodność z prawem przetwarzania dokonanego przed
+            jej wycofaniem — np. poprzez kliknięcie linku rezygnacji w otrzymanej wiadomości e-mail lub wysyłając
+            wiadomość na adres kontakt@fidens.pl.
+          </p>
+          <p>
+            Dane przetwarzane w celach marketingowych (adres e-mail, numer telefonu) przechowywane są do czasu
+            wycofania zgody.
+          </p>
+
+          <h2 className="text-xl font-bold mt-8 mb-3" style={{ color: "#1B2A4A" }}>§9 Bezpieczeństwo danych</h2>
           <p>Fidens stosuje odpowiednie środki techniczne i organizacyjne w celu ochrony danych osobowych przed nieuprawnionym dostępem, utratą lub zniszczeniem.</p>
 
-          <h2 className="text-xl font-bold mt-8 mb-3" style={{ color: "#1B2A4A" }}>§9 Zmiany Polityki</h2>
+          <h2 className="text-xl font-bold mt-8 mb-3" style={{ color: "#1B2A4A" }}>§10 Zmiany Polityki</h2>
           <p>
             Fidens zastrzega sobie prawo do zmiany niniejszej Polityki Prywatności. Aktualna wersja zawsze dostępna
             jest pod adresem fidens.pl/polityka.
