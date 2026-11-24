@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState, useRef, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
@@ -157,8 +157,8 @@ export default function SearchAutocomplete({ variant = "desktop", onSelect, auto
                   {highlightMatch(item.label, query)}
                 </span>
                 <span className="text-[10px] uppercase tracking-wider text-gray-400 shrink-0">
-                  {item.category === "osobowe" && "Osobowe"}
-                  {item.category === "ciezarowe" && "Ciężarowe"}
+                  {item.category === "osobowe_dostawcze" && "Osobowe/dostawcze"}
+                  {item.category === "ciezki_transport" && "Ciężki transport"}
                   {item.category === "maszyna" && "Maszyna"}
                 </span>
               </li>

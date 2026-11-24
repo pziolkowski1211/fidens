@@ -1,5 +1,5 @@
 // lib/supabase/types.ts
-export type VehicleType = 'osobowe' | 'ciezarowe' | 'maszyna'
+export type VehicleType = 'osobowe_dostawcze' | 'ciezki_transport' | 'maszyna'
 export type FuelType = 'benzyna' | 'diesel' | 'elektryczny' | 'hybryda' | 'lpg' | 'inny'
 export type TransmissionType = 'manualna' | 'automatyczna' | 'inne'
 export type ListingStatus = 'active' | 'inactive' | 'sold'

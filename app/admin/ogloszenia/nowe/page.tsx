@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
@@ -20,7 +20,7 @@ export default function NoweOgloszeniePage() {
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
   const [slugTouched, setSlugTouched] = useState(false);
-  const [vehicleType, setVehicleType] = useState("osobowe");
+  const [vehicleType, setVehicleType] = useState("osobowe_dostawcze");
   const [status, setStatus] = useState("active");
   const [brand, setBrand] = useState("");
   const [model, setModel] = useState("");
@@ -149,7 +149,7 @@ export default function NoweOgloszeniePage() {
       .insert({
         title,
         slug,
-        vehicle_type: vehicleType as "osobowe" | "ciezarowe" | "maszyna",
+        vehicle_type: vehicleType as "osobowe_dostawcze" | "ciezki_transport" | "maszyna",
         status: status as "active" | "inactive" | "sold",
         brand,
         model,
@@ -266,8 +266,8 @@ export default function NoweOgloszeniePage() {
                 value={vehicleType}
                 onChange={(e) => setVehicleType(e.target.value)}
               >
-                <option value="osobowe">Osobowe</option>
-                <option value="ciezarowe">Ciężarowe</option>
+                <option value="osobowe_dostawcze">Osobowe i dostawcze (do 3,5t)</option>
+                <option value="ciezki_transport">Ciężki transport</option>
                 <option value="maszyna">Maszyna</option>
               </select>
             </div>

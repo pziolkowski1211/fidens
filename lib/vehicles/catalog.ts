@@ -1,5 +1,5 @@
-﻿// lib/vehicles/catalog.ts
-export type VehicleCategory = 'osobowe' | 'ciezarowe' | 'maszyna'
+// lib/vehicles/catalog.ts
+export type VehicleCategory = 'osobowe_dostawcze' | 'ciezki_transport' | 'maszyna'
 
 export interface VehicleSuggestion {
   brand: string
@@ -26,52 +26,60 @@ function s(brand: string, models: string[], category: VehicleCategory): VehicleS
   return [brandSuggestion, ...modelSuggestions]
 }
 
-const OSOBOWE: VehicleSuggestion[] = [
-  ...s('Audi',       ['A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'Q3', 'Q5', 'Q7', 'Q8', 'e-tron'], 'osobowe'),
-  ...s('BMW',        ['1 Series', '2 Series', '3 Series', '4 Series', '5 Series', '7 Series', 'X1', 'X3', 'X5', 'X6', 'X7', 'iX'], 'osobowe'),
-  ...s('Mercedes',   ['A-Class', 'C-Class', 'E-Class', 'S-Class', 'CLA', 'CLS', 'GLA', 'GLC', 'GLE', 'GLS', 'EQC', 'EQE', 'EQS'], 'osobowe'),
-  ...s('Volkswagen', ['Golf', 'Passat', 'Arteon', 'Tiguan', 'Touareg', 'T-Roc', 'ID.3', 'ID.4', 'ID.5'], 'osobowe'),
-  ...s('Skoda',      ['Octavia', 'Superb', 'Kodiaq', 'Karoq', 'Kamiq', 'Enyaq'], 'osobowe'),
-  ...s('Toyota',     ['Corolla', 'Camry', 'RAV4', 'C-HR', 'Highlander', 'Land Cruiser', 'Yaris'], 'osobowe'),
-  ...s('Lexus',      ['IS', 'ES', 'LS', 'NX', 'RX', 'UX'], 'osobowe'),
-  ...s('Volvo',      ['XC40', 'XC60', 'XC90', 'S60', 'S90', 'V60', 'V90'], 'osobowe'),
-  ...s('Porsche',    ['911', 'Cayenne', 'Macan', 'Panamera', 'Taycan'], 'osobowe'),
-  ...s('Tesla',      ['Model 3', 'Model Y', 'Model S', 'Model X'], 'osobowe'),
-  ...s('Ford',       ['Focus', 'Mondeo', 'Kuga', 'Mustang', 'Mustang Mach-E', 'Puma'], 'osobowe'),
-  ...s('Opel',       ['Astra', 'Insignia', 'Mokka', 'Grandland', 'Crossland'], 'osobowe'),
-  ...s('Peugeot',    ['208', '308', '508', '2008', '3008', '5008'], 'osobowe'),
-  ...s('Renault',    ['Clio', 'Megane', 'Captur', 'Kadjar', 'Talisman', 'Arkana'], 'osobowe'),
-  ...s('Hyundai',    ['i30', 'Tucson', 'Santa Fe', 'Kona', 'Ioniq 5', 'Ioniq 6'], 'osobowe'),
-  ...s('Kia',        ['Ceed', 'Sportage', 'Sorento', 'Niro', 'EV6'], 'osobowe'),
-  ...s('Mazda',      ['CX-3', 'CX-5', 'CX-30', 'CX-60', 'Mazda 3', 'Mazda 6'], 'osobowe'),
-  ...s('Honda',      ['Civic', 'CR-V', 'HR-V', 'Jazz'], 'osobowe'),
-  ...s('Jeep',       ['Compass', 'Renegade', 'Grand Cherokee', 'Wrangler'], 'osobowe'),
-  ...s('Land Rover', ['Discovery', 'Defender', 'Range Rover', 'Range Rover Sport', 'Range Rover Velar', 'Range Rover Evoque'], 'osobowe'),
-  ...s('Jaguar',     ['XE', 'XF', 'F-Pace', 'E-Pace', 'I-Pace'], 'osobowe'),
-  ...s('Mini',       ['Cooper', 'Countryman', 'Clubman'], 'osobowe'),
-  ...s('Cupra',      ['Leon', 'Formentor', 'Ateca', 'Born'], 'osobowe'),
-  ...s('Seat',       ['Leon', 'Ateca', 'Arona', 'Ibiza'], 'osobowe'),
-  ...s('Nissan',     ['Qashqai', 'X-Trail', 'Juke', 'Leaf', 'Ariya'], 'osobowe'),
-  ...s('Dacia',      ['Duster', 'Sandero', 'Jogger', 'Spring'], 'osobowe'),
-  ...s('Fiat',       ['500', 'Tipo', 'Panda', '500X'], 'osobowe'),
-  ...s('Citroen',    ['C3', 'C4', 'C5 Aircross', 'Berlingo'], 'osobowe'),
+const LEKKIE: VehicleSuggestion[] = [
+  ...s('Audi',       ['A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'Q3', 'Q5', 'Q7', 'Q8', 'e-tron'], 'osobowe_dostawcze'),
+  ...s('BMW',        ['1 Series', '2 Series', '3 Series', '4 Series', '5 Series', '7 Series', 'X1', 'X3', 'X5', 'X6', 'X7', 'iX'], 'osobowe_dostawcze'),
+  ...s('Mercedes',   ['A-Class', 'C-Class', 'E-Class', 'S-Class', 'CLA', 'CLS', 'GLA', 'GLC', 'GLE', 'GLS', 'EQC', 'EQE', 'EQS'], 'osobowe_dostawcze'),
+  ...s('Volkswagen', ['Golf', 'Passat', 'Arteon', 'Tiguan', 'Touareg', 'T-Roc', 'ID.3', 'ID.4', 'ID.5'], 'osobowe_dostawcze'),
+  ...s('Skoda',      ['Octavia', 'Superb', 'Kodiaq', 'Karoq', 'Kamiq', 'Enyaq'], 'osobowe_dostawcze'),
+  ...s('Toyota',     ['Corolla', 'Camry', 'RAV4', 'C-HR', 'Highlander', 'Land Cruiser', 'Yaris'], 'osobowe_dostawcze'),
+  ...s('Lexus',      ['IS', 'ES', 'LS', 'NX', 'RX', 'UX'], 'osobowe_dostawcze'),
+  ...s('Volvo',      ['XC40', 'XC60', 'XC90', 'S60', 'S90', 'V60', 'V90'], 'osobowe_dostawcze'),
+  ...s('Porsche',    ['911', 'Cayenne', 'Macan', 'Panamera', 'Taycan'], 'osobowe_dostawcze'),
+  ...s('Tesla',      ['Model 3', 'Model Y', 'Model S', 'Model X'], 'osobowe_dostawcze'),
+  ...s('Ford',       ['Focus', 'Mondeo', 'Kuga', 'Mustang', 'Mustang Mach-E', 'Puma'], 'osobowe_dostawcze'),
+  ...s('Opel',       ['Astra', 'Insignia', 'Mokka', 'Grandland', 'Crossland'], 'osobowe_dostawcze'),
+  ...s('Peugeot',    ['208', '308', '508', '2008', '3008', '5008'], 'osobowe_dostawcze'),
+  ...s('Renault',    ['Clio', 'Megane', 'Captur', 'Kadjar', 'Talisman', 'Arkana'], 'osobowe_dostawcze'),
+  ...s('Hyundai',    ['i30', 'Tucson', 'Santa Fe', 'Kona', 'Ioniq 5', 'Ioniq 6'], 'osobowe_dostawcze'),
+  ...s('Kia',        ['Ceed', 'Sportage', 'Sorento', 'Niro', 'EV6'], 'osobowe_dostawcze'),
+  ...s('Mazda',      ['CX-3', 'CX-5', 'CX-30', 'CX-60', 'Mazda 3', 'Mazda 6'], 'osobowe_dostawcze'),
+  ...s('Honda',      ['Civic', 'CR-V', 'HR-V', 'Jazz'], 'osobowe_dostawcze'),
+  ...s('Jeep',       ['Compass', 'Renegade', 'Grand Cherokee', 'Wrangler'], 'osobowe_dostawcze'),
+  ...s('Land Rover', ['Discovery', 'Defender', 'Range Rover', 'Range Rover Sport', 'Range Rover Velar', 'Range Rover Evoque'], 'osobowe_dostawcze'),
+  ...s('Jaguar',     ['XE', 'XF', 'F-Pace', 'E-Pace', 'I-Pace'], 'osobowe_dostawcze'),
+  ...s('Mini',       ['Cooper', 'Countryman', 'Clubman'], 'osobowe_dostawcze'),
+  ...s('Cupra',      ['Leon', 'Formentor', 'Ateca', 'Born'], 'osobowe_dostawcze'),
+  ...s('Seat',       ['Leon', 'Ateca', 'Arona', 'Ibiza'], 'osobowe_dostawcze'),
+  ...s('Nissan',     ['Qashqai', 'X-Trail', 'Juke', 'Leaf', 'Ariya'], 'osobowe_dostawcze'),
+  ...s('Dacia',      ['Duster', 'Sandero', 'Jogger', 'Spring'], 'osobowe_dostawcze'),
+  ...s('Fiat',       ['500', 'Tipo', 'Panda', '500X'], 'osobowe_dostawcze'),
+  ...s('Citroen',    ['C3', 'C4', 'C5 Aircross', 'Berlingo'], 'osobowe_dostawcze'),
+  ...s('Mercedes-Benz', ['Sprinter', 'Vito'], 'osobowe_dostawcze'),
+  ...s('Ford',          ['Transit', 'Transit Custom', 'Ranger'], 'osobowe_dostawcze'),
+  ...s('Volkswagen',    ['Crafter', 'Transporter', 'Caddy'], 'osobowe_dostawcze'),
+  ...s('Peugeot',       ['Boxer', 'Expert', 'Partner'], 'osobowe_dostawcze'),
+  ...s('Citroen',       ['Jumper', 'Jumpy', 'Berlingo'], 'osobowe_dostawcze'),
+  ...s('Fiat',          ['Ducato', 'Doblo', 'Talento'], 'osobowe_dostawcze'),
+  ...s('Opel',          ['Movano', 'Vivaro', 'Combo'], 'osobowe_dostawcze'),
+  ...s('Renault',       ['Master', 'Trafic', 'Kangoo'], 'osobowe_dostawcze'),
+  ...s('Iveco',         ['Daily'], 'osobowe_dostawcze'),
+  ...s('MAN',           ['TGE'], 'osobowe_dostawcze'),
 ]
 
-const CIEZAROWE: VehicleSuggestion[] = [
-  ...s('Mercedes-Benz', ['Sprinter', 'Vito', 'Actros', 'Atego', 'Arocs'], 'ciezarowe'),
-  ...s('Volvo',         ['FH', 'FH 460', 'FH 500', 'FM', 'FE'], 'ciezarowe'),
-  ...s('Scania',        ['R 450', 'R 500', 'R 540', 'S 500', 'S 540', 'P 280'], 'ciezarowe'),
-  ...s('MAN',           ['TGX', 'TGS', 'TGM', 'TGL', 'TGE'], 'ciezarowe'),
-  ...s('DAF',           ['XF', 'XG', 'CF', 'LF'], 'ciezarowe'),
-  ...s('Renault Trucks',['T 480', 'T 520', 'C', 'K', 'D'], 'ciezarowe'),
-  ...s('Iveco',         ['Daily', 'Eurocargo', 'Stralis', 'S-Way'], 'ciezarowe'),
-  ...s('Ford',          ['Transit', 'Transit Custom', 'Ranger'], 'ciezarowe'),
-  ...s('Volkswagen',    ['Crafter', 'Transporter', 'Caddy'], 'ciezarowe'),
-  ...s('Peugeot',       ['Boxer', 'Expert', 'Partner'], 'ciezarowe'),
-  ...s('Citroen',       ['Jumper', 'Jumpy', 'Berlingo'], 'ciezarowe'),
-  ...s('Fiat',          ['Ducato', 'Doblo', 'Talento'], 'ciezarowe'),
-  ...s('Opel',          ['Movano', 'Vivaro', 'Combo'], 'ciezarowe'),
-  ...s('Renault',       ['Master', 'Trafic', 'Kangoo'], 'ciezarowe'),
+const CIEZKI_TRANSPORT: VehicleSuggestion[] = [
+  ...s('Mercedes-Benz', ['Actros', 'Atego', 'Arocs'], 'ciezki_transport'),
+  ...s('Volvo',         ['FH', 'FH 460', 'FH 500', 'FM', 'FE'], 'ciezki_transport'),
+  ...s('Scania',        ['R 450', 'R 500', 'R 540', 'S 500', 'S 540', 'P 280'], 'ciezki_transport'),
+  ...s('MAN',           ['TGX', 'TGS', 'TGM', 'TGL'], 'ciezki_transport'),
+  ...s('DAF',           ['XF', 'XG', 'CF', 'LF'], 'ciezki_transport'),
+  ...s('Renault Trucks',['T 480', 'T 520', 'C', 'K', 'D'], 'ciezki_transport'),
+  ...s('Iveco',         ['Eurocargo', 'Stralis', 'S-Way'], 'ciezki_transport'),
+  ...s('Wielton',           ['Naczepa plandekowana', 'Naczepa chłodnia', 'Naczepa wywrotka', 'Naczepa niskopodwoziowa'], 'ciezki_transport'),
+  ...s('Krone',             ['Naczepa plandekowana', 'Naczepa chłodnia', 'Naczepa typu Mega'], 'ciezki_transport'),
+  ...s('Schmitz Cargobull', ['Naczepa plandekowana', 'Naczepa chłodnia', 'Naczepa typu Mega'], 'ciezki_transport'),
+  ...s('Kögel',             ['Naczepa plandekowana', 'Naczepa chłodnia'], 'ciezki_transport'),
+  ...s('Kässbohrer',        ['Naczepa niskopodwoziowa', 'Naczepa wywrotka', 'Naczepa do przewozu kontenerów'], 'ciezki_transport'),
 ]
 
 const MASZYNY: VehicleSuggestion[] = [
@@ -90,8 +98,8 @@ const MASZYNY: VehicleSuggestion[] = [
 ]
 
 export const VEHICLE_CATALOG: VehicleSuggestion[] = [
-  ...OSOBOWE,
-  ...CIEZAROWE,
+  ...LEKKIE,
+  ...CIEZKI_TRANSPORT,
   ...MASZYNY,
 ]
 
