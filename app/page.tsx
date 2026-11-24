@@ -254,32 +254,6 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* OPINIE */}
-      <section className="px-4 sm:px-6 py-12 sm:py-16" style={{ backgroundColor: "#ffffff" }}>
-        <div className="max-w-[1100px] mx-auto">
-          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-10 sm:mb-12" style={{ color: "#1B2A4A" }}>
-            Opinie klientów
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              { tekst: "Ekspresowa decyzja, zero stresu. Polecam każdemu przedsiębiorcy.", imie: "Marek K.", miasto: "Warszawa" },
-              { tekst: "Wszystko załatwione w jeden dzień. Auto stało pod domem następnego dnia.", imie: "Tomasz W.", miasto: "Kraków" },
-              { tekst: "Profesjonalne podejście, najlepsza oferta leasingu jaką znalazłem.", imie: "Anna P.", miasto: "Wrocław" },
-            ].map((opinia) => (
-              <div key={opinia.imie} className="rounded-xl p-6" style={{ backgroundColor: "#f8f9fb", border: "1px solid #e8eaed" }}>
-                <div className="text-lg mb-3" style={{ color: "#F0A500" }}>&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                <p className="text-sm leading-relaxed mb-4 italic" style={{ color: "#555" }}>
-                  &quot;{opinia.tekst}&quot;
-                </p>
-                <div className="text-[13px] font-semibold" style={{ color: "#1B2A4A" }}>
-                  {opinia.imie}, {opinia.miasto}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* STOPKA */}
       <footer className="px-4 sm:px-6 py-8 sm:py-10" style={{ backgroundColor: "#1B2A4A" }}>
         <div className="max-w-[1100px] mx-auto flex flex-col sm:flex-row justify-between items-center gap-6">
