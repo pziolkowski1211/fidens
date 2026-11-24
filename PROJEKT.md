@@ -620,3 +620,74 @@ poprawieniem maila w VS Code, zweryfikowano brak BOM po zapisie (odczyt pierwszy
   trzeba to zrobic przed promowaniem /pawilony)
 - Rozwazyc dodanie npx playwright test jako krok w konwencji "przed pushem"
   (albo uruchamiac osobno, co jakis czas - nie kazdorazowo, bo trwa ok. 1-1.5 min)
+
+### Sesja 24-25.11 - opinie, polityka, kategorie pojazdow, badge fix
+
+UWAGA: punkt "Do zrobienia" nizej o uszkodzonych zdjeciach dla dom-modulowy-40m2-10x4m
+jest NIEAKTUALNY - zdjecia zostaly uzupelnione (realne, skonwertowane .jpg) w
+poprzedniej sesji, strona ma kompletne dane (147 000 zl brutto, 5 zdjec).
+Zakladka /pawilony jest w calosci gotowa (5/5 realizacji z realnymi danymi).
+
+**1. Usuniete fikcyjne opinie klientow** (app/page.tsx) - sekcja "Opinie klientow"
+(fikcyjne "Marek K.", "Tomasz W.", "Anna P.") skasowana calkowicie, bo brak jeszcze
+realnych opinii. Plan na przyszlosc: po zalozeniu wizytowki Google i zebraniu opinii,
+dodac sekcje wyswietlajaca realne opinie 5-gwiazdkowe z Google.
+
+**2. Zgoda marketingowa w polityce prywatnosci** (app/polityka/page.tsx) - dodana
+nowa sekcja SS8 Zgoda marketingowa (podstawa prawna, dobrowolnosc, sposob wycofania,
+okres przechowywania danych), przenumerowano SS8 Bezpieczenstwo->SS9,
+SS9 Zmiany Polityki->SS10.
+
+**3. Restrukturyzacja kategorii pojazdow** - najwieksza zmiana tej sesji:
+- Stare kategorie: osobowe / ciezarowe / maszyna
+- Nowe kategorie: osobowe_dostawcze (osobowe + dostawcze do 3,5t, w tym Renault Master,
+  Sprinter, Crafter, VW/Peugeot/Citroen/Fiat/Opel busy, MAN TGE) / ciezki_transport
+  (ciagniki, ciezarowki pow. 3,5t, NOWE marki naczep: Wielton, Krone, Schmitz Cargobull,
+  Kogel, Kassbohrer) / maszyna (bez zmian, nie dzielone na budowlane/przemyslowe)
+- vehicle_type w Supabase to PRAWDZIWY ENUM Postgresa (nie text) - zmiana wymagala
+  utworzenia nowego typu enum, migracji danych z jawnym mapowaniem (CASE ... USING),
+  usuniecia starego typu i zmiany nazwy nowego z powrotem na "vehicle_type". W repo
+  NIE MA folderu migrations/ ani plikow .sql - schema zmieniana recznie w Supabase
+  SQL Editor, trzeba o tym pamietac przy kazdej zmianie schematu.
+  W momencie migracji byly tylko 4 wiersze w listings (BMW, Porsche, Mercedes Sprinter,
+  Caterpillar) - Sprinter byl jedynym "ciezarowe", poszedl do osobowe_dostawcze.
+- Zmienione pliki: lib/supabase/types.ts, lib/vehicles/catalog.ts (pelny rewrite,
+  rozdzielenie marek typu Sprinter/Crafter/Master z grupy ciezarowe na lekkie, MAN TGE
+  tez przeniesiony do lekkich bo to lekki van a nie ciezarowka), SearchAutocomplete.tsx,
+  app/admin/ogloszenia/nowe/page.tsx, app/admin/ogloszenia/[id]/page.tsx (dropdown +
+  typ TS w obu).
+
+**4. Alt teksty SEO - okazalo sie ze juz sa wszedzie** (auto.title / r.nazwa / alt w
+Carousel.tsx), nie trzeba bylo nic dodawac. Jedyny pusty alt to miniatury w karuzeli
+(Carousel.tsx:154, alt="") - to CELOWE, zgodne z WCAG (nawigacyjne duplikaty glownego
+zdjecia, nie trzeba ich opisywac druga rae). Zdecydowano zostawic bez zmian.
+
+**5. Bug: pasek Nowe/Promocja rozciagal sie na cala szerokosc kafelka** - skutek
+uboczny wczesniejszej poprawki wyrownania cen (p-4 -> p-4 flex flex-col flex-1).
+Dziecko z display:inline-block w kontenerze flex-col i tak rozciaga sie na cala
+szerokosc (align-items: stretch domyslnie), bo flexbox ignoruje inline-block dla
+layoutu. Naprawione dodaniem self-start do klasy badge'a w app/page.tsx i
+app/ogloszenia/page.tsx. LEKCJA: kazda zmiana kontenera na flex/grid trzeba sprawdzic
+pod katem WSZYSTKICH dzieci w tym kontenerze, nie tylko tego ktore mialo byc naprawione.
+
+**6. Dociagniety zalegly fix**: app/ogloszenia/page.tsx mial niezacommitowana
+od ~8 dni poprawke wyrownania cen (flex-col + mt-auto) - sprawdzono git diff,
+zweryfikowano ze to dokladnie ta sama poprawka, zbudowano i zacommitowano.
+
+### Do zrobienia (nastepna sesja / w toku)
+- Wizytowka Google Business Profile - Piotr jeszcze jej nie ma, potrzebuje wsparcia
+  przy zakladaniu (serwis uslugowy bez adresu publicznego, kategoria broker/leasing)
+- Po zalozeniu wizytowki: mechanizm wyswietlania realnych opinii Google na stronie
+  glownej (prawdopodobnie recznie aktualizowany plik na poczatek, zamiast platnego API)
+- Numer telefonu firmowy - NIE moze byc prywatny numer komorkowy Piotra na stronie.
+  Plan: druga karta SIM + przekierowanie polaczen (lub VoIP w przyszlosci), docelowo
+  maks. 2 numery, na razie 1. WAZNE: zrobic stala konfiguracyjna (np.
+  lib/config/contact.ts z PHONE_NUMBER/PHONE_HREF) uzywana w Navbar/stopce/kontakcie,
+  zeby zmiana numeru w przyszlosci byla edycja jednej linijki a nie szukaniem po
+  calym projekcie. NIE ZROBIONE JESZCZE - czeka na decyzje Piotra o konkretnym numerze.
+- Social media / marketing (FB, TikTok, IG, YT Shorts) - co i kiedy publikowac z
+  realizacji leasingowych, jakim softem sie wspomagac, jak prowadzic i czytac
+  statystyki. To osobny, wiekszy temat, jeszcze nie zaczety - potrzebne od Piotra:
+  jakie ma juz narzedzia analityczne, ile czasu/sprzetu tygodniowo moze na to poswiecic
+- Dynamiczne promocje sezonowe na stronie (przyklad Piotra: Black Friday - "bak paliwa
+  gratis" przy zakupie do konca miesiaca) - nie zaczete, czeka na konkretny pomysl
