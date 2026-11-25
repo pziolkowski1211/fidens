@@ -691,3 +691,40 @@ zweryfikowano ze to dokladnie ta sama poprawka, zbudowano i zacommitowano.
   jakie ma juz narzedzia analityczne, ile czasu/sprzetu tygodniowo moze na to poswiecic
 - Dynamiczne promocje sezonowe na stronie (przyklad Piotra: Black Friday - "bak paliwa
   gratis" przy zakupie do konca miesiaca) - nie zaczete, czeka na konkretny pomysl
+
+
+### Sesja 25-26.11 - kategorie ogloszen, maszyny przemyslowe, pawilony poza navbarem
+
+**1. /ogloszenia = ekran wyboru kategorii** (app/ogloszenia/page.tsx, przepisany):
+- Bez parametrow: 5 kafelkow (ikony SVG, robocze - docelowo grafiki): osobowe_dostawcze,
+  ciezki_transport, maszyna (UI: "Maszyny budowlane"), maszyna_przemyslowa, Pawilony (-> /pawilony).
+  Brak "Wszystkie" i brak licznikow ofert (swiadoma decyzja klienta). Ekran nie odpytuje bazy.
+- /ogloszenia?kategoria=<klucz>: lista jednej kategorii + pasek pigul do przelaczania + link
+  "Kategorie". Nieznana wartosc kategoria wraca do ekranu wyboru.
+- ?marka=, ?model=, ?q= nadal przeszukuja cala oferte; kategoria moze je zawezac.
+- SEO: osobny title/description/canonical dla kazdej kategorii.
+- Teksty: maszyny -> "Zapytaj o oferte" / "sprzet"; auta i transport -> "Zapytaj o ten pojazd".
+
+**2. Nowa kategoria maszyna_przemyslowa** (nowe obrabiarki CNC, strugarki, maszyny do obrobki
+drewna): wartosc dodana do enuma vehicle_type w Supabase SQL Editor (ALTER TYPE ... ADD VALUE
+IF NOT EXISTS). Wartosc "maszyna" ZOSTALA (UI: "Maszyny budowlane" - koparki, ladowarki).
+Bez katalogu marek/modeli dla przemyslowych (marka/model wpisywane recznie; wyszukiwanie
+pelnotekstowe po q). Zmienione: types.ts, catalog.ts (typ VehicleCategory), oba formularze
+admina, SearchAutocomplete (etykieta "Maszyna budowlana").
+- Admin: dla maszyn przemyslowych ukryte pola: przebieg km, paliwo, skrzynia, pojemnosc;
+  przy zapisie te pola sa zerowane (isIndustrial). Zostaja motogodziny, moc, kolor, kraj.
+
+**3. Strona oferty ([slug]/page.tsx):** dodane Motogodziny w tabeli parametrow (wczesniej
+mileage_hours nie bylo nigdzie wyswietlane), dla maszyn JSON-LD @type Product (nie Vehicle),
+naglowek "Dane maszyny", przycisk w kalkulatorze "Zapytaj o oferte" (prop ctaLabel).
+
+**4. Pawilony usuniete z navbara** (desktop i menu mobilne) - dostepne jako kafelek na
+/ogloszenia; /pawilony bez zmian.
+
+**5. Testy:** przepisany ogloszenia-list.spec.ts (ekran kategorii + lista kategorii),
+ogloszenie-detail.spec.ts (pierwsza oferta szukana po kategoriach, naglowek "Dane pojazdu" lub
+"Dane maszyny"), navbar.spec.ts (Pawilony ma NIE byc w pasku).
+
+**Uwagi:** schema bazy zmieniana recznie w SQL Editor (brak migracji w repo). npm run lint
+zglasza starsze bledy w plikach nie ruszanych w tej sesji (React 19 set-state-in-effect,
+scraper.ts: any) - do osobnego sprzatania; build ich nie sprawdza.

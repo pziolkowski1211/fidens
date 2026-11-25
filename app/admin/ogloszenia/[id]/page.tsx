@@ -19,6 +19,7 @@ export default function EdytujOgloszeniePage() {
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
   const [vehicleType, setVehicleType] = useState("osobowe_dostawcze");
+  const isIndustrial = vehicleType === "maszyna_przemyslowa";
   const [status, setStatus] = useState("active");
   const [brand, setBrand] = useState("");
   const [model, setModel] = useState("");
@@ -147,12 +148,12 @@ export default function EdytujOgloszeniePage() {
         model,
         variant: variant || null,
         year: Number(year),
-        mileage_km: mileageKm ? Number(mileageKm) : null,
+        mileage_km: !isIndustrial && mileageKm ? Number(mileageKm) : null,
         mileage_hours: mileageHours ? Number(mileageHours) : null,
-        fuel: (fuel || null) as "benzyna" | "diesel" | "elektryczny" | "hybryda" | "lpg" | "inny" | null,
-        transmission: (transmission || null) as "manualna" | "automatyczna" | "inne" | null,
+        fuel: (isIndustrial ? null : fuel || null) as "benzyna" | "diesel" | "elektryczny" | "hybryda" | "lpg" | "inny" | null,
+        transmission: (isIndustrial ? null : transmission || null) as "manualna" | "automatyczna" | "inne" | null,
         power_hp: powerHp ? Number(powerHp) : null,
-        engine_cc: engineCc ? Number(engineCc) : null,
+        engine_cc: !isIndustrial && engineCc ? Number(engineCc) : null,
         color: color || null,
         country_origin: countryOrigin || null,
         price_pln: Number(pricePln),
@@ -308,7 +309,7 @@ export default function EdytujOgloszeniePage() {
         <section className="rounded-lg border border-gray-200 bg-white p-4">
           <h2 className="mb-3 text-sm font-semibold text-gray-500">Techniczne</h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
+            {!isIndustrial && (<div>
               <label className={labelClass}>Przebieg (km)</label>
               <input
                 type="number"
@@ -316,7 +317,7 @@ export default function EdytujOgloszeniePage() {
                 value={mileageKm}
                 onChange={(e) => setMileageKm(e.target.value)}
               />
-            </div>
+            </div>)}
             <div>
               <label className={labelClass}>Motogodziny</label>
               <input
@@ -326,7 +327,7 @@ export default function EdytujOgloszeniePage() {
                 onChange={(e) => setMileageHours(e.target.value)}
               />
             </div>
-            <div>
+            {!isIndustrial && (<div>
               <label className={labelClass}>Paliwo</label>
               <select
                 className={inputClass}
@@ -341,8 +342,8 @@ export default function EdytujOgloszeniePage() {
                 <option value="lpg">LPG</option>
                 <option value="inny">Inny</option>
               </select>
-            </div>
-            <div>
+            </div>)}
+            {!isIndustrial && (<div>
               <label className={labelClass}>Skrzynia</label>
               <select
                 className={inputClass}
@@ -354,7 +355,7 @@ export default function EdytujOgloszeniePage() {
                 <option value="automatyczna">Automatyczna</option>
                 <option value="inne">Inne</option>
               </select>
-            </div>
+            </div>)}
             <div>
               <label className={labelClass}>Moc (KM)</label>
               <input
@@ -364,7 +365,7 @@ export default function EdytujOgloszeniePage() {
                 onChange={(e) => setPowerHp(e.target.value)}
               />
             </div>
-            <div>
+            {!isIndustrial && (<div>
               <label className={labelClass}>Pojemność (cm3)</label>
               <input
                 type="number"
@@ -372,7 +373,7 @@ export default function EdytujOgloszeniePage() {
                 value={engineCc}
                 onChange={(e) => setEngineCc(e.target.value)}
               />
-            </div>
+            </div>)}
             <div>
               <label className={labelClass}>Kolor</label>
               <input

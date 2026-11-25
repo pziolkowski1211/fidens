@@ -97,6 +97,8 @@ interface Listing {
   model: string | null
   year: number | null
   mileage_km: number | null
+  mileage_hours: number | null
+  vehicle_type: string | null
   fuel: string | null
   transmission: string | null
   power_hp: number | null
@@ -192,6 +194,7 @@ export default async function OgloszenieDetailPage({ params }: PageProps) {
 
   if (listing.year) params_list.push({ label: "Rok produkcji", value: String(listing.year) })
   if (listing.mileage_km) params_list.push({ label: "Przebieg", value: formatNumber(listing.mileage_km) + " km" })
+  if (listing.mileage_hours) params_list.push({ label: "Motogodziny", value: formatNumber(listing.mileage_hours) + " mth" })
   if (listing.fuel) params_list.push({ label: "Paliwo", value: capitalizeFirst(listing.fuel) })
   if (listing.transmission) params_list.push({ label: "Skrzynia biegów", value: capitalizeFirst(listing.transmission) })
   if (listing.power_hp) params_list.push({ label: "Moc", value: listing.power_hp + " KM" })
@@ -199,34 +202,50 @@ export default async function OgloszenieDetailPage({ params }: PageProps) {
   if (listing.color) params_list.push({ label: "Kolor", value: listing.color })
   if (listing.country_origin) params_list.push({ label: "Pochodzenie", value: listing.country_origin })
 
+  const isMachine = listing.vehicle_type === "maszyna" || listing.vehicle_type === "maszyna_przemyslowa"
+
   const isMarza = listing.vat_type === "marza"
 
   const coverImage = images.find((i) => i.is_cover)?.url || images[0]?.url
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Vehicle",
-    name: listing.title,
-    brand: listing.brand || undefined,
-    model: listing.model || undefined,
-    vehicleModelDate: listing.year || undefined,
-    fuelType: listing.fuel || undefined,
-    vehicleTransmission: listing.transmission || undefined,
-    color: listing.color || undefined,
-    image: coverImage || undefined,
-    mileageFromOdometer: listing.mileage_km
-      ? { "@type": "QuantitativeValue", value: listing.mileage_km, unitCode: "KMT" }
-      : undefined,
-    offers: listing.price_pln
-      ? {
-          "@type": "Offer",
-          price: listing.price_pln,
-          priceCurrency: "PLN",
-          availability: "https://schema.org/InStock",
-          url: `https://fidens.pl/ogloszenia/${listing.slug}`,
-        }
-      : undefined,
-  }
+  const offer = listing.price_pln
+    ? {
+        "@type": "Offer",
+        price: listing.price_pln,
+        priceCurrency: "PLN",
+        availability: "https://schema.org/InStock",
+        url: `https://fidens.pl/ogloszenia/${listing.slug}`,
+      }
+    : undefined
+
+  const jsonLd = isMachine
+    ? {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        name: listing.title,
+        brand: listing.brand ? { "@type": "Brand", name: listing.brand } : undefined,
+        model: listing.model || undefined,
+        productionDate: listing.year ? String(listing.year) : undefined,
+        color: listing.color || undefined,
+        image: coverImage || undefined,
+        offers: offer,
+      }
+    : {
+        "@context": "https://schema.org",
+        "@type": "Vehicle",
+        name: listing.title,
+        brand: listing.brand || undefined,
+        model: listing.model || undefined,
+        vehicleModelDate: listing.year || undefined,
+        fuelType: listing.fuel || undefined,
+        vehicleTransmission: listing.transmission || undefined,
+        color: listing.color || undefined,
+        image: coverImage || undefined,
+        mileageFromOdometer: listing.mileage_km
+          ? { "@type": "QuantitativeValue", value: listing.mileage_km, unitCode: "KMT" }
+          : undefined,
+        offers: offer,
+      }
 
   return (
     <main className="min-h-screen flex flex-col" style={{ backgroundColor: "#f8f9fb" }}>
@@ -256,7 +275,7 @@ export default async function OgloszenieDetailPage({ params }: PageProps) {
 
             {params_list.length > 0 && (
               <div className="rounded-xl p-6 mb-6" style={{ backgroundColor: "#ffffff", border: "1px solid #e8eaed" }}>
-                <h2 className="text-lg font-bold mb-4" style={{ color: "#1B2A4A" }}>Dane pojazdu</h2>
+                <h2 className="text-lg font-bold mb-4" style={{ color: "#1B2A4A" }}>{isMachine ? "Dane maszyny" : "Dane pojazdu"}</h2>
                 <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
                   {params_list.map((p) => (
                     <div key={p.label} className="flex justify-between border-b pb-2" style={{ borderColor: "#f0f0f0" }}>
@@ -279,7 +298,7 @@ export default async function OgloszenieDetailPage({ params }: PageProps) {
           <aside className="lg:sticky lg:top-6 lg:self-start">
             <div className="rounded-xl p-6" style={{ backgroundColor: "#ffffff", border: "1px solid #e8eaed" }}>
               {listing.price_pln && (
-                <LeasingCalculator price={listing.price_pln} isMarza={isMarza} slug={listing.slug} brand={listing.brand} model={listing.model} />
+                <LeasingCalculator price={listing.price_pln} isMarza={isMarza} slug={listing.slug} brand={listing.brand} model={listing.model} ctaLabel={isMachine ? "Zapytaj o ofert\u0119" : undefined} />
               )}
             </div>
           </aside>

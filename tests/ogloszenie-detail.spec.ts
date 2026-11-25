@@ -26,7 +26,7 @@ test.describe("/ogloszenia/[slug] - strona szczegółowa + kalkulator", () => {
   test("sekcja Dane pojazdu jest widoczna", async ({ page }) => {
     const href = await goToFirstListing(page);
     test.skip(!href, "Brak ogłoszeń do przetestowania");
-    await expect(page.getByRole("heading", { name: "Dane pojazdu" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Dane (pojazdu|maszyny)/ })).toBeVisible();
   });
 
   test("opis nie pokazuje surowych gwiazdek Markdown", async ({ page }) => {
