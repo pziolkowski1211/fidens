@@ -6,9 +6,9 @@ test.describe("/pawilony - lista", () => {
     await expect(page.getByRole("heading", { name: "Pawilony i kontenery na zamówienie" })).toBeVisible();
     await expect(page.getByText("Domek całoroczny 35m² z antresolą")).toBeVisible();
     await expect(page.getByText("Dom modułowy 40m²")).toBeVisible();
-    await expect(page.getByText("Pawilon biurowy 24m²")).toBeVisible();
+    await expect(page.getByText("Pawilon modułowy 24m²")).toBeVisible();
     await expect(page.getByText("Pawilon gastronomiczny 18m²")).toBeVisible();
-    await expect(page.getByText("Domek modułowy 42m² z elewacją palisandrową")).toBeVisible();
+    await expect(page.getByText("Domek modułowy 42m²")).toBeVisible();
     await expect(page.getByText("Twój własny projekt")).toBeVisible();
   });
 
