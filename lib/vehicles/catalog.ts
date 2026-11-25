@@ -1,5 +1,5 @@
 // lib/vehicles/catalog.ts
-export type VehicleCategory = 'osobowe_dostawcze' | 'ciezki_transport' | 'maszyna'
+export type VehicleCategory = 'osobowe_dostawcze' | 'ciezki_transport' | 'maszyna' | 'maszyna_przemyslowa' | 'maszyna_przemyslowa'
 
 export interface VehicleSuggestion {
   brand: string

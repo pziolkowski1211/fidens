@@ -2,7 +2,10 @@ import { test, expect } from "@playwright/test";
 
 test.describe("/ogloszenia/[slug] - strona szczegółowa + kalkulator", () => {
   async function goToFirstListing(page: import("@playwright/test").Page) {
-    await page.goto("/ogloszenia");
+    for (const k of ["osobowe_dostawcze", "ciezki_transport", "maszyna", "maszyna_przemyslowa"]) {
+      await page.goto("/ogloszenia?kategoria=" + k);
+      if ((await page.locator(`a[href^="/ogloszenia/"]`).count()) > 0) break;
+    }
     const firstCard = page.locator(`a[href^="/ogloszenia/"]`).first();
     const count = await firstCard.count();
     if (count === 0) return null;

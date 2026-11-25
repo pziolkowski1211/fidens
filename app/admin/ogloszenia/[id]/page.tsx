@@ -141,7 +141,7 @@ export default function EdytujOgloszeniePage() {
       .update({
         title,
         slug,
-        vehicle_type: vehicleType as "osobowe_dostawcze" | "ciezki_transport" | "maszyna",
+        vehicle_type: vehicleType as "osobowe_dostawcze" | "ciezki_transport" | "maszyna" | "maszyna_przemyslowa",
         status: status as "active" | "inactive" | "sold",
         brand,
         model,
@@ -250,7 +250,8 @@ export default function EdytujOgloszeniePage() {
               >
                 <option value="osobowe_dostawcze">Osobowe i dostawcze (do 3,5t)</option>
                 <option value="ciezki_transport">Ciężki transport</option>
-                <option value="maszyna">Maszyna</option>
+                <option value="maszyna">Maszyny budowlane</option>
+                <option value="maszyna_przemyslowa">Maszyny przemysłowe</option>
               </select>
             </div>
             <div>

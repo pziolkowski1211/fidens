@@ -159,7 +159,7 @@ export default function SearchAutocomplete({ variant = "desktop", onSelect, auto
                 <span className="text-[10px] uppercase tracking-wider text-gray-400 shrink-0">
                   {item.category === "osobowe_dostawcze" && "Osobowe/dostawcze"}
                   {item.category === "ciezki_transport" && "Ciężki transport"}
-                  {item.category === "maszyna" && "Maszyna"}
+                  {item.category === "maszyna" && "Maszyna budowlana"}
                 </span>
               </li>
             ))}

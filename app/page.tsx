@@ -183,7 +183,7 @@ export default async function Home() {
                   </div>
                   <div className="p-4 flex flex-col flex-1">
                     {auto.badge && (
-                      <div className="text-[10px] py-0.5 px-2 rounded-[3px] inline-block mb-2"
+                      <div className="text-[10px] py-0.5 px-2 rounded-[3px] inline-block self-start mb-2"
                         style={{
                           backgroundColor: auto.badge === "Promocja" ? "#fff3e0" : "#e8f4e8",
                           color: auto.badge === "Promocja" ? "#e65100" : "#2a7a2a"
