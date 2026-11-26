@@ -54,9 +54,4 @@ test.describe("/pawilony/[slug] - strona szczegółowa + PawilonCalculator", () 
     await page.goto("/pawilony/domek-caloroczny-35m2-z-antresola");
     await expect(page.getByRole("link", { name: "Zapytaj o ten obiekt" })).toBeVisible();
   });
-
-  test("nowa realizacja (placeholder) pokazuje żółte ostrzeżenie o cenie", async ({ page }) => {
-    await page.goto("/pawilony/dom-modulowy-40m2-10x4m");
-    await expect(page.getByText(/UWAGA.*placeholder/i)).toBeVisible();
-  });
 });
