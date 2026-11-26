@@ -728,3 +728,13 @@ ogloszenie-detail.spec.ts (pierwsza oferta szukana po kategoriach, naglowek "Dan
 **Uwagi:** schema bazy zmieniana recznie w SQL Editor (brak migracji w repo). npm run lint
 zglasza starsze bledy w plikach nie ruszanych w tej sesji (React 19 set-state-in-effect,
 scraper.ts: any) - do osobnego sprzatania; build ich nie sprawdza.
+## Sesja 26.11 - hero na stronie glownej
+
+- Hero (app/components/HeroSearch.tsx): obraz w tle przesuwa sie w bok (autoplay 8 s, przeciaganie myszka i palcem, kropki, strzalki na xl). Tekst i przycisk stoja w miejscu, zmieniaja sie plynnie.
+- Slajdy edytuje sie w jednym pliku: lib/config/hero-slides.ts (enabled, endDate, tytul, link). Tla: public/hero/*.jpg (promo, odreki, maszyny, pawilony) - do wygenerowania.
+- Wyszukiwarka tylko dla osobowych i dostawczych (bez zakladek), link "wszystkie kategorie" -> /ogloszenia.
+- Suwak raty + suwak wplaty wlasnej (0-200 000 zl). Rata liczona przy wybranej wplacie: lib/leasing/calculator.ts -> calculateRateWithDownPayment (wplata max 45% ceny).
+- /ogloszenia przyjmuje parametry rata_max i wplata (filtr i rata na kartach przy tej wplacie).
+- Navbar: zloty przycisk "Wszystkie ogloszenia".
+- Testy: tests/homepage.spec.ts (nowy), tests/navbar.spec.ts (zaktualizowany).
+- DO ZROBIENIA: wygenerowac 4 zdjecia hero, uzupelnic warunki promocji w slajdzie 1 (albo enabled:false), slajd z opiniami (po zalozeniu wizytowki Google), telefon w lib/config/contact.ts.

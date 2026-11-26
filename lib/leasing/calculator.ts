@@ -60,12 +60,23 @@ export function getNettoPrice(cenaBrutto: number): number {
   return cenaBrutto / (1 + VAT_RATE)
 }
 
-export function calculateShowcaseRate(cenaPln: number, isMarza: boolean): number {
+function calcShowcase(cenaPln: number, isMarza: boolean, wplataProc: number): number {
   const hasWykup = !isMarza
   const wykupProc = hasWykup ? getWykupLimits(SHOWCASE_OKRES_MSC).max : 0
   // Dla VAT-23 (leasing) rata liczona jest od ceny netto (cena bez VAT) -
   // tak wyglada realny leasing dla firm, ktore odliczaja VAT. Dla VAT-marza
   // (pozyczka) nie ma podzialu netto/brutto, liczymy od pelnej ceny.
   const cenaDoWyliczenia = hasWykup ? getNettoPrice(cenaPln) : cenaPln
-  return calculateRata(cenaDoWyliczenia, SHOWCASE_WPLATA_PROC, SHOWCASE_OKRES_MSC, wykupProc, hasWykup)
+  return calculateRata(cenaDoWyliczenia, wplataProc, SHOWCASE_OKRES_MSC, wykupProc, hasWykup)
+}
+
+export function calculateShowcaseRate(cenaPln: number, isMarza: boolean): number {
+  return calcShowcase(cenaPln, isMarza, SHOWCASE_WPLATA_PROC)
+}
+
+// Rata przy konkretnej wplacie wlasnej w zlotych (brutto), ograniczonej do WPLATA_MAX % ceny.
+export function calculateRateWithDownPayment(cenaPln: number, isMarza: boolean, wplataPln: number): number {
+  if (!(cenaPln > 0)) return 0
+  const proc = Math.min(Math.max((wplataPln / cenaPln) * 100, 0), WPLATA_MAX)
+  return calcShowcase(cenaPln, isMarza, proc)
 }

@@ -5,7 +5,7 @@ test.describe("Navbar", () => {
     test.skip(testInfo.project.name !== "chromium-desktop", "tylko desktop");
     await page.goto("/");
     const nav = page.locator("nav").first();
-    await expect(nav.getByRole("link", { name: "Ogłoszenia", exact: true })).toBeVisible();
+    await expect(nav.getByRole("link", { name: "Wszystkie ogłoszenia", exact: true })).toBeVisible();
     await expect(nav.getByRole("link", { name: "Pawilony", exact: true })).toHaveCount(0);
     await expect(nav.getByRole("link", { name: "Poznaj Fidens", exact: true })).toBeVisible();
     await expect(nav.getByRole("link", { name: "Kontakt", exact: true })).toBeVisible();
@@ -15,7 +15,7 @@ test.describe("Navbar", () => {
   test("desktop - kliknięcie w Ogłoszenia przenosi do /ogloszenia", async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== "chromium-desktop", "tylko desktop");
     await page.goto("/");
-    await page.locator("nav").first().getByRole("link", { name: "Ogłoszenia", exact: true }).click();
+    await page.locator("nav").first().getByRole("link", { name: "Wszystkie ogłoszenia", exact: true }).click();
     await expect(page).toHaveURL(/\/ogloszenia/);
   });
 
@@ -40,7 +40,7 @@ test.describe("Navbar", () => {
     await page.getByRole("button", { name: "Menu", exact: true }).click();
     const menu = page.getByRole("dialog", { name: "Menu" });
     await expect(menu.getByRole("link", { name: "Strona główna", exact: true })).toBeVisible();
-    await expect(menu.getByRole("link", { name: "Ogłoszenia", exact: true })).toBeVisible();
+    await expect(menu.getByRole("link", { name: "Wszystkie ogłoszenia", exact: true })).toBeVisible();
     await expect(menu.getByRole("link", { name: "Pawilony", exact: true })).toHaveCount(0);
     await expect(menu.getByRole("link", { name: "Poznaj Fidens", exact: true })).toBeVisible();
     await expect(menu.getByRole("link", { name: "Kontakt", exact: true })).toBeVisible();

@@ -3,6 +3,8 @@ import Image from "next/image";
 import Navbar from "./components/Navbar";
 import { createClient } from "@/lib/supabase/server";
 import { calculateShowcaseRate } from "@/lib/leasing/calculator";
+import HeroSearch, { type HeroListing } from "./components/HeroSearch";
+import { getActiveSlides } from "@/lib/config/hero-slides";
 
 interface FeaturedListing {
   id: string;
@@ -85,22 +87,30 @@ export default async function Home() {
     is_marza: row.vat_type === "marza",
   }));
 
+  const { data: heroData } = await supabase
+    .from("listings")
+    .select("brand, model, price_pln, vat_type")
+    .eq("status", "active")
+    .eq("vehicle_type", "osobowe_dostawcze");
+  const heroListings: HeroListing[] = (
+    (heroData || []) as { brand: string | null; model: string | null; price_pln: number | null; vat_type: string | null }[]
+  )
+    .filter((row) => row.brand && row.model && row.price_pln)
+    .map((row) => ({
+      b: row.brand as string,
+      m: row.model as string,
+      p: row.price_pln as number,
+      v: row.vat_type === "marza",
+    }));
+  const heroSlides = getActiveSlides();
+
   return (
     <main className="min-h-screen" style={{ backgroundColor: "#f8f9fb" }}>
 
       <Navbar />
 
       {/* HERO */}
-      <section style={{ backgroundColor: "#1B2A4A" }} className="px-4 sm:px-6 py-12 sm:py-16 lg:py-20 text-center">
-        <h1 className="text-white text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight mb-4">
-          Finansowanie pojazdów<br className="hidden sm:inline" />
-          <span className="sm:hidden"> </span>i maszyn budowlanych
-        </h1>
-        <p className="text-white/60 text-base sm:text-lg mb-4 px-4">
-          Leasing, kredyt, wynajem &mdash; szybka decyzja kredytowa.<br className="hidden sm:inline" />
-          <span className="sm:hidden"> </span>Ty wybierasz pojazd, my zajmujemy się resztą.
-        </p>
-      </section>
+      <HeroSearch slides={heroSlides} listings={heroListings} />
 
       {/* OGŁOSZENIE TYGODNIA */}
       {featured && (

@@ -3,7 +3,7 @@ import Image from "next/image"
 import type { Metadata } from "next"
 import Navbar from "../components/Navbar"
 import { createClient } from "@/lib/supabase/server"
-import { calculateShowcaseRate } from "@/lib/leasing/calculator"
+import { calculateShowcaseRate, calculateRateWithDownPayment } from "@/lib/leasing/calculator"
 
 type CategoryKey = "osobowe_dostawcze" | "ciezki_transport" | "maszyna" | "maszyna_przemyslowa"
 type IconName = "car" | "truck" | "excavator" | "cog" | "building"
@@ -14,6 +14,8 @@ interface PageProps {
     model?: string
     q?: string
     kategoria?: string
+    rata_max?: string
+    wplata?: string
   }>
 }
 
@@ -163,6 +165,8 @@ export default async function OgloszeniaPage({ searchParams }: PageProps) {
   const model = params.model
   const q = params.q
   const kategoria = findCategory(params.kategoria)
+  const rataMax = Number(params.rata_max) > 0 ? Number(params.rata_max) : null
+  const wplata = Number(params.wplata) > 0 ? Number(params.wplata) : null
 
   const isLanding = !marka && !model && !q && !kategoria
 
@@ -198,7 +202,7 @@ export default async function OgloszeniaPage({ searchParams }: PageProps) {
     console.error("B\u0142\u0105d pobierania og\u0142osze\u0144:", error)
   }
 
-  const listingsArr: ListingCard[] = ((data as RawListingRow[] | null) || []).map((row) => ({
+  const allListings: ListingCard[] = ((data as RawListingRow[] | null) || []).map((row) => ({
     id: row.id,
     slug: row.slug,
     title: row.title,
@@ -206,12 +210,17 @@ export default async function OgloszeniaPage({ searchParams }: PageProps) {
     model: row.model,
     year: row.year,
     mileage_km: row.mileage_km,
-    rate: row.price_pln ? calculateShowcaseRate(row.price_pln, row.vat_type === "marza") : null,
+    rate: row.price_pln
+      ? wplata
+        ? calculateRateWithDownPayment(row.price_pln, row.vat_type === "marza", wplata)
+        : calculateShowcaseRate(row.price_pln, row.vat_type === "marza")
+      : null,
     badge: row.badge,
     vehicle_type: row.vehicle_type,
     cover_url: extractCoverUrl(row.listing_images),
     is_marza: row.vat_type === "marza",
   }))
+  const listingsArr = rataMax ? allListings.filter((l) => l.rate !== null && l.rate <= rataMax) : allListings
 
   let title = kategoria ? kategoria.name : "Og\u0142oszenia"
   let filterText = ""
@@ -246,7 +255,16 @@ export default async function OgloszeniaPage({ searchParams }: PageProps) {
               {"Kategoria: " + kategoria.name}
             </p>
           )}
-          {!noResults && (
+          {rataMax && (
+            <p className="text-sm mb-1" style={{ color: "#888" }}>
+              Maksymalna rata: {formatNumber(rataMax)} z&#322;/msc
+            </p>
+          )}
+          {wplata && (
+            <p className="text-sm mb-1" style={{ color: "#888" }}>
+              Wp&#322;ata w&#322;asna: {formatNumber(wplata)} z&#322;
+            </p>
+          )}          {!noResults && (
             <p className="text-sm" style={{ color: "#888" }}>
               Znaleziono <strong>{listingsArr.length}</strong> {pluralizeOferty(listingsArr.length)}
             </p>
@@ -311,6 +329,9 @@ export default async function OgloszeniaPage({ searchParams }: PageProps) {
                     {auto.rate && (
                       <div className="text-[22px] font-bold mt-auto" style={{ color: "#1B2A4A" }}>
                         od {formatNumber(Math.round(auto.rate))} {"z\u0142"} <span className="text-[13px] font-normal" style={{ color: "#888" }}>/msc{!auto.is_marza && " netto"}</span>
+                        {wplata && (
+                          <span className="block text-[12px] font-normal" style={{ color: "#888" }}>przy wp&#322;acie {formatNumber(wplata)} z&#322;</span>
+                        )}
                       </div>
                     )}
                   </div>
