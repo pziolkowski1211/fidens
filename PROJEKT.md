@@ -738,3 +738,11 @@ scraper.ts: any) - do osobnego sprzatania; build ich nie sprawdza.
 - Navbar: zloty przycisk "Wszystkie ogloszenia".
 - Testy: tests/homepage.spec.ts (nowy), tests/navbar.spec.ts (zaktualizowany).
 - DO ZROBIENIA: wygenerowac 4 zdjecia hero, uzupelnic warunki promocji w slajdzie 1 (albo enabled:false), slajd z opiniami (po zalozeniu wizytowki Google), telefon w lib/config/contact.ts.
+## Lista kontrolna PRZED STARTEM PRODUKCYJNYM
+
+- lib/config/site.ts: ALLOW_INDEXING = true (teraz false, strona jest zablokowana przed Google).
+- lib/config/contact.ts: wpisac prawdziwy numer telefonu (pusty = przyciski Zadzwon ukryte).
+- Konsultacja z prawnikiem: adres w stopce/regulaminie, regulamin, polityka prywatnosci, zasady reklamowania uslug finansowych, zgody na opinie.
+- lib/config/hero-slides.ts: uzupelnic warunki promocji (slajd 1) albo enabled: false.
+- Wizytowka Google (adres ukryty lub prawdziwy coworking), potem slajd z opiniami.
+- Social media (Facebook, Instagram): dopiero po powyzszym.
