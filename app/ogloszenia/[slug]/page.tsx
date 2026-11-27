@@ -6,6 +6,7 @@ import type { Metadata } from "next"
 import Navbar from "../../components/Navbar"
 import Carousel from "../../components/Carousel"
 import LeasingCalculator from "../../components/LeasingCalculator"
+import { CONTACT_PHONE, phoneHref } from "@/lib/config/contact"
 import { createClient } from "@/lib/supabase/server"
 
 function parseInlineBold(text: string, keyPrefix: string): ReactNode[] {
@@ -164,13 +165,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       siteName: "Fidens",
       locale: "pl_PL",
       type: "website",
-      images: cover ? [{ url: cover, width: 1200, height: 630, alt: listing.title }] : undefined,
+      images: [{ url: cover || "https://fidens.pl/og-image.png", width: 1200, height: 630, alt: listing.title }],
     },
     twitter: {
       card: "summary_large_image",
       title: listing.title,
       description,
-      images: cover ? [cover] : undefined,
+      images: [cover || "https://fidens.pl/og-image.png"],
     },
   }
 }
@@ -301,6 +302,14 @@ export default async function OgloszenieDetailPage({ params }: PageProps) {
                 <LeasingCalculator price={listing.price_pln} isMarza={isMarza} slug={listing.slug} brand={listing.brand} model={listing.model} ctaLabel={isMachine ? "Zapytaj o ofert\u0119" : undefined} />
               )}
             </div>
+          {CONTACT_PHONE && (
+              <a
+                href={phoneHref()}
+                className="mt-4 flex items-center justify-center rounded-xl border-2 border-[#1B2A4A] py-3 text-[15px] font-bold text-[#1B2A4A] transition-colors hover:bg-[#1B2A4A] hover:text-white"
+              >
+                Zadzwo&#324;: {CONTACT_PHONE}
+              </a>
+            )}
           </aside>
 
         </div>

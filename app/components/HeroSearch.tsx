@@ -313,7 +313,7 @@ export default function HeroSearch({ slides, listings }: HeroSearchProps) {
         {/* Prawa strona: wyszukiwarka (stoi w miejscu, nie przesuwa sie ze slajdami) */}
         <div ref={formRef} className="cursor-auto select-text rounded-2xl bg-white p-5 sm:p-6 shadow-2xl">
           <p className="text-[22px] font-bold leading-tight" style={{ color: NAVY }}>
-            Znajd&#378; auto na leasing
+            Znajd&#378; auto
           </p>
           <p className="text-[13px] mt-1 mb-5" style={{ color: "#6b7280" }}>
             <span
@@ -448,7 +448,7 @@ export default function HeroSearch({ slides, listings }: HeroSearchProps) {
             className="block text-center text-[13px] mt-3 underline underline-offset-2 hover:text-[#F0A500]"
             style={{ color: "#555" }}
           >
-            Ciężarówki, maszyny i pawilony &rarr; wszystkie kategorie
+            Ciężarówki, maszyny i pawilony &rarr; wszystkie og&#322;oszenia
           </Link>
         </div>
       </div>

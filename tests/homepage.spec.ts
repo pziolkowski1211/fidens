@@ -8,7 +8,7 @@ test.describe("Strona glowna - hero", () => {
     await expect(page.getByRole("tablist")).toHaveCount(0)
     const search = page.getByRole("link", { name: /Poka. oferty/ })
     await expect(search).toHaveAttribute("href", /kategoria=osobowe_dostawcze/)
-    await expect(page.getByRole("link", { name: /wszystkie kategorie/i })).toHaveAttribute("href", "/ogloszenia")
+    await expect(page.getByRole("link", { name: /Ci.*wszystkie og.oszenia/ })).toHaveAttribute("href", "/ogloszenia")
   })
 
   test("suwak wplaty wlasnej zmienia link wyszukiwania", async ({ page }) => {
