@@ -3,11 +3,27 @@
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import SearchAutocomplete from "./SearchAutocomplete"
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+  const pathname = usePathname()
+  const onListings = pathname.startsWith("/ogloszenia")
+  const onAbout = pathname.startsWith("/o-nas")
+  const onContact = pathname.startsWith("/kontakt")
+
+  // Pasek zmniejsza sie i dostaje cien po przewinieciu strony
+  useEffect(() => {
+    function onScroll() {
+      setScrolled(window.scrollY > 12)
+    }
+    onScroll()
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => window.removeEventListener("scroll", onScroll)
+  }, [])
 
   // Zablokuj scroll body kiedy menu jest otwarte
   useEffect(() => {
@@ -36,7 +52,10 @@ export default function Navbar() {
   return (
     <>
       {/* GLOWNA NAWIGACJA */}
-      <nav style={{ backgroundColor: "#1B2A4A" }} className="px-4 sm:px-6 py-4 sticky top-0 z-50 flex items-center">
+      <nav
+        style={{ backgroundColor: "#1B2A4A" }}
+        className={"px-4 sm:px-6 sticky top-0 z-50 flex items-center transition-all duration-300 " + (scrolled ? "py-2 shadow-lg shadow-black/25" : "py-4")}
+      >
 
         {/* Logo - lewa strona, klikalne */}
         <Link href="/" className="flex items-center shrink-0">
@@ -45,7 +64,7 @@ export default function Navbar() {
             alt="Fidens"
             width={300}
             height={200}
-            className="h-9 sm:h-11 w-auto"
+            className={"w-auto transition-all duration-300 " + (scrolled ? "h-8 sm:h-9" : "h-9 sm:h-11")}
             priority
           />
         </Link>
@@ -59,11 +78,21 @@ export default function Navbar() {
 
         {/* DESKTOP: Menu prawa strona */}
         <div className="hidden lg:flex items-center gap-6 shrink-0">
-          <Link href="/ogloszenia" className="text-[#F0A500] text-[14px] font-semibold border border-[#F0A500] rounded-md px-4 py-[7px] transition-colors hover:bg-[#F0A500] hover:text-[#1B2A4A]">Wszystkie og&#322;oszenia</Link>
-          <Link href="/o-nas" style={{ color: "rgba(255,255,255,0.8)", fontSize: "14px" }}>Poznaj Fidens</Link>
-          <a href="/kontakt" style={{ color: "rgba(255,255,255,0.8)", fontSize: "14px" }}>Kontakt</a>
+          <Link
+            href="/ogloszenia"
+            aria-current={onListings ? "page" : undefined}
+            className={
+              "nav-shine relative overflow-hidden text-[14px] font-semibold border border-[#F0A500] rounded-md px-4 py-[7px] transition-colors hover:bg-[#F0A500] hover:text-[#1B2A4A] " +
+              (onListings ? "bg-[#F0A500] text-[#1B2A4A]" : "text-[#F0A500]")
+            }
+          >
+            Wszystkie og&#322;oszenia
+          </Link>
+          <Link href="/o-nas" className="nav-link" aria-current={onAbout ? "page" : undefined}>Poznaj Fidens</Link>
+          <a href="/kontakt" className="nav-link" aria-current={onContact ? "page" : undefined}>Kontakt</a>
           <a
             href="/kontakt"
+            className="nav-cta"
             style={{ backgroundColor: "#F0A500", color: "#1B2A4A", padding: "8px 20px", borderRadius: "6px", fontWeight: "600", fontSize: "14px" }}
           >
             Zamów bezpłatną kalkulację
@@ -143,7 +172,7 @@ export default function Navbar() {
             </div>
 
             {/* Linki */}
-            <nav className="flex flex-col p-5 gap-1 flex-1">
+            <nav className="drawer-links flex flex-col p-5 gap-1 flex-1">
               <Link
                 href="/"
                 onClick={() => setIsMenuOpen(false)}
@@ -206,14 +235,94 @@ export default function Navbar() {
         :global(.animate-slideIn) {
           animation: slideIn 280ms ease-out;
         }
+
+        /* Linki w pasku: zmiana koloru po najechaniu */
+        :global(.nav-link) {
+          position: relative;
+          padding: 4px 0;
+          font-size: 14px;
+          color: rgba(255, 255, 255, 0.8);
+          transition: color 200ms;
+        }
+        :global(.nav-link:hover),
+        :global(.nav-link[aria-current="page"]) {
+          color: #ffffff;
+        }
+
+        /* Przycisk kalkulacji: lekkie uniesienie */
+        :global(.nav-cta) {
+          transition: transform 200ms, box-shadow 200ms;
+        }
+        :global(.nav-cta:hover) {
+          transform: translateY(-1px);
+          box-shadow: 0 6px 16px rgba(240, 165, 0, 0.35);
+        }
+
+        /* Przycisk "Wszystkie ogloszenia": blysk co kilka sekund */
+        @keyframes shine {
+          0%,
+          70% {
+            left: -60%;
+          }
+          100% {
+            left: 130%;
+          }
+        }
+        :global(.nav-shine)::after {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: -60%;
+          width: 40%;
+          height: 100%;
+          background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+          transform: skewX(-20deg);
+          animation: shine 6s ease-in-out infinite;
+          pointer-events: none;
+        }
+
+        /* Menu mobilne: linki wjezdzaja kolejno */
+        @keyframes linkIn {
+          from {
+            opacity: 0;
+            transform: translateX(14px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+        :global(.drawer-links) > :global(*) {
+          opacity: 0;
+          animation: linkIn 300ms ease-out forwards;
+        }
+        :global(.drawer-links) > :global(*:nth-child(1)) {
+          animation-delay: 80ms;
+        }
+        :global(.drawer-links) > :global(*:nth-child(2)) {
+          animation-delay: 130ms;
+        }
+        :global(.drawer-links) > :global(*:nth-child(3)) {
+          animation-delay: 180ms;
+        }
+        :global(.drawer-links) > :global(*:nth-child(4)) {
+          animation-delay: 230ms;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          :global(.nav-shine)::after {
+            display: none;
+          }
+          :global(.drawer-links) > :global(*) {
+            animation: none;
+            opacity: 1;
+          }
+          :global(.nav-cta),
+          :global(.nav-link) {
+            transition: none;
+          }
+        }
       `}</style>
     </>
   )
 }
-
-
-
-
-
-
-
