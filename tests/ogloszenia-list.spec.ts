@@ -15,7 +15,7 @@ test.describe("/ogloszenia - ekran kategorii", () => {
     await expect(kafelki.getByRole("link", { name: /Transport ci/ })).toBeVisible();
     await expect(kafelki.getByRole("link", { name: /Maszyny budowlane/ })).toBeVisible();
     await expect(kafelki.getByRole("link", { name: /Maszyny przemys/ })).toBeVisible();
-    await expect(kafelki.getByRole("link", { name: /Pawilony/ })).toBeVisible();
+    await expect(kafelki.getByRole("link", { name: /Domy modu.owe i pawilony/ })).toBeVisible();
   });
 
   test("klikniecie kafelka otwiera liste kategorii", async ({ page }) => {
@@ -27,7 +27,7 @@ test.describe("/ogloszenia - ekran kategorii", () => {
 
   test("kafelek Pawilony prowadzi do /pawilony", async ({ page }) => {
     await page.goto("/ogloszenia");
-    await page.locator("section").getByRole("link", { name: /Pawilony/ }).click();
+    await page.locator("section").getByRole("link", { name: /Domy modu.owe i pawilony/ }).click();
     await expect(page).toHaveURL(/\/pawilony/);
   });
 

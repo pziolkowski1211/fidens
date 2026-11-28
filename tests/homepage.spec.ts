@@ -33,4 +33,20 @@ test.describe("Strona glowna - hero", () => {
     await page.goto("/ogloszenia?kategoria=osobowe_dostawcze&wplata=50000")
     await expect(page.getByText(/Wp.ata w.asna/).first()).toBeVisible()
   })
+
+  test("kafelki kategorii pod hero", async ({ page }) => {
+    await page.goto("/")
+    const strip = page.getByRole("region", { name: "Kategorie ofert" })
+    await expect(strip.getByRole("link", { name: /Transport ci/ })).toHaveAttribute("href", /ciezki_transport/)
+    await expect(strip.getByRole("link", { name: /Domy modu.owe i pawilony/ })).toHaveAttribute("href", "/pawilony")
+    await expect(strip.getByRole("link").filter({ hasNotText: /Wszystkie/ })).toHaveCount(5)
+  })
+
+  test("sekcja FAQ rozwija odpowiedz", async ({ page }) => {
+    await page.goto("/")
+    const faq = page.getByRole("region", { name: /Najcz.stsze pytania/ })
+    await expect(faq.locator("details")).toHaveCount(7)
+    await faq.getByText(/Czy kalkulacja jest bezp.atna/).click()
+    await expect(faq.getByText(/nie wi.*koszta/)).toBeVisible()
+  })
 })

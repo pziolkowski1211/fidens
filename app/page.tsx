@@ -4,6 +4,8 @@ import Navbar from "./components/Navbar";
 import { createClient } from "@/lib/supabase/server";
 import { calculateShowcaseRate } from "@/lib/leasing/calculator";
 import HeroSearch, { type HeroListing } from "./components/HeroSearch";
+import CategoryStrip from "./components/CategoryStrip";
+import FaqSection from "./components/FaqSection";
 import { getActiveSlides } from "@/lib/config/hero-slides";
 
 interface FeaturedListing {
@@ -111,6 +113,9 @@ export default async function Home() {
 
       {/* HERO */}
       <HeroSearch slides={heroSlides} listings={heroListings} />
+
+      {/* KATEGORIE */}
+      <CategoryStrip />
 
       {/* OGŁOSZENIE TYGODNIA */}
       {featured && (
@@ -263,6 +268,9 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      {/* FAQ */}
+      <FaqSection />
 
       {/* STOPKA */}
       <footer className="px-4 sm:px-6 py-8 sm:py-10" style={{ backgroundColor: "#1B2A4A" }}>

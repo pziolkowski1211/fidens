@@ -26,6 +26,7 @@ interface CategoryInfo {
   metaDesc: string
   isMachine: boolean
   icon: IconName
+  image: string
 }
 
 interface ListingCard {
@@ -66,6 +67,7 @@ const CATEGORIES: CategoryInfo[] = [
     metaDesc: "Samochody osobowe i dostawcze do 3,5 t dost\u0119pne w leasingu i finansowaniu na Fidens.pl.",
     isMachine: false,
     icon: "car",
+    image: "/kategorie/osobowe.jpg",
   },
   {
     key: "ciezki_transport",
@@ -74,6 +76,7 @@ const CATEGORIES: CategoryInfo[] = [
     metaDesc: "Ci\u0105gniki siod\u0142owe, samochody ci\u0119\u017carowe i naczepy w leasingu i finansowaniu na Fidens.pl.",
     isMachine: false,
     icon: "truck",
+    image: "/kategorie/transport-ciezki.jpg",
   },
   {
     key: "maszyna",
@@ -82,6 +85,7 @@ const CATEGORIES: CategoryInfo[] = [
     metaDesc: "Koparki, \u0142adowarki i inne maszyny budowlane w leasingu i finansowaniu na Fidens.pl.",
     isMachine: true,
     icon: "excavator",
+    image: "/kategorie/maszyny-budowlane.jpg",
   },
   {
     key: "maszyna_przemyslowa",
@@ -90,6 +94,7 @@ const CATEGORIES: CategoryInfo[] = [
     metaDesc: "Nowe obrabiarki CNC, strugarki i maszyny do obr\u00f3bki drewna w leasingu i finansowaniu na Fidens.pl.",
     isMachine: true,
     icon: "cog",
+    image: "/kategorie/maszyny-przemyslowe.jpg",
   },
 ]
 
@@ -354,13 +359,15 @@ function KategorieEkran() {
       name: c.name,
       desc: c.desc,
       icon: c.icon,
+      image: c.image,
       cta: "Zobacz oferty",
     })),
     {
       href: "/pawilony",
-      name: "Pawilony",
+      name: "Domy modu\u0142owe i pawilony",
       desc: PAVILION_DESC,
       icon: "building" as IconName,
+      image: "/pawilony/pawilon-biurowy-24m2-8x3m/1.jpg",
       cta: "Zobacz pawilony",
     },
   ]
@@ -387,21 +394,37 @@ function KategorieEkran() {
               <Link
                 key={tile.href}
                 href={tile.href}
-                className={"group rounded-xl p-6 sm:p-7 flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-[#F0A500] " + TILE_LAYOUT[idx]}
+                className={"group rounded-xl overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-[#F0A500] " + TILE_LAYOUT[idx]}
                 style={{ backgroundColor: "#ffffff", border: "1px solid #e8eaed" }}
               >
+                <div className="relative aspect-[16/10] overflow-hidden" style={{ backgroundColor: "#1B2A4A" }}>
+                  <Image
+                    src={tile.image}
+                    alt=""
+                    fill
+                    sizes="(min-width: 1024px) 360px, (min-width: 640px) 50vw, 100vw"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div
+                    className="absolute inset-x-0 bottom-0 h-1/3"
+                    style={{ background: "linear-gradient(to top, rgba(27,42,74,0.55), transparent)" }}
+                    aria-hidden="true"
+                  />
+                </div>
                 <div
-                  className="w-14 h-14 rounded-full flex items-center justify-center mb-5 transition-transform duration-300 group-hover:scale-110"
+                  className="relative -mt-7 ml-6 w-14 h-14 rounded-full flex items-center justify-center border-4 border-white transition-transform duration-300 group-hover:scale-110"
                   style={{ backgroundColor: "#1B2A4A" }}
                 >
                   <CategoryIcon name={tile.icon} />
                 </div>
-                <div className="text-lg font-bold mb-2" style={{ color: "#1B2A4A" }}>{tile.name}</div>
-                <p className="text-sm leading-relaxed mb-5" style={{ color: "#666" }}>{tile.desc}</p>
-                <span className="mt-auto text-sm font-bold" style={{ color: "#1B2A4A" }}>
-                  {tile.cta}{" "}
-                  <span className="inline-block transition-transform duration-300 group-hover:translate-x-1" style={{ color: "#F0A500" }}>&rarr;</span>
-                </span>
+                <div className="flex flex-col flex-1 px-6 pb-6 pt-4 sm:px-7 sm:pb-7">
+                  <div className="text-lg font-bold mb-2" style={{ color: "#1B2A4A" }}>{tile.name}</div>
+                  <p className="text-sm leading-relaxed mb-5" style={{ color: "#666" }}>{tile.desc}</p>
+                  <span className="mt-auto text-sm font-bold" style={{ color: "#1B2A4A" }}>
+                    {tile.cta}{" "}
+                    <span className="inline-block transition-transform duration-300 group-hover:translate-x-1" style={{ color: "#F0A500" }}>&rarr;</span>
+                  </span>
+                </div>
               </Link>
             ))}
           </div>
